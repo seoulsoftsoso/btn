@@ -1,0 +1,711 @@
+{% load static %}
+<div class="layout-container layout-content-navbar">
+    <!-- Menu -->
+    <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+        <div class="app-brand demo">
+            <a href="/landing/user" class="app-brand-link">
+                <span class="app-brand-logo demo">
+                    <svg width="173"
+                         height="169"
+                         viewBox="0 0 173 169"
+                         fill="none"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M146.914 106.19C131.02 141.46 94.3506 167.539 55.9688 167.935C101.92 169.74 160.221 165.605 170.783 137.343C175.94 123.549 166.538 112.673 146.914 106.2V106.19Z" fill="#A0765F" />
+                        <path d="M99.8774 0.004398C53.5116 0.483251 9.63212 38.46 1.87839 84.8258C-5.87534 131.192 25.4251 168.395 71.7909 167.925C110.164 167.529 146.833 141.45 162.736 106.181C166.051 98.8323 168.455 91.0969 169.79 83.1038C177.544 36.7379 146.243 -0.465246 99.8774 0.004398Z" fill="#EAEA73" />
+                    </svg>
+                </span>
+                <span class="app-brand-text demo menu-text fw-bold ms-2">Button</span>
+            </a>
+            <a class="layout-menu-toggle menu-link text-large ms-auto">
+                <i class="bx bx-chevron-left bx-sm align-middle">
+                </i>
+            </a>
+        </div>
+        <div class="menu-inner-shadow"></div>
+        <ul class="menu-inner py-1">
+            <!-- Dashboards -->
+            <li class="menu-header small text-uppercase fs-4">
+                <span class="menu-header-text">데이터</span>
+            </li>
+            <li class="menu-item {% if request.resolver_match.route|slice:":6" == 'users/' %}active open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-user"></i>
+                    <div class="text-truncate" data-i18n="사용자 관리">사용자 관리</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {% if request.resolver_match.url_name == 'user_manage' %}active{% endif %}">
+                        <a href='/user/manage' class="menu-link">
+                            <div class="text-truncate">사용자 관리</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'part' %}active{% endif %}">
+                        <a href="/user/part" class="menu-link">
+                            <div class="text-truncate">사용자 계정관리</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item {% if request.resolver_match.route|slice:":5" == 'data/' %}active open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div class="text-truncate">재배동</div>
+                    <span class="badge badge-center rounded-pill bg-danger ms-auto">5</span>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {% if request.resolver_match.url_name == 'deviceControl' %}active{% endif %}">
+                        <a href="/device/control" class="menu-link">
+                            <div class="text-truncate">재배동 관리</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'deviceExplain' %}active{% endif %}">
+                        <a href="/device/explain" class="menu-link">
+                            <div class="text-truncate">재배동 상세</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item {% if request.resolver_match.route|slice:":6" == 'order/' %}active open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-cart"></i>
+                    <div class="text-truncate">주문관리</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {% if request.resolver_match.url_name == 'delivery' %}active{% endif %}">
+                        <a href="/order/delivery" class="menu-link">
+                            <div class="text-truncate">주문 조회/등록</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'build' %}active{% endif %}">
+                        <a href="/order/build" class="menu-link">
+                            <div class="text-truncate">주문 상세/설계</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'item' %}active{% endif %}">
+                        <a href="/order/item" class="menu-link">
+                            <div class="text-truncate">품목정보 관리</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!-- Layouts -->
+            <li class="menu-item {% if request.resolver_match.route|slice:":7" == 'manage/' %}active open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-calendar"></i>
+                    <div class="text-truncate">재배일자 관리</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {% if request.resolver_match.url_name == 'auto' %}active{% endif %}">
+                        <a href="/manage/auto" class="menu-link">
+                            <div class="text-truncate" data-i18n="자동재배 관리">자동재배 관리</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!-- Layouts -->
+            <li class="menu-item {% if request.resolver_match.route|slice:":10" == 'breakDown/' %}active open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-error"></i>
+                    <div class="text-truncate" data-i18n="고장식별 기준관리">고장식별 기준관리</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {% if request.resolver_match.url_name == 'controlError' %}active{% endif %}">
+                        <a href="/breakdown/control" class="menu-link">
+                            <div class="text-truncate">제어장비</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'collectError' %}active{% endif %}">
+                        <a href="/breakdown/collect" class="menu-link">
+                            <div class="text-truncate">수집장비</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!-- Front Pages -->
+            <li class="menu-item {% if request.resolver_match.route|slice:":8" == 'harvest/' %}active open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-store"></i>
+                    <div class="text-truncate" data-i18n="재배가이드 관리">재배가이드 관리</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {% if request.resolver_match.url_name == 'Manual' %}active{% endif %}">
+                        <a href="/harvest/manual" class="menu-link">
+                            <div class="text-truncate" data-i18n="메뉴얼 관리">메뉴얼 관리</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'FAQ' %}active{% endif %}">
+                        <a href="/harvest/faq" class="menu-link">
+                            <div class="text-truncate" data-i18n="문의, FAQ 관리">문의, FAQ 관리</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'Info' %}active{% endif %}">
+                        <a href="/harvest/info" class="menu-link">
+                            <div class="text-truncate" data-i18n="공지사항 관리">공지사항 관리</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!-- e-commerce-app menu end -->
+            <!-- Academy menu start -->
+            <li class="menu-item {% if request.resolver_match.route|slice:":6" == 'alarm/' %}active open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-book-open"></i>
+                    <div class="text-truncate" data-i18n="알림 관리">알림 관리</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {% if request.resolver_match.url_name == 'control' %}active{% endif %}">
+                        <a href="/alram/control" class="menu-link">
+                            <div class="text-truncate" data-i18n="제어 알림 관리">제어 알림 관리</div>
+                            <span class="badge badge-center rounded-pill bg-danger ms-auto">5</span>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'Contact' %}active{% endif %}">
+                        <a href="/alram/contact" class="menu-link">
+                            <div class="text-truncate" data-i18n="고객센터 알림관리">고객센터 알림관리</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if request.resolver_match.url_name == 'etc' %}active{% endif %}">
+                        <a href="/alram/etc" class="menu-link">
+                            <div class="text-truncate" data-i18n="기타 알림관리">기타 알림관리</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
+    <!-- / Menu -->
+    <!-- Layout container -->
+    <div class="layout-page">
+        <!-- Navbar -->
+        <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+             id="layout-navbar">
+            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                    <i class="bx bx-menu bx-sm"></i>
+                </a>
+            </div>
+            <div class="navbar-nav-right d-flex align-items-center"
+                 id="navbar-collapse">
+                <!-- Search -->
+                <div class="navbar-nav align-items-center">
+                    <div class="nav-item navbar-search-wrapper mb-0">
+                        <a class="nav-item nav-link r px-0" href="javascript:void(0);">
+                            <i class="bx bx-search bx-sm"></i>
+                            <span id="menuTitle" class="d-none d-md-inline-block text-muted">{{ request.resolver_match.url_name }}</span>
+                        </a>
+                    </div>
+                </div>
+                <!-- /Search -->
+                <ul class="navbar-nav flex-row align-items-center ms-auto">
+                    <!-- Language -->
+                    <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
+                        <a class="nav-link dropdown-toggle hide-arrow"
+                           href="javascript:void(0);"
+                           data-bs-toggle="dropdown">
+                            <i class="bx bx-globe bx-sm"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item active"
+                                   href="javascript:void(0);"
+                                   data-language="en"
+                                   data-text-direction="ltr">
+                                    <span class="align-middle">English</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   href="javascript:void(0);"
+                                   data-language="fr"
+                                   data-text-direction="ltr">
+                                    <span class="align-middle">French</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   href="javascript:void(0);"
+                                   data-language="ar"
+                                   data-text-direction="rtl">
+                                    <span class="align-middle">Arabic</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   href="javascript:void(0);"
+                                   data-language="de"
+                                   data-text-direction="ltr">
+                                    <span class="align-middle">German</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- /Language -->
+                    <!-- Quick links -->
+                    <li class="nav-item dropdown-shortcuts navbar-dropdown dropdown me-2 me-xl-0">
+                        <a class="nav-link dropdown-toggle hide-arrow"
+                           href="javascript:void(0);"
+                           data-bs-toggle="dropdown"
+                           data-bs-auto-close="outside"
+                           aria-expanded="false">
+                            <i class="bx bx-grid-alt bx-sm"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end py-0">
+                            <div class="dropdown-menu-header border-bottom">
+                                <div class="dropdown-header d-flex align-items-center py-3">
+                                    <h5 class="text-body mb-0 me-auto">Shortcuts</h5>
+                                    <a href="javascript:void(0)"
+                                       class="dropdown-shortcuts-add text-body"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       aria-label="Add shortcuts"
+                                       data-bs-original-title="Add shortcuts">
+                                        <i class="bx bx-sm bx-plus-circle"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="dropdown-shortcuts-list scrollable-container ps">
+                                <div class="row row-bordered overflow-visible g-0">
+                                    <div class="dropdown-shortcuts-item col">
+                                        <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                                            <i class="bx bx-calendar fs-4"></i>
+                                        </span>
+                                        <a href="app-calendar.html" class="stretched-link">Calendar</a>
+                                        <small class="text-muted mb-0">Appointments</small>
+                                    </div>
+                                    <div class="dropdown-shortcuts-item col">
+                                        <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                                            <i class="bx bx-food-menu fs-4"></i>
+                                        </span>
+                                        <a href="app-invoice-list.html" class="stretched-link">Invoice App</a>
+                                        <small class="text-muted mb-0">Manage Accounts</small>
+                                    </div>
+                                </div>
+                                <div class="row row-bordered overflow-visible g-0">
+                                    <div class="dropdown-shortcuts-item col">
+                                        <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                                            <i class="bx bx-user fs-4"></i>
+                                        </span>
+                                        <a href="app-user-list.html" class="stretched-link">User App</a>
+                                        <small class="text-muted mb-0">Manage Users</small>
+                                    </div>
+                                    <div class="dropdown-shortcuts-item col">
+                                        <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                                            <i class="bx bx-check-shield fs-4"></i>
+                                        </span>
+                                        <a href="app-access-roles.html" class="stretched-link">Role Management</a>
+                                        <small class="text-muted mb-0">Permission</small>
+                                    </div>
+                                </div>
+                                <div class="row row-bordered overflow-visible g-0">
+                                    <div class="dropdown-shortcuts-item col">
+                                        <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                                            <i class="bx bx-pie-chart-alt-2 fs-4"></i>
+                                        </span>
+                                        <a href="index.html" class="stretched-link">Dashboard</a>
+                                        <small class="text-muted mb-0">User Profile</small>
+                                    </div>
+                                    <div class="dropdown-shortcuts-item col">
+                                        <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                                            <i class="bx bx-cog fs-4"></i>
+                                        </span>
+                                        <a href="pages-account-settings-account.html" class="stretched-link">Setting</a>
+                                        <small class="text-muted mb-0">Account Settings</small>
+                                    </div>
+                                </div>
+                                <div class="row row-bordered overflow-visible g-0">
+                                    <div class="dropdown-shortcuts-item col">
+                                        <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                                            <i class="bx bx-help-circle fs-4"></i>
+                                        </span>
+                                        <a href="pages-faq.html" class="stretched-link">FAQs</a>
+                                        <small class="text-muted mb-0">FAQs &amp; Articles</small>
+                                    </div>
+                                    <div class="dropdown-shortcuts-item col">
+                                        <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                                            <i class="bx bx-window-open fs-4"></i>
+                                        </span>
+                                        <a href="modal-examples.html" class="stretched-link">Modals</a>
+                                        <small class="text-muted mb-0">Useful Popups</small>
+                                    </div>
+                                </div>
+                                <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                                    <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                                </div>
+                                <div class="ps__rail-y" style="top: 0px; right: 0px;">
+                                    <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Quick links -->
+                    <!-- Style Switcher -->
+                    <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
+                        <a class="nav-link dropdown-toggle hide-arrow"
+                           href="javascript:void(0);"
+                           data-bs-toggle="dropdown">
+                            <i class="bx bx-sm bx-sun"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0);" data-theme="light">
+                                    <span class="align-middle">
+                                        <i class="bx bx-sun me-2"></i>Light</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0);" data-theme="dark">
+                                    <span class="align-middle">
+                                        <i class="bx bx-moon me-2"></i>Dark</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0);" data-theme="system">
+                                    <span class="align-middle">
+                                        <i class="bx bx-desktop me-2"></i>System</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- / Style Switcher-->
+                    <!-- Notification -->
+                    <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+                        <a class="nav-link dropdown-toggle hide-arrow"
+                           href="javascript:void(0);"
+                           data-bs-toggle="dropdown"
+                           data-bs-auto-close="outside"
+                           aria-expanded="false">
+                            <i class="bx bx-bell bx-sm"></i>
+                            <span class="badge bg-danger rounded-pill badge-notifications">5</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end py-0">
+                            <li class="dropdown-menu-header border-bottom">
+                                <div class="dropdown-header d-flex align-items-center py-3">
+                                    <h5 class="text-body mb-0 me-auto">Notification</h5>
+                                    <a href="javascript:void(0)"
+                                       class="dropdown-notifications-all text-body"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       aria-label="Mark all as read"
+                                       data-bs-original-title="Mark all as read">
+                                        <i class="bx fs-4 bx-envelope-open"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            <li class="dropdown-notifications-list scrollable-container ps">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <img src="{% static '/assets/img/avatars/1.png' %}"
+                                                         alt=""
+                                                         class="w-px-40 h-auto rounded-circle">
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Congratulation Lettie 🎉</h6>
+                                                <p class="mb-0">Won the monthly best seller gold badge</p>
+                                                <small class="text-muted">1h ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <span class="avatar-initial rounded-circle bg-label-danger">CF</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Charles Franklin</h6>
+                                                <p class="mb-0">Accepted your connection</p>
+                                                <small class="text-muted">12hr ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <img src="{% static '/assets/img/avatars/2.png' %}"
+                                                         alt=""
+                                                         class="w-px-40 h-auto rounded-circle">
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">New Message ✉️</h6>
+                                                <p class="mb-0">You have new message from Natalie</p>
+                                                <small class="text-muted">1h ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <span class="avatar-initial rounded-circle bg-label-success">
+                                                        <i class="bx bx-cart"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Whoo! You have new order 🛒</h6>
+                                                <p class="mb-0">ACME Inc. made new order $1,154</p>
+                                                <small class="text-muted">1 day ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <img src="{% static '/assets/img/avatars/9.png' %}"
+                                                         alt=""
+                                                         class="w-px-40 h-auto rounded-circle">
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Application has been approved 🚀</h6>
+                                                <p class="mb-0">Your ABC project application has been approved.</p>
+                                                <small class="text-muted">2 days ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <span class="avatar-initial rounded-circle bg-label-success">
+                                                        <i class="bx bx-pie-chart-alt"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Monthly report is generated</h6>
+                                                <p class="mb-0">July monthly financial report is generated</p>
+                                                <small class="text-muted">3 days ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <img src="{% static '/assets/img/avatars/5.png' %}"
+                                                         alt=""
+                                                         class="w-px-40 h-auto rounded-circle">
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Send connection request</h6>
+                                                <p class="mb-0">Peter sent you connection request</p>
+                                                <small class="text-muted">4 days ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <img src="{% static '/assets/img/avatars/6.png' %}"
+                                                         alt=""
+                                                         class="w-px-40 h-auto rounded-circle">
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">New message from Jane</h6>
+                                                <p class="mb-0">Your have new message from Jane</p>
+                                                <small class="text-muted">5 days ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar">
+                                                    <span class="avatar-initial rounded-circle bg-label-warning">
+                                                        <i class="bx bx-error"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">CPU is running high</h6>
+                                                <p class="mb-0">CPU Utilization Percent is currently at 88.63%,</p>
+                                                <small class="text-muted">5 days ago</small>
+                                            </div>
+                                            <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                <a href="javascript:void(0)" class="dropdown-notifications-read">
+                                                    <span class="badge badge-dot"></span></a>
+                                                <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                                                    <span class="bx bx-x"></span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                                    <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                                </div>
+                                <div class="ps__rail-y" style="top: 0px; right: 0px;">
+                                    <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
+                                </div>
+                            </li>
+                            <li class="dropdown-menu-footer border-top p-3">
+                                <button class="btn btn-primary text-uppercase w-100">view all notifications</button>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--/ Notification -->
+                    <!-- User -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                            <a class="nav-link dropdown-toggle hide-arrow"
+                               href="javascript:void(0);"
+                               data-bs-toggle="dropdown">
+                                <div class="avatar avatar-online">
+                                    <img src="{% static '/assets/img/avatars/1.png' %}"
+                                         alt=""
+                                         class="w-px-40 h-auto rounded-circle">
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="pages-account-settings-account.html">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar avatar-online">
+                                                    <img src="{% static '/assets/img/avatars/1.png' %}"
+                                                         alt=""
+                                                         class="w-px-40 h-auto rounded-circle">
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <span class="fw-medium d-block">John Doe</span>
+                                                <small class="text-muted">Admin</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="dropdown-divider"></div>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="pages-profile-user.html">
+                                        <i class="bx bx-user me-2"></i>
+                                        <span class="align-middle">My Profile</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="pages-account-settings-account.html">
+                                        <i class="bx bx-cog me-2"></i>
+                                        <span class="align-middle">Settings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="pages-account-settings-billing.html">
+                                        <span class="d-flex align-items-center align-middle">
+                                            <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
+                                            <span class="flex-grow-1 align-middle">Billing</span>
+                                            <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="dropdown-divider"></div>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="pages-faq.html">
+                                        <i class="bx bx-help-circle me-2"></i>
+                                        <span class="align-middle">FAQ</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="pages-pricing.html">
+                                        <i class="bx bx-dollar me-2"></i>
+                                        <span class="align-middle">Pricing</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="dropdown-divider"></div>
+                                </li>
+                                <li>
+                                    <form action="/auth/logout"  method="post">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item" type="submit">
+                                            <i class="bx bx-power-off me-2"></i>
+                                            <span class="align-middle">Log Out</span>
+                                        </button>
+                                    </form>
+                                    
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a href="/auth/login/" class="nav-link">
+                                <i class="bx bx-log-in bx-sm"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <!--/ User -->
+                </ul>
+            </div>
+            <!-- Search Small Screens -->
+            <div class="navbar-search-wrapper search-input-wrapper d-none">
+                <input type="text"
+                       class="form-control search-input container-xxl border-0"
+                       placeholder="{{ request.resolver_match.url_name }}">
+                <i class="bx bx-x bx-sm search-toggler cursor-pointer"></i>
+            </div>
+        </nav>
+        <!-- / Navbar -->
+        <!-- Content wrapper -->
+        <div class="content-wrapper">
+            <div class="container-xxl flex-grow-1 container-p-y">
+                <!-- Content -->

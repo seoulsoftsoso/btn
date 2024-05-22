@@ -1,0 +1,1169 @@
+{% include "header.html" %}
+{% include 'menu.html' %}
+{% load static %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+        <div class="d-flex flex-column justify-content-center">
+            <h5 class="mb-1 mt-3">
+                order # {{ order }}
+                <span class="badge bg-label-success me-2 ms-2">Paid</span>
+                <span class="badge bg-label-info">Ready to Pickup</span>
+            </h5>
+            <p class="text-body">
+                Aug 17,
+                <span id="orderYear"></span>, 5:48 (ET)
+            </p>
+        </div>
+        <div class="d-flex align-content-center flex-wrap gap-2">
+            <button class="btn btn-label-danger delete-order">Delete Order</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card mb-4">
+                <!-- Checkbox -->
+                <div class="col-12">
+                    <div class="card mb-md-0 mb-4">
+                        <h5 class="card-header">
+                            <div class="d-flex align-content-center justify-content-between flex-wrap gap-2">
+                                <div class="ml-auto align-content-center">제품 설계도</div>
+                                <div class="d-flex align-content-center gap-2">
+                                    <button class="btn btn-outline-success add-container">
+                                        <i class="bx bx-cog"></i>&nbsp; 컨테이너 추가
+                                    </button>
+                                </div>
+                            </div>
+                        </h5>
+                        <div class="card-body">
+                            <div id="jstree-checkbox"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Checkbox -->
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h5>제품</h5>
+                    </div>
+                </div>
+                <div class="card-datatable table-responsive">
+                    <table class="datatables-order-details table">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th class="w-50">products</th>
+                            <th class="w-25">price</th>
+                            <th class="w-25">qty</th>
+                            <th>total</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="d-flex justify-content-end align-items-center m-3 mb-2 p-1">
+                        <div class="order-calculations">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="w-px-100">Subtotal:</span>
+                                <span class="text-heading">$6398</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="w-px-100">Discount:</span>
+                                <span class="text-heading mb-0">$22</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="w-px-100">Tax:</span>
+                                <span class="text-heading">$30</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <h6 class="w-px-100 mb-0">Total:</h6>
+                                <h6 class="mb-0">$6450</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class='ml-auto d-flex justify-content-end gap-2'>
+                        <button class="btn btn-outline-success add-item" id="add-item">
+                            <i class="bx bx-cog"></i>&nbsp; 제품 추가
+                        </button>
+                        <button class="btn btn-outline-info " id="edit-item">
+                            <i class="bx bx-edit"></i>&nbsp; 제품 수정
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title m-0">주문상황</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="timeline pb-0 mb-0">
+                        <li class="timeline-item timeline-item-transparent border-primary">
+                            <span class="timeline-point-wrapper">
+                                <span class="timeline-point timeline-point-primary"></span></span>
+                            <div class="timeline-event">
+                                <div class="timeline-header">
+                                    <h6 class="mb-0">주문이 완료되었습니다 (주문 ID: #32543)</h6>
+                                    <span class="text-muted">목요일 11:29 오전</span>
+                                </div>
+                                <p class="mt-2"></p>
+                            </div>
+                        </li>
+                        <li class="timeline-item timeline-item-transparent border-primary">
+                                <span class="timeline-point-wrapper">
+                                    <span class="timeline-point timeline-point-primary"></span></span>
+                            <div class="timeline-event">
+                                <div class="timeline-header">
+                                    <h6 class="mb-0">픽업</h6>
+                                    <span class="text-muted"></span>
+                                </div>
+                                <p class="mt-2"></p>
+                            </div>
+                        </li>
+                        <li class="timeline-item timeline-item-transparent border-primary">
+                                    <span class="timeline-point-wrapper">
+                                        <span class="timeline-point timeline-point-primary"></span></span>
+                            <div class="timeline-event">
+                                <div class="timeline-header">
+                                    <h6 class="mb-0">발송됨</h6>
+                                    <span class="text-muted"></span>
+                                </div>
+                                <p class="mt-2"></p>
+                            </div>
+                        </li>
+                        <li class="timeline-item timeline-item-transparent border-primary">
+                                        <span class="timeline-point-wrapper">
+                                            <span class="timeline-point timeline-point-primary"></span></span>
+                            <div class="timeline-event">
+                                <div class="timeline-header">
+                                    <h6 class="mb-0">패키지 도착</h6>
+                                    <span class="text-muted"></span>
+                                </div>
+                                <p class="mt-2"></p>
+                            </div>
+                        </li>
+                        <li class="timeline-item timeline-item-transparent border-left-dashed">
+                                            <span class="timeline-point-wrapper">
+                                                <span class="timeline-point timeline-point-primary"></span></span>
+                            <div class="timeline-event">
+                                <div class="timeline-header">
+                                    <h6 class="mb-0">배송을 위해 발송됨(예정)</h6>
+                                    <span class="text-muted"></span>
+                                </div>
+                                <p class="mt-2"></p>
+                            </div>
+                        </li>
+                        <li class="timeline-item timeline-item-transparent border-transparent pb-0">
+                                                <span class="timeline-point-wrapper">
+                                                    <span class="timeline-point timeline-point-secondary"></span></span>
+                            <div class="timeline-event pb-0">
+                                <div class="timeline-header">
+                                    <h6 class="mb-0">배송</h6>
+                                </div>
+                                <p class="mt-2 mb-0">패키지는 내일 배달될 예정입니다</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card mb-4 h-50">
+                <div class="card-header">
+                    <h5 class="card-title m-0">배치도</h5>
+                </div>
+                <div class="card-body">
+                    <img src="{% static 'assets/img/front-pages/misc/nav-item-col-img.png' %}"
+                         class="card-img-top p-1"
+                         alt="...">
+                </div>
+                <div class="card-footer">
+                    <div class="ml-auto d-flex justify-content-end">
+                        <button class="btn btn-outline-success" id="submit-order">
+                            <i class="bx bx-upload"></i>&nbsp; 의뢰
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUser" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3>Edit User Information</h3>
+                    <p>Updating user details will receive a privacy audit.</p>
+                </div>
+                <form id="editUserForm" class="row g-3" onsubmit="return false">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalEditUserFirstName">First Name</label>
+                        <input type="text"
+                               id="modalEditUserFirstName"
+                               name="modalEditUserFirstName"
+                               class="form-control"
+                               placeholder="John"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalEditUserLastName">Last Name</label>
+                        <input type="text"
+                               id="modalEditUserLastName"
+                               name="modalEditUserLastName"
+                               class="form-control"
+                               placeholder="Doe"/>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="modalEditUserName">Username</label>
+                        <input type="text"
+                               id="modalEditUserName"
+                               name="modalEditUserName"
+                               class="form-control"
+                               placeholder="john.doe.007"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalEditUserEmail">Email</label>
+                        <input type="text"
+                               id="modalEditUserEmail"
+                               name="modalEditUserEmail"
+                               class="form-control"
+                               placeholder="example@domain.com"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalEditUserStatus">Status</label>
+                        <select id="modalEditUserStatus"
+                                name="modalEditUserStatus"
+                                class="form-select"
+                                aria-label="Default select example">
+                            <option selected="selected">Status</option>
+                            <option value="1">Active</option>
+                            <option value="2">Inactive</option>
+                            <option value="3">Suspended</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalEditTaxID">Tax ID</label>
+                        <input type="text"
+                               id="modalEditTaxID"
+                               name="modalEditTaxID"
+                               class="form-control modal-edit-tax-id"
+                               placeholder="123 456 7890"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalEditUserPhone">Phone Number</label>
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text">+1</span>
+                            <input type="text"
+                                   id="modalEditUserPhone"
+                                   name="modalEditUserPhone"
+                                   class="form-control phone-number-mask"
+                                   placeholder="202 555 0111"/>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalEditUserLanguage">Language</label>
+                        <select id="modalEditUserLanguage"
+                                name="modalEditUserLanguage"
+                                class="select2 form-select"
+                                multiple="multiple">
+                            <option value="">Select</option>
+                            <option value="english" selected="selected">English</option>
+                            <option value="spanish">Spanish</option>
+                            <option value="french">French</option>
+                            <option value="german">German</option>
+                            <option value="dutch">Dutch</option>
+                            <option value="hebrew">Hebrew</option>
+                            <option value="sanskrit">Sanskrit</option>
+                            <option value="hindi">Hindi</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalEditUserCountry">Country</label>
+                        <select id="modalEditUserCountry"
+                                name="modalEditUserCountry"
+                                class="select2 form-select"
+                                data-allow-clear="true">
+                            <option value="">Select</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Bangladesh">Bangladesh</option>
+                            <option value="Belarus">Belarus</option>
+                            <option value="Brazil">Brazil</option>
+                            <option value="Canada">Canada</option>
+                            <option value="China">China</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="India">India</option>
+                            <option value="Indonesia">Indonesia</option>
+                            <option value="Israel">Israel</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Japan">Japan</option>
+                            <option value="Korea">Korea, Republic of</option>
+                            <option value="Mexico">Mexico</option>
+                            <option value="Philippines">Philippines</option>
+                            <option value="Russia">Russian Federation</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="Thailand">Thailand</option>
+                            <option value="Turkey">Turkey</option>
+                            <option value="Ukraine">Ukraine</option>
+                            <option value="United Arab Emirates">United Arab Emirates</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="United States">United States</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="switch">
+                            <input type="checkbox" class="switch-input"/>
+                            <span class="switch-toggle-slider">
+                                                        <span class="switch-on"></span>
+                                                        <span class="switch-off"></span>
+                                                    </span>
+                            <span class="switch-label">Use as a billing address?</span>
+                        </label>
+                    </div>
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
+                        <button type="reset"
+                                class="btn btn-label-secondary"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Edit User Modal -->
+<!-- Add New Address Modal -->
+<div class="modal fade"
+     id="addNewAddress"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-add-new-address">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3 class="address-title">Add New Address</h3>
+                    <p class="address-subtitle">Add new address for express delivery</p>
+                </div>
+                <form id="addNewAddressForm" class="row g-3" onsubmit="return false">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-md mb-md-0 mb-3">
+                                <div class="form-check custom-option custom-option-icon">
+                                    <label class="form-check-label custom-option-content" for="customRadioHome">
+                                                                <span class="custom-option-body">
+                                                                    <i class="bx bx-home"></i>
+                                                                    <span class="custom-option-title">Home</span>
+                                                                    <small>Delivery time (9am – 9pm)</small>
+                                                                </span>
+                                        <input name="customRadioIcon"
+                                               class="form-check-input"
+                                               type="radio"
+                                               value=""
+                                               id="customRadioHome"
+                                               checked="checked"/>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md mb-md-0 mb-3">
+                                <div class="form-check custom-option custom-option-icon">
+                                    <label class="form-check-label custom-option-content"
+                                           for="customRadioOffice">
+                                                                <span class="custom-option-body">
+                                                                    <i class="bx bx-briefcase"></i>
+                                                                    <span class="custom-option-title">Office</span>
+                                                                    <small>Delivery time (9am – 5pm)</small>
+                                                                </span>
+                                        <input name="customRadioIcon"
+                                               class="form-check-input"
+                                               type="radio"
+                                               value=""
+                                               id="customRadioOffice"/>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalAddressFirstName">First Name</label>
+                        <input type="text"
+                               id="modalAddressFirstName"
+                               name="modalAddressFirstName"
+                               class="form-control"
+                               placeholder="John"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalAddressLastName">Last Name</label>
+                        <input type="text"
+                               id="modalAddressLastName"
+                               name="modalAddressLastName"
+                               class="form-control"
+                               placeholder="Doe"/>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="modalAddressCountry">Country</label>
+                        <select id="modalAddressCountry"
+                                name="modalAddressCountry"
+                                class="select2 form-select"
+                                data-allow-clear="true">
+                            <option value="">Select</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Bangladesh">Bangladesh</option>
+                            <option value="Belarus">Belarus</option>
+                            <option value="Brazil">Brazil</option>
+                            <option value="Canada">Canada</option>
+                            <option value="China">China</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="India">India</option>
+                            <option value="Indonesia">Indonesia</option>
+                            <option value="Israel">Israel</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Japan">Japan</option>
+                            <option value="Korea">Korea, Republic of</option>
+                            <option value="Mexico">Mexico</option>
+                            <option value="Philippines">Philippines</option>
+                            <option value="Russia">Russian Federation</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="Thailand">Thailand</option>
+                            <option value="Turkey">Turkey</option>
+                            <option value="Ukraine">Ukraine</option>
+                            <option value="United Arab Emirates">United Arab Emirates</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="United States">United States</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="modalAddressAddress1">Address Line 1</label>
+                        <input type="text"
+                               id="modalAddressAddress1"
+                               name="modalAddressAddress1"
+                               class="form-control"
+                               placeholder="12, Business Park"/>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="modalAddressAddress2">Address Line 2</label>
+                        <input type="text"
+                               id="modalAddressAddress2"
+                               name="modalAddressAddress2"
+                               class="form-control"
+                               placeholder="Mall Road"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalAddressLandmark">Landmark</label>
+                        <input type="text"
+                               id="modalAddressLandmark"
+                               name="modalAddressLandmark"
+                               class="form-control"
+                               placeholder="Nr. Hard Rock Cafe"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalAddressCity">City</label>
+                        <input type="text"
+                               id="modalAddressCity"
+                               name="modalAddressCity"
+                               class="form-control"
+                               placeholder="Los Angeles"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalAddressLandmark">State</label>
+                        <input type="text"
+                               id="modalAddressState"
+                               name="modalAddressState"
+                               class="form-control"
+                               placeholder="California"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modalAddressZipCode">Zip Code</label>
+                        <input type="text"
+                               id="modalAddressZipCode"
+                               name="modalAddressZipCode"
+                               class="form-control"
+                               placeholder="99950"/>
+                    </div>
+                    <div class="col-12">
+                        <label class="switch">
+                            <input type="checkbox" class="switch-input"/>
+                            <span class="switch-toggle-slider">
+                                                        <span class="switch-on"></span>
+                                                        <span class="switch-off"></span>
+                                                    </span>
+                            <span class="switch-label">Use as a billing address?</span>
+                        </label>
+                    </div>
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
+                        <button type="reset"
+                                class="btn btn-label-secondary"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Add New Address Modal -->
+</div>
+<!-- / Content -->
+<!-- Footer -->
+<footer class="content-footer footer bg-footer-theme">
+    <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+        <div class="mb-2 mb-md-0">
+            ©
+            <script>document.write(new Date().getFullYear());</script>
+            , made with ❤️ by
+            <a href="https://themeselection.com"
+               target="_blank"
+               class="footer-link fw-medium">ThemeSelection</a>
+        </div>
+        <div class="d-none d-lg-inline-block">
+            <a href="https://themeselection.com/license/"
+               class="footer-link me-4"
+               target="_blank">License</a>
+            <a href="https://themeselection.com/"
+               target="_blank"
+               class="footer-link me-4">More Themes</a>
+            <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/documentation/"
+               target="_blank"
+               class="footer-link me-4">Documentation</a>
+            <a href="https://themeselection.com/support/"
+               target="_blank"
+               class="footer-link d-none d-sm-inline-block">Support</a>
+        </div>
+    </div>
+</footer>
+<div class="offcanvas offcanvas-end" id="add-new-record">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="exampleModalLabel">주문 등록</h5>
+        <button type="button"
+                class="btn-close text-reset"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body flex-grow-1">
+        <form class="add-new-record pt-0 row g-2" id="form-add-new-record">
+            <div class="col-12">
+                <label class="form-label" for="item">아이템</label>
+                <select id="item"
+                        class="select2 form-select"
+                        name="bom_id"
+                        data-allow-clear="true"
+                        aria-label="Select item">
+                </select>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <label class="form-label" for="order_cnt">주문수량</label>
+                <input type="number"
+                       id="order_cnt"
+                       name="order_cnt"
+                       class="form-control"
+                       placeholder="품목을 선택해 주세요"
+                       aria-label="품목을 선택해 주세요"
+                       disabled="disabled"/>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <label class="form-label" for="price">공급가</label>
+                <div class="input-group input-group-merge">
+                                        <span id="price2" class="input-group-text">
+                                            <i class="bx bx-dollar"></i>
+                                        </span>
+                    <input type="number"
+                           id="price"
+                           name="price"
+                           class="form-control dt-salary"
+                           placeholder="Enter supply price"
+                           aria-label="Enter supply price"
+                           aria-describedby="price2"/>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <label class="form-label" for="tax">부가세</label>
+                <input type="number"
+                       id="tax"
+                       name="tax"
+                       class="form-control"
+                       placeholder="Enter tax"
+                       readonly="readonly"/>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <label class="form-label" for="order_total">합계</label>
+                <div class="input-group input-group-merge">
+                                        <span id="order_total2" class="input-group-text">
+                                            <i class="bx bx-dollar"></i>
+                                        </span>
+                    <input type="number"
+                           id="order_total"
+                           name="order_total"
+                           class="form-control dt-salary"
+                           readonly="readonly"/>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <label class="form-label" for="comment">비고</label>
+                <input id="comment"
+                       name="comment"
+                       class="form-control"
+                       rows="3"
+                       placeholder="Enter comment"
+                       aria-label="Enter comment"/>
+            </div>
+            <div class="col-sm-12 mt-3" id="formButton">
+                <button class="btn btn-primary data-submit me-sm-3 me-1" id="plus-item">추가</button>
+                <button type="reset" class="btn btn-outline-info" data-bs-dismiss="offcanvas">초기화</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="content-backdrop fade"></div>
+<script>
+
+    let tree = []
+    $(document).ready( function () {
+
+        function getBomTree () {
+            let order_id = window.location.href.split('/').pop().split('=').pop()
+            tree =  fetch(`/api/bom/list?order=${order_id}`).then(
+                res => res.json()
+            ).then(
+                res=> res.map(({parent, ...data}) => ({
+                    ...data,
+                    parent: parent || '#',
+                    text: data.product_name
+                }))
+            ).then(
+                res => {
+                    console.log(res)
+                    return res
+                }
+            )
+        }
+
+        getBomTree()
+
+        var dt_details_table = $('.datatables-order-details');
+        if (dt_details_table.length) {
+            var dt_products = dt_details_table.DataTable({
+                data: tree,
+                columns: [
+                    {
+                        data: 'id'
+                    }, {
+                        data: 'product_name'
+                    }, {
+                        data: 'price'
+                    }, {
+                        data: 'qty'
+                    }, {
+                        data: ''
+                    }
+                ],
+                columnDefs: [
+                    {
+                        className: 'control',
+                        searchable: false,
+                        orderable: false,
+                        responsivePriority: 2,
+                        targets: 0,
+                        render: function (data, type, full, meta) {
+                            return '';
+                        }
+                    }, {
+                        targets: 1,
+                        responsivePriority: 1,
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, type, full, meta) {
+                            var $name = full['product_name'],
+                                $product_brand = full['product_info'],
+                                $image = full['image'];
+                            console.log(full)
+                            if ($image) {
+                                var $output = '<img src="' + assetsPath + 'img/products/' + $image + '" alt="product-' + $name + '" class="rounded-2">';
+                            } else {
+                                var stateNum = Math.floor(Math.random() * 6);
+                                var states = [
+                                    'success',
+                                    'danger',
+                                    'warning',
+                                    'info',
+                                    'dark',
+                                    'primary',
+                                    'secondary'
+                                ];
+                                var $state = states[stateNum],
+                                    $name = full['product_name'],
+                                    $initials = $name.match(/\b\w/g) || [];
+                                $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
+                                $output = '<span class="avatar-initial rounded-2 bg-label-' + $state + '">' + $initials + '</span>';
+                            }
+                            var $row_output = '<div class="d-flex justify-content-start align-items-center text-nowrap">' + '<div class="avatar-wrapper">' + '<div class="avatar me-2">' + $output + '</div>' + '</div>' + '<div class="d-flex flex-column">' + '<h6 class="text-body mb-0">' + $name + '</h6>' + '<small class="text-muted">' + $product_brand + '</small>' + '</div>' + '</div>';
+                            return $row_output;
+                        }
+                    }, {
+                        targets: 2,
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, type, full, meta) {
+                            var $price = full['price'];
+                            var $output = '<span>' + $price + '</span>';
+                            return $output;
+                        }
+                    }, {
+                        targets: 3,
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, type, full, meta) {
+                            var $qty = full['qty'];
+                            var $output = '<span class="text-body">' + $qty + '</span>';
+                            return $output;
+                        }
+                    }, {
+                        targets: 4,
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, type, full, meta) {
+                            var $total = parseInt(full['qty']) * full['price'];
+                            var $output = $total ? '<h6 class="mb-0">' + $total + '</h6>' : data;
+                            return $output;
+                        }
+                    }
+                ],
+                order: [
+                    1, ''
+                ],
+                dom: 't',
+                responsive: {
+                    details: {
+                        display: $
+                            .fn
+                            .dataTable
+                            .Responsive
+                            .display
+                            .modal({
+                                header: function (row) {
+                                    var data = row.data();
+                                    return 'Details of ' + data['full_name'];
+                                }
+                            }),
+                        type: 'column',
+                        renderer: function (api, rowIdx, columns) {
+                            var data = $
+                                .map(columns, function (col, i) {
+                                    return col.title !== ''
+                                        ? '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' + '<td>' + col.title + ':' + '</td> ' + '<td>' + col.data + '</td>' + '</tr>'
+                                        : '';
+                                })
+                                .join('');
+
+                            return data
+                                ? $('<table class="table" /><tbody />').append(data)
+                                : false;
+                        }
+                    }
+                }
+            });
+        }
+        setTimeout(() => {
+            let offCanvasElement = document.querySelector('#add-new-record');
+            $(".add-item").on('click', function () {
+                $("#plus-item").removeClass('d-none');
+                $('.delete-item').remove();
+                offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
+                offCanvasEl.show();
+            });
+            $('.add-container').on('click', function () {
+                $("#plus-item").removeClass('d-none');
+                $('.delete-item').remove();
+                offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
+                offCanvasEl.show();
+                let inst = $('#jstree-checkbox').jstree(true);
+                inst.deselect_all();
+            });
+        }, 300);
+        let checkboxTree = $('#jstree-checkbox');
+        if (checkboxTree.length) {
+            checkboxTree.jstree({
+                core: {
+                    check_callback: true,
+                    data: tree
+                },
+                plugins: [
+                    'types', 'state', 'contextmenu'
+                ],
+                contextmenu: {
+                    items: function (node) {
+                        console.log(node)
+                        switch (node.parents.length - 1) {
+                            case 0:
+                                return {
+                                    컨테이너_변경: {
+                                        label: '컨테이너 변경',
+                                        action: function (data) {
+                                            var inst = $.jstree.reference(data.reference),
+                                                obj = inst.get_node(data.reference);
+                                            inst.edit(obj);
+                                        }
+                                    },
+                                    컨테이너_삭제: {
+                                        label: '컨테이너 삭제',
+                                        action: function (node) {
+                                            data = $("#jstree-checkbox").jstree(true).get_node(node.reference);
+                                            let offCanvasElement = document.querySelector('#add-new-record');
+                                            offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
+                                            offCanvasEl.show();
+                                            let formRecord = document.getElementById('form-add-new-record');
+                                            let formButton = document.getElementById('formButton');
+                                            $("#plus-item").addClass('d-none');
+                                            let deleteButton = document.createElement('button');
+                                            deleteButton.textContent = '삭제';
+                                            deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item');
+                                            formButton.appendChild(deleteButton);
+                                            formRecord.querySelector(`[name=price]`).value = data.data.price;
+                                            $("#item").val(data.data.item_id).trigger('change')
+                                            $("#order_cnt").val(data.data.qty).trigger('change')
+                                            formRecord.querySelector(`[name=comment]`).value = data.data.product_info;
+                                            deleteButton.addEventListener('click', function (e) {
+                                                $.ajax({
+                                                    url: '/api/bom/delete',
+                                                    method: 'POST',
+                                                    data: {
+                                                        id: data.id
+                                                    },
+                                                    headers: {
+                                                        'X-CSRFToken': '{{ csrf_token }}'
+                                                    }
+                                                }).done(function (res) {
+                                                    inst = $('#jstree-checkbox').jstree(true);
+                                                    inst.delete_node(data);
+                                                    offCanvasEl.hide();
+                                                })
+                                            })
+                                        }
+                                    }
+                                }
+                            case 1:
+                                return {
+                                    bom_삭제: {
+                                        label: 'bom 삭제',
+                                        action: function (node) {
+                                            data = $("#jstree-checkbox").jstree(true).get_node(node.reference);
+                                            let offCanvasElement = document.querySelector('#add-new-record');
+                                            offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
+                                            offCanvasEl.show();
+                                            let formRecord = document.getElementById('form-add-new-record');
+                                            let formButton = document.getElementById('formButton');
+                                            $("#plus-item").addClass('d-none');
+                                            let deleteButton = document.createElement('button');
+                                            deleteButton.textContent = '삭제';
+                                            deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1');
+                                            formButton.appendChild(deleteButton);
+                                            formRecord.querySelector(`[name=price]`).value = data.data.price;
+                                            $("#item").val(data.data.item_id).trigger('change')
+                                            $("#order_cnt").val(data.data.qty).trigger('change')
+                                            formRecord.querySelector(`[name=comment]`).value = data.data.product_info;
+                                            deleteButton.addEventListener('click', function (e) {
+                                                $.ajax({
+                                                    url: '/api/bom/delete',
+                                                    method: 'POST',
+                                                    data: {
+                                                        id: data.id
+                                                    },
+                                                    headers: {
+                                                        'X-CSRFToken': '{{ csrf_token }}'
+                                                    }
+                                                }).done(function (res) {
+                                                    inst = $('#jstree-checkbox').jstree(true);
+                                                    inst.delete_node(data);
+                                                    offCanvasEl.hide();
+                                                })
+                                                formButton.removeChild(deleteButton);
+                                                $("#plus-item").removeClass('d-none');
+                                            })
+                                        }
+                                    }
+                                }
+                        }
+                    },
+                },
+                types: {
+                    default: {
+                        icon: 'bx bx-folder'
+                    },
+                    html: {
+                        icon: 'bx bxl-html5 text-danger'
+                    },
+                    css: {
+                        icon: 'bx bxl-css3 text-info'
+                    },
+                    img: {
+                        icon: 'bx bx-image text-success'
+                    },
+                    js: {
+                        icon: 'bx bxl-nodejs text-warning'
+                    }
+                }
+            });
+            let formAddNewRecord = document.getElementById('form-add-new-record');
+            fv = FormValidation.formValidation(formAddNewRecord, {
+                fields: {
+                    order_cnt: {
+                        validators: {
+                            notEmpty: {
+                                message: '주문수량은 필수입니다.'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    trigger: new FormValidation
+                        .plugins
+                        .Trigger(),
+                    bootstrap5: new FormValidation
+                        .plugins
+                        .Bootstrap5({eleValidClass: '', rowSelector: '.col-sm-12'}),
+                    submitButton: new FormValidation
+                        .plugins
+                        .SubmitButton(),
+                    autoFocus: new FormValidation
+                        .plugins
+                        .AutoFocus()
+                },
+                init: instance => {
+                    instance.on('plugins.message.placed', function (e) {
+                        if (e.element.parentElement.classList.contains('input-group')) {
+                            e
+                                .element
+                                .parentElement
+                                .insertAdjacentElement('afterend', e.messageElement);
+                        }
+                    });
+                }
+            });
+            $("#item").on('change', (e) => {
+                if (!e.target.value) {
+                    $('#order_cnt').attr('disabled', 'disabled');
+                    $('#price').val('');
+                    $('#tax').val('');
+                    $('#order_total').val('');
+                } else {
+                    $('#order_cnt').removeAttr('disabled');
+                    $('#order_cnt').on('change', (e) => {
+                        $('#order_total').val(e.target.value * $('#price').val());
+                        let tax = $('#order_total').val() * 0.1;
+                        tax = tax.toFixed(2);
+                        $('#tax').val(tax);
+                    })
+                }
+            })
+        }
+        $("#plus-item").on('click', function (e) {
+            let offCanvasElement = document.querySelector('#add-new-record');
+            let offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
+            let formAddNewRecord = $('#form-add-new-record');
+            fv.validate().then(function (status) {
+                if (status === 'Valid') {
+                    let data = formAddNewRecord.serializeArray();
+                    let formData = data.reduce((acc, item) => {
+                        acc[item.name] = item.value;
+                        return acc;
+                    }, {});
+                    let formInput = {
+                        'item_id': formData.bom_id,
+                        'product_name': items[formData.bom_id - 1].item_name,
+                        'qty': formData.order_cnt,
+                        'price': formData.price,
+                        'total': formData.order_total,
+                        'product_info': formData.comment,
+                        'image': ''
+                    }
+                    let row = dt_products.row.add({
+                        "id": dt_products.data().length + 1,
+                        ...formInput
+                    }).draw();
+                    inst = $('#jstree-checkbox').jstree(true);
+                    selectedTree = inst.get_selected();
+                    parent = selectedTree[0] ? selectedTree[0] : '#';
+                    let objNode = {
+                        id: tree.length + 1,
+                        parent,
+                        text: items[formData.bom_id - 1].name,
+                        data: formInput
+                    }
+                    $.ajax({
+                        url: 'api/bom/add',
+                        method: 'POST',
+                        data: JSON.stringify(objNode),
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        dataType: 'json'
+                    }).done(function (data) {
+                        let order_id = data.order_id;
+                        let bom_id = data.bom_id;
+                        objNode.data.id = order_id
+                        objNode.id = bom_id
+                        inst.create_node(parent, objNode, 'last', function (new_node) {
+                            setTimeout(function () {
+                                inst.edit(new_node);
+                            }, 0);
+                        });
+                        tree.push(objNode);
+                    })
+                }
+            });
+            offCanvasEl.hide();
+        })
+        $("#edit-item").on('click', function (e) {
+            dt_products
+                .rows()
+                .every(function (rowIdx, tableLoop, rowLoop) {
+                    let qty = dt_products
+                        .cell(rowIdx, 3)
+                        .data();
+                    dt_products
+                        .cell(rowIdx, 3)
+                        .data('<input type="number" class="form-control" value="' + qty + '">');
+                    dt_products
+                        .cell(rowIdx, 4)
+                        .data('<button class="btn btn-outline-danger delete-item"><i class="bx bx-trash"></i></button>');
+                });
+            $(e.target).addClass('d-none');
+            let edit_button = document.createElement('button');
+            edit_button
+                .classList
+                .add('btn', 'btn-outline-success', 'save-item');
+            edit_button.innerHTML = '<i class="bx bx-save"></i>&nbsp; 변경 저장';
+            edit_button.addEventListener('click', function (e2) {
+                dt_products
+                    .rows()
+                    .every(function (rowIdx, tableLoop, rowLoop) {
+                        let qty = dt_products
+                            .cell(rowIdx, 3)
+                            .node()
+                            .querySelector('input');
+                        qty = $(qty).val();
+                        dt_products
+                            .cell(rowIdx, 3)
+                            .data(qty);
+                        dt_products
+                            .cell(rowIdx, 4)
+                            .data(qty * dt_products.cell(rowIdx, 2).data());
+                        $.ajax({
+                            url: 'api/bom/edit/${data.id}',
+                            method: 'POST',
+                            data: {
+                                qty: qty
+                            },
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            }
+                        }).done(function (data) {
+                        })
+                    });
+                $(e.target).removeClass('d-none');
+                e2
+                    .target
+                    .remove();
+
+            })
+            e
+                .target
+                .parentElement
+                .appendChild(edit_button);
+            let deleteButton = $(document).find('.delete-item');
+            deleteButton.on('click', function (e2) {
+                let id = dt_products.row(e2.target.closest('tr')).data().id;
+                let inst = $('#jstree-checkbox').jstree(true);
+                let selected = tree.find(item => item.id == id);
+                let node = inst.get_node(selected);
+                dt_products
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+                checkboxTree.jstree(true).delete_node(
+                    node
+                );
+                $.ajax({
+                    url: '/api/bom/delete',
+                    method: 'POST',
+                    data: {
+                        id: node.id
+                    },
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                }).done(message => {
+                })
+
+            })
+        })
+        $('#jstree-checkbox').on('select_node.jstree', function (e, data) {
+            let filterdTree = $('#jstree-checkbox').jstree(true).get_json('#', {
+                flat: true,
+                no_state: true
+            });
+            let selected = data.selected
+            let inst = $('#jstree-checkbox').jstree(true);
+            let node = inst.get_node(selected);
+            let parent_level = node.parents.length - 1;
+            console.log(selected)
+            let child = tree.filter(item => item.parent === parseInt(selected[0]))
+            switch (parent_level) {
+                case 0:
+                    dt_products.data().clear().rows.add(child.map((item, index) => {
+                        return {
+                            ...item,
+                            product_info: 'level 2'
+                        }
+                    })).draw()
+                    break;
+                case 1:
+                    dt_products.data().clear().rows.add(child.map((item, index) => {
+                        return {
+                            ...item,
+                            product_info: 'level 3'
+                        }
+                    })).draw();
+                    break;
+                case 2:
+                    item.deselect_all()
+                    break;
+                default:
+                    break;
+            }
+
+        });
+        $("#submit-order").on('click', function () {
+            let items = []
+            $.ajax({
+                url: '/api/items/list',
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+            }).done(function (res) {
+                items = res.data
+                items.forEach(item => {
+                    $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
+                })
+            })
+        })
+        $("#item").on('change', function (e) {
+            let item = e.target.value;
+            let product = items.find(item => item.id == e.target.value);
+            $('#price').val(product.standard_price);
+        });
+    })
+</script>
+{% include 'footer.html' %}

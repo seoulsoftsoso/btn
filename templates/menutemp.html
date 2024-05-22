@@ -1,0 +1,175 @@
+{% load static %}
+<div class="layout-wrapper layout-navbar-full layout-horizontal layout-without-menu">
+
+<div class="layout-page">
+    <!-- Navbar -->
+    <nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme"
+         id="layout-navbar">
+        <!--    <div class="container-xxl">-->
+        <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
+            <a href="{% url 'dashboard2' %}" class="app-brand-link">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="39"
+                     height="35"
+                     viewBox="0 0 39 35"
+                     fill="none">
+                    <path d="M33.2198 21.7705C29.9612 29.0012 22.4435 34.3478 14.5747 34.429C23.9954 34.799 35.9478 33.9514 38.1133 28.1573C39.1705 25.3292 37.2429 23.0996 33.2198 21.7724V21.7705Z" fill="#A0765F" />
+                    <path d="M20.333 0.000901654C10.8273 0.0990734 1.83137 7.88485 0.241747 17.3905C-1.34788 26.8962 5.06915 34.5234 14.5748 34.4271C22.4418 34.3459 29.9595 28.9993 33.2199 21.7686C33.8995 20.262 34.3923 18.6762 34.666 17.0375C36.2557 7.5318 29.8386 -0.0953822 20.333 0.000901654Z" fill="#EAEA73" />
+                </svg>
+                <span>&nbsp&nbsp&nbsp&nbsp</span>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="93"
+                     height="35"
+                     viewBox="0 0 93 35"
+                     fill="none">
+                    <g clip-path="url(#clip0_4935_29705)">
+                    <path d="M13.5235 10.9937C15.3145 10.0009 16.2723 8.20541 16.2723 6.18719C16.2723 2.98224 14.035 0.898727 11.3494 0.289996C10.5181 0.0979674 9.27108 0.00195312 7.57776 0.00195312H0V23.7194H7.86509C11.6061 23.7194 12.8205 23.4314 14.6747 22.1179C16.4657 20.8678 17.4235 18.7843 17.4235 16.5087C17.4235 13.7838 16.1133 11.8943 13.5235 10.9956M5.78676 5.32114H8.21754C9.71931 5.32114 10.4874 5.86651 10.4874 7.11661C10.4874 8.36672 9.68866 9.00809 8.18498 9.00809H5.78676V5.32306V5.32114ZM8.88797 18.3983H5.78676V14.0719H8.92054C10.7115 14.0719 11.6386 14.744 11.6386 16.1228C11.6386 17.6609 10.5832 18.3983 8.88989 18.3983" fill="#3D170F" />
+                    <path d="M30.3052 15.8C30.3052 17.9795 29.2823 19.3256 27.2672 19.3256C25.252 19.3256 24.4226 18.2368 24.4226 15.896V5.92969H19.1147V16.9867C19.1147 22.0505 22.216 24.2934 25.957 24.2934C28.3552 24.2934 29.7612 23.46 30.5293 21.8258H30.5925V23.7173H35.6111V5.92969H30.3032V15.8019L30.3052 15.8Z" fill="#3D170F" />
+                    <path d="M65.3724 5.35156C60.0645 5.35156 55.814 9.29391 55.814 14.807C55.814 20.3202 59.9706 24.2625 65.3724 24.2625C70.7741 24.2625 74.9327 20.3202 74.9327 14.7437C74.9327 9.16717 70.7128 5.35348 65.3724 5.35348M65.3724 19.2948C62.9741 19.2948 61.1199 17.2439 61.1199 14.807C61.1199 12.3702 63.0067 10.3193 65.3398 10.3193C67.8338 10.3193 69.6229 12.4355 69.6229 14.807C69.6229 17.1786 67.8644 19.2948 65.3704 19.2948" fill="#3D170F" />
+                    <path d="M86.4146 5.32129C84.273 5.32129 82.7061 5.99339 81.5875 7.8215H81.5243V5.93002H76.5688V23.7176H81.8767V13.9107C81.8767 11.5065 82.7713 10.3217 84.9128 10.3217C86.8628 10.3217 87.6941 11.4432 87.6941 13.8474V23.7195H93.002V12.3745C93.002 7.11868 89.6135 5.32321 86.4165 5.32321" fill="#3D170F" />
+                    <path d="M52.2148 5.92984V0H46.907V5.92984H42.9265V0H37.6187V17.3037C37.6187 22.3636 40.7237 24.6104 44.4609 24.6104C44.662 24.6104 44.8593 24.6065 45.8879 24.5912V19.5831C43.0645 19.5831 42.9304 18.2485 42.9304 16.213V10.7747H46.9089V17.3037C46.9089 22.3636 50.0139 24.6104 53.7511 24.6104C53.9522 24.6104 54.1495 24.6065 55.1781 24.5912V19.5831C52.3547 19.5831 52.2206 18.2485 52.2206 16.213V10.7747H55.1781V5.92792H52.2168L52.2148 5.92984Z" fill="#3D170F" />
+                    <path d="M22.7314 29.2998H23.3463L26.2177 33.1269V29.2998H26.8191V34.1485H26.233L23.331 30.2407V34.1485H22.7314V29.2998Z" fill="#3D170F" />
+                    <path d="M29.5737 29.2998H33.1711V29.874H30.1963V31.3641H32.8186V31.9383H30.1963V33.5744H33.2439V34.1485H29.5737V29.2998Z" fill="#3D170F" />
+                    <path d="M36.7893 31.6502L35.0883 29.2998H35.8507L37.2433 31.2316L38.5918 29.2998H39.3312L37.6245 31.7251L39.3829 34.1485H38.6205L37.1762 32.1437L35.7779 34.1485H35.0366L36.7893 31.6502Z" fill="#3D170F" />
+                    <path d="M42.553 29.8817H40.8979V29.2998H44.8324V29.8817H43.1755V34.1485H42.553V29.8817Z" fill="#3D170F" />
+                    <path d="M49.9375 29.2998H53.418V29.874H50.56V31.4313H53.0655V32.0036H50.56V34.1485H49.9375V29.2998Z" fill="#3D170F" />
+                    <path d="M56.7642 29.2998H57.3273L59.3635 34.1466H58.6969L58.2142 32.9944H55.8543L55.3716 34.1466H54.7261L56.7623 29.2998H56.7642ZM57.9729 32.4145L57.0343 30.1006L56.0957 32.4145H57.971H57.9729Z" fill="#3D170F" />
+                    <path d="M61.4609 29.2998H63.5048C64.6177 29.2998 65.1981 29.778 65.1981 30.717C65.1981 31.4889 64.8035 31.9517 64.0488 32.09L65.5506 34.1466H64.7748L63.3017 32.1341H62.0854V34.1466H61.4629V29.2998H61.4609ZM63.5048 31.5619C64.2365 31.5619 64.5679 31.3046 64.5679 30.717C64.5679 30.1294 64.2384 29.872 63.5048 29.872H62.0835V31.5619H63.5048Z" fill="#3D170F" />
+                    <path d="M67.7153 29.2998H68.3762L70.2285 32.4433L72.075 29.2998H72.757V34.1485H72.1344V30.3368L70.4047 33.2748H70.0312L68.3168 30.3656V34.1485H67.7153V29.2998Z" fill="#3D170F" />
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_4935_29705">
+                    <rect width="93" height="34.1484" fill="white" />
+                    </clipPath>
+                    </defs>
+                </svg>
+            </a>
+            <span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
+            <a style="border-radius: 50px;
+                      background: var(--buton-original, #EAEA73);
+                      width: 165px;
+                      height: 54px;
+                      flex-shrink: 0;
+                      text-align:center;
+                      line-height: 54px;
+                      color: var(--original-brown, #3D170F);
+                      text-align: center;
+                      font-family: Pretendard;
+                      font-size: 20px;
+                      font-style: normal;
+                      font-weight: 500">환경그래프조회</a>
+            <span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
+            <a style="flex-shrink: 0;
+                      text-align:center;
+                      line-height: 54px;
+                      color: var(--original-brown, #3D170F);
+                      text-align: center;
+                      font-family: Pretendard;
+                      font-size: 20px;
+                      font-style: normal;
+                      font-weight: 500">문의현황</a>
+        </div>
+        <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+            <div class="navbar-nav-right d-flex align-items-center"
+                 id="navbar-collapse">
+                <ul class="navbar-nav flex-row align-items-center ms-auto">
+                    <!-- User -->
+                    <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                        <a class="nav-link dropdown-toggle hide-arrow"
+                           href="javascript:void(0);"
+                           data-bs-toggle="dropdown"
+                           style="color: var(--original-brown, #3D170F);
+                                  text-align: center;
+                                  font-family: Pretendard;
+                                  font-size: 20px;
+                                  font-style: normal;
+                                  font-weight: 400;
+                                  line-height: normal">camoonh님</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="pages-account-settings-account.html">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="avatar avatar-online">
+                                                <img src="{% static '/assets/img/avatars/1.png' %}"
+                                                     alt
+                                                     class="w-px-40 h-auto rounded-circle" />
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <span class="fw-medium d-block">John Doe</span>
+                                            <small class="text-muted">Admin</small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <div class="dropdown-divider"></div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="pages-profile-user.html">
+                                    <i class="bx bx-user me-2"></i>
+                                    <span class="align-middle">My Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="pages-account-settings-account.html">
+                                    <i class="bx bx-cog me-2"></i>
+                                    <span class="align-middle">Settings</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="pages-account-settings-billing.html">
+                                    <span class="d-flex align-items-center align-middle">
+                                        <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
+                                        <span class="flex-grow-1 align-middle">Billing</span>
+                                        <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <div class="dropdown-divider"></div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="pages-faq.html">
+                                    <i class="bx bx-help-circle me-2"></i>
+                                    <span class="align-middle">FAQ</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="pages-pricing.html">
+                                    <i class="bx bx-dollar me-2"></i>
+                                    <span class="align-middle">Pricing</span>
+                                </a>
+                            </li>
+                            <li>
+                                <div class="dropdown-divider"></div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
+                                    <i class="bx bx-power-off me-2"></i>
+                                    <span class="align-middle">Log Out</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <span>&nbsp&nbsp&nbsp&nbsp</span>
+                    <!--/ User -->
+                    <a class="" style="color: var(--original-brown, #3D170F);
+                              text-align: center;
+                              font-family: Pretendard;
+                              font-size: 20px;
+                              font-style: normal;
+                              font-weight: 400;
+                              line-height: normal;
+                              text-decoration-line: underline">로그아웃</a>
+                </ul>
+            </div>
+        </div>
+        <!--    </div>-->
+    </nav>
+    <!-- / Navbar -->
+    <!-- Layout container -->
+    <div class="layout-page" style="padding-top: 40px !important;">
+        <!-- Content wrapper -->
+        <div class="content-wrapper">

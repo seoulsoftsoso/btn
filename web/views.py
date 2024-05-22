@@ -1,0 +1,96 @@
+from django.shortcuts import render
+
+# 알람
+
+def alram_contact(request):
+    return render(request, 'alram/contact.html')
+
+def alram_control(request):
+    return render(request, 'alram/control.html')
+
+def alram_etc(request):
+    return render(request, 'alram/etc.html')
+
+def alram_plan(request):
+    return render(request, 'alram/plan.html')
+
+# 유저 관리
+
+def register_register(request):
+    return render(request, 'register/register.html')
+
+def register_select(request):
+    return render(request, 'register/select.html')
+
+# 고장 관리
+
+def breakdown_control(request):
+    return render(request, 'breakdown/control.html')   
+
+def breakdown_collect(request):
+    return render(request, 'breakdown/collect.html')
+
+# 재배 관리
+
+def harvest_faq(request):
+    return render(request, 'harvest/faq.html')
+
+def harvest_info(request):
+    return render(request, 'harvest/info.html')
+
+def harvest_manual(request):
+    return render(request, 'harvest/manual.html')
+
+# 초기 화면
+
+def landing_user(request):
+    return render(request, 'landing/dashboard2.html')
+
+def landing_admin(request):
+    return render(request, 'landing/dashboard.html')
+
+# 자동 재배 관리
+
+def manage_auto(request):
+    return render(request, 'manage/auto.html')
+
+# 주문 관리
+
+def order_build(request):
+    return render(request, 'order/build.html')
+
+def order_delivery(request):
+    return render(request, 'order/delivery.html')
+
+def order_item(request):
+    return render(request, 'order/item.html')
+
+# 유저 관리
+
+def user_manage(request):
+    return render(request, 'user/manage.html')
+
+def user_part(request):
+    return render(request, 'user/part.html')
+
+def device_control(request):
+    return render(request, 'device/control.html')
+
+def device_explain(request):
+    return render(request, 'device/explain.html')
+
+def build(request, order):
+    if not order:
+        return render(request, 'pages/Build.html', { 'order': 0, 'orderProduct': [], 'BomMaster': [] })
+    bomTree = []
+    orderProduct = OrderProduct.objects.filter(order_id=order, delete_flag="N").values_list('id')
+    bomTree = list(BomMaster.objects.filter(op_id__in=orderProduct).annotate(
+        qty=F('order_cnt'),
+        price=Round(Cast(F('item__standard_price'), FloatField()), 2),
+        product_info=F('item__item_name'),
+        image=F('item__brand'),
+        product_name=F('item__item_name'),
+    ).values('id', 'product_name', 'qty', 'price', 'product_info', 'image', 'level', 'item_id', 'parent'))
+    bomTree = json.dumps(bomTree ,cls=DjangoJSONEncoder)
+    context = { 'order': order, 'bomTree': bomTree }
+    return render(request, 'pages/Build.html', context)

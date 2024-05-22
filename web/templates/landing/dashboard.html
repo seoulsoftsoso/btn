@@ -1,0 +1,1224 @@
+{% include "header.html" %}
+{% include 'menu.html' %}
+{% load static %}
+<div class="row">
+    <div class="row">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
+                            <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                                <div class="card-title">
+                                    <h5 class="text-nowrap mb-2">Profile Report</h5>
+                                    <span class="badge bg-label-warning rounded-pill">Year 2021</span>
+                                </div>
+                                <div class="mt-sm-auto">
+                                    <small class="text-success text-nowrap fw-medium">
+                                        <i class="bx bx-chevron-up"></i>
+                                    68.2%</small>
+                                    <h3 class="mb-0">$84,686k</h3>
+                                </div>
+                            </div>
+                            <div id="profileReportChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <!-- Order Statistics -->
+    <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between pb-0">
+                <div class="card-title mb-0">
+                    <h5 class="m-0 me-2">보유 회원</h5>
+                    <small class="text-muted">3천명 유저</small>
+                </div>
+                <div class="dropdown">
+                    <button class="btn p-0"
+                            type="button"
+                            id="orederStatistics"
+                            data-bs-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                        <i class="bx bx-dots-vertical-rounded"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end"
+                         aria-labelledby="orederStatistics">
+                        <a class="dropdown-item" href="javascript:void(0);">Select All</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex flex-column align-items-center gap-1">
+                        <h2 class="mb-2">3,234</h2>
+                        <span>연령별 분포</span>
+                    </div>
+                    <div id="orderStatisticsChart"></div>
+                </div>
+                <ul class="p-0 m-0">
+                    <li class="d-flex mb-4 pb-1">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded bg-label-primary">
+                                <i class="bx bx-mobile-alt"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                            <div class="me-2">
+                                <h6 class="mb-0">20대</h6>
+                                <small class="text-muted"></small>
+                            </div>
+                            <div class="user-progress">
+                                <small class="fw-medium">8,2천</small>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-4 pb-1">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded bg-label-success">
+                                <i class="bx bx-closet"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                            <div class="me-2">
+                                <h6 class="mb-0">30대</h6>
+                                <small class="text-muted"></small>
+                            </div>
+                            <div class="user-progress">
+                                <small class="fw-medium">2.3천</small>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-4 pb-1">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded bg-label-info">
+                                <i class="bx bx-home-alt"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                            <div class="me-2">
+                                <h6 class="mb-0">40대</h6>
+                                <small class="text-muted"></small>
+                            </div>
+                            <div class="user-progress">
+                                <small class="fw-medium">8.4천</small>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded bg-label-secondary">
+                                <i class="bx bx-football"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                            <div class="me-2">
+                                <h6 class="mb-0">50대~</h6>
+                                <small class="text-muted"></small>
+                            </div>
+                            <div class="user-progress">
+                                <small class="fw-medium">99</small>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--/ Order Statistics -->
+    <!-- Expense Overview -->
+    <div class="col-md-6 col-lg-4 order-1 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <ul class="nav nav-pills" role="tablist">
+                    <li class="nav-item">
+                        <button type="button"
+                                class="nav-link active"
+                                role="tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#navs-tabs-line-card-order"
+                                aria-controls="navs-tabs-line-card-order"
+                                aria-selected="true">
+                            주문 현황
+                        </li>
+                        <li class="nav-item">
+                            <button type="button"
+                                    class="nav-link"
+                                    role="tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#navs-tabs-line-card-income"
+                                    aria-controls="navs-tabs-line-card-income"
+                                    aria-selected="false">주문 비율</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body px-0">
+                    <div class="tab-content p-0">
+                        <div class="tab-pane fade show active"
+                             id="navs-tabs-line-card-order"
+                             role="tabpanel">
+                            <div class="d-flex p-4 pt-3">
+                                <ul class="p-0 m-0 w-100 list-unstyled">
+                                    <li class="d-flex align-items-center gap-2 mb-4 pb-1">
+                                        <div class="avatar flex-shrink-0 me-3">
+                                            <img src="{% static 'assets/img/icons/unicons/paypal.png' %}"
+                                                 alt="User"
+                                                 class="rounded" />
+                                        </div>
+                                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                            <div class="me-2">
+                                                <h6 class="mb-0">Paypal</h6>
+                                                <small class="text-muted">안형세</small>
+                                            </div>
+                                            <div class="d-flex flex-wrap">
+                                                <div>
+                                                    <h6 class="mb-0">
+                                                        5,643
+                                                        <span class="text-secondary">g</span>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="d-flex align-items-center gap-2 mb-4 pb-1">
+                                        <div class="avatar flex-shrink-0 me-3">
+                                            <img src="{% static 'assets/img/icons/unicons/wallet.png' %}"
+                                                 alt="User"
+                                                 class="rounded" />
+                                        </div>
+                                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                            <div class="me-2">
+                                                <h6 class="mb-0">Wallet</h6>
+                                                <small class="text-muted">이수람</small>
+                                            </div>
+                                            <div class="d-flex flex-wrap">
+                                                <div>
+                                                    <h6 class="mb-0">
+                                                        1,267
+                                                        <span class="text-secondary">g</span>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade show"
+                             id="navs-tabs-line-card-income"
+                             role="tabpanel">
+                            <div class="d-flex p-4 pt-3"></div>
+                            <div id="incomeChart"></div>
+                            <div class="d-flex justify-content-center pt-4 gap-2">
+                                <div class="flex-shrink-0">
+                                    <div id="expensesOfWeek"></div>
+                                </div>
+                                <div>
+                                    <p class="mb-n1 mt-1">Expenses This Week</p>
+                                    <small class="text-muted">$39 less than last week</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/ Expense Overview -->
+        <!-- Transactions -->
+        <div class="col-md-6 col-lg-4 order-2 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title m-0 me-2">출고 전 컨테이너 알람</h5>
+                    <div class="dropdown">
+                        <button class="btn p-0"
+                                type="button"
+                                id="transactionID"
+                                data-bs-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                            <i class="bx bx-dots-vertical-rounded"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end"
+                             aria-labelledby="transactionID">
+                            <a class="dropdown-item" href="javascript:void(0);">3일전</a>
+                            <a class="dropdown-item" href="javascript:void(0);">10일전</a>
+                            <a class="dropdown-item" href="javascript:void(0);">한달전</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="p-0 m-0">
+                        <li class="d-flex mb-4 pb-1">
+                            <div class="avatar flex-shrink-0 me-3">
+                                <img src="{% static 'assets/img/icons/unicons/paypal.png' %}"
+                                     alt="User"
+                                     class="rounded" />
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <small class="text-muted d-block mb-1">버섯</small>
+                                    <h6 class="mb-0">D-2</h6>
+                                </div>
+                                <div class="user-progress d-flex align-items-center gap-1">
+                                    <h6 class="mb-0 text-danger">-1,783</h6>
+                                    <span class="text-muted">g</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="d-flex mb-4 pb-1">
+                            <div class="avatar flex-shrink-0 me-3">
+                                <img src="{% static 'assets/img/icons/unicons/wallet.png' %}"
+                                     alt="User"
+                                     class="rounded" />
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <small class="text-muted d-block mb-1">사과</small>
+                                    <h6 class="mb-0">D-5</h6>
+                                </div>
+                                <div class="user-progress d-flex align-items-center gap-1">
+                                    <h6 class="mb-0 text-success">+1,78</h6>
+                                    <span class="text-muted">개</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="d-flex mb-4 pb-1">
+                            <div class="avatar flex-shrink-0 me-3">
+                                <img src="{% static 'assets/img/icons/unicons/chart.png' %}"
+                                     alt="User"
+                                     class="rounded" />
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <small class="text-muted d-block mb-1">버섯</small>
+                                    <h6 class="mb-0">D-2</h6>
+                                </div>
+                                <div class="user-progress d-flex align-items-center gap-1">
+                                    <h6 class="mb-0 text-success">500</h6>
+                                    <span class="text-muted">g</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="d-flex mb-4 pb-1">
+                            <div class="avatar flex-shrink-0 me-3">
+                                <img src="{% static 'assets/img/icons/unicons/cc-success.png' %}"
+                                     alt="User"
+                                     class="rounded" />
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <small class="text-muted d-block mb-1">망고</small>
+                                    <h6 class="mb-0">D-1</h6>
+                                </div>
+                                <div class="user-progress d-flex align-items-center gap-1">
+                                    <h6 class="mb-0 text-danger">-838.71</h6>
+                                    <span class="text-muted">g</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="d-flex mb-4 pb-1">
+                            <div class="avatar flex-shrink-0 me-3">
+                                <img src="{% static 'assets/img/icons/unicons/wallet.png' %}"
+                                     alt="User"
+                                     class="rounded" />
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <small class="text-muted d-block mb-1">커피</small>
+                                    <h6 class="mb-0">D-1</h6>
+                                </div>
+                                <div class="user-progress d-flex align-items-center gap-1">
+                                    <h6 class="mb-0 text-info">+203.33</h6>
+                                    <span class="text-muted">g</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="d-flex">
+                            <div class="avatar flex-shrink-0 me-3">
+                                <img src="{% static 'assets/img/icons/unicons/cc-warning.png' %}"
+                                     alt="User"
+                                     class="rounded" />
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div>
+                                    <small class="text-muted d-block mb-1">파인애플</small>
+                                    <h6 class="mb-0">D-4</h6>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <h6 class="mb-0 text-muted">lesther</h6>
+                                </div>
+                                <div class="user-progress d-flex align-items-center gap-1">
+                                    <h6 class="mb-0 text-warning">-92.45</h6>
+                                    <span class="text-muted">g</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--/ Transactions -->
+        <!-- Activity Timeline -->
+        <div class="col-md-12 col-lg-6 order-4 order-lg-3">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title m-0 me-2">문의사항</h5>
+                    <div class="dropdown">
+                        <button class="btn p-0"
+                                type="button"
+                                id="timelineWapper"
+                                data-bs-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                            <i class="bx bx-dots-vertical-rounded"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end"
+                             aria-labelledby="timelineWapper">
+                            <a class="dropdown-item" href="javascript:void(0);">Select All</a>
+                            <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                            <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Activity Timeline -->
+                    <ul class="timeline">
+                        <li class="timeline-item timeline-item-transparent">
+                            <span class="timeline-point-wrapper">
+                                <span class="timeline-point timeline-point-primary"></span></span>
+                                <div class="timeline-event">
+                                    <div class="timeline-header mb-1">
+                                        <h6 class="mb-0">답변 완료</h6>
+                                        <small class="text-muted">12분 전</small>
+                                    </div>
+                                    <p class="mb-2">제 참송이 버섯 왜 이리 작은가요?</p>
+                                    <div class="d-flex flex-wrap">
+                                        <div class="avatar me-3">
+                                            <img src="{% static 'assets/img/avatars/5.png' %}"
+                                                 alt="Avatar"
+                                                 class="rounded-circle" />
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">사용자 이름</h6>
+                                            <span>농장 이름</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="timeline-item timeline-item-transparent">
+                                <span class="timeline-point-wrapper">
+                                    <span class="timeline-point timeline-point-warning"></span></span>
+                                    <div class="timeline-event">
+                                        <div class="timeline-header mb-1">
+                                            <h6 class="mb-0">답변 중</h6>
+                                            <small class="text-muted">45분전</small>
+                                        </div>
+                                        <p class="mb-2">제 참송이 버섯 왜 이리 작은가요?</p>
+                                        <div class="d-flex flex-wrap">
+                                            <div class="avatar me-3">
+                                                <img src="{% static 'assets/img/avatars/3.png' %}"
+                                                     alt="Avatar"
+                                                     class="rounded-circle" />
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">lesther</h6>
+                                                <span>Farm 23</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="timeline-item timeline-item-transparent">
+                                    <span class="timeline-point-wrapper">
+                                        <span class="timeline-point timeline-point-danger"></span></span>
+                                        <div class="timeline-event pb-0">
+                                            <div class="timeline-header mb-1">
+                                                <h6 class="mb-0">답변 대기</h6>
+                                                <small class="text-muted">2일전</small>
+                                            </div>
+                                            <p class="mb-2">5월 12일에 심은 콩이 아직도 발아하지 않았어요.</p>
+                                            <div class="d-flex flex-wrap">
+                                                <div class="avatar me-3">
+                                                    <img src="{% static 'assets/img/avatars/6.png' %}"
+                                                         alt="Avatar"
+                                                         class="rounded-circle" />
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0">lesther</h6>
+                                                    <span>Farm 23</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="timeline-end-indicator">
+                                            <i class="bx bx-check-circle"></i>
+                                        </li>
+                                    </ul>
+                                    <!-- /Activity Timeline -->
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ Activity Timeline -->
+                        <!-- pill table -->
+                        <div class="col-md-6 order-3 order-lg-4 mb-4 mb-lg-0">
+                            <div class="card text-center">
+                                <div class="card-header py-3">
+                                    <ul class="nav nav-pills" role="tablist">
+                                        <li class="nav-item">
+                                            <button type="button"
+                                                    class="nav-link active"
+                                                    role="tab"
+                                                    data-bs-toggle="tab"
+                                                    data-bs-target="#navs-pills-browser"
+                                                    aria-controls="navs-pills-browser"
+                                                    aria-selected="true">Browser</button>
+                                        </li>
+                                        <li class="nav-item">
+                                            <button type="button"
+                                                    class="nav-link"
+                                                    role="tab"
+                                                    data-bs-toggle="tab"
+                                                    data-bs-target="#navs-pills-os"
+                                                    aria-controls="navs-pills-os"
+                                                    aria-selected="false">Operating System</button>
+                                        </li>
+                                        <li class="nav-item">
+                                            <button type="button"
+                                                    class="nav-link"
+                                                    role="tab"
+                                                    data-bs-toggle="tab"
+                                                    data-bs-target="#navs-pills-country"
+                                                    aria-controls="navs-pills-country"
+                                                    aria-selected="false">Country</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content pt-0">
+                                    <div class="tab-pane fade show active"
+                                         id="navs-pills-browser"
+                                         role="tabpanel">
+                                        <div class="table-responsive text-start">
+                                            <table class="table table-borderless text-nowrap">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Browser</th>
+                                                        <th>Visits</th>
+                                                        <th class="w-50">Data In Percentage</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/chrome.png' %}"
+                                                                     alt="Chrome"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Chrome</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>8.92k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-success"
+                                                                         role="progressbar"
+                                                                         style="width: 84.75%"
+                                                                         aria-valuenow="84.75"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">84.75%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/safari.png' %}"
+                                                                     alt="Safari"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Safari</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>7.29k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-primary"
+                                                                         role="progressbar"
+                                                                         style="width: 72.43%"
+                                                                         aria-valuenow="72.43"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">72.43%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/firefox.png' %}"
+                                                                     alt="Firefox"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Firefox</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>6.11k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-primary"
+                                                                         role="progressbar"
+                                                                         style="width: 67.37%"
+                                                                         aria-valuenow="67.37"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">67.37%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/edge.png' %}"
+                                                                     alt="Edge"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Edge</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>5.08k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-info"
+                                                                         role="progressbar"
+                                                                         style="width: 60.12%"
+                                                                         aria-valuenow="60.12"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">60.12%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>5</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/opera.png' %}"
+                                                                     alt="Opera"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Opera</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>3.93k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-info"
+                                                                         role="progressbar"
+                                                                         style="width: 51.94%"
+                                                                         aria-valuenow="51.94"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">51.94%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>6</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/brave.png' %}"
+                                                                     alt="Brave"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Brave</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>3.19k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-warning"
+                                                                         role="progressbar"
+                                                                         style="width: 39.94%"
+                                                                         aria-valuenow="39.94"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">39.94%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>7</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/vivaldi.png' %}"
+                                                                     alt="Vivaldi"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Vivaldi</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>1.29k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-danger"
+                                                                         role="progressbar"
+                                                                         style="width: 28.43%"
+                                                                         aria-valuenow="28.43"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">18.43%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>8</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/uc.png' %}"
+                                                                     alt="UC Browser"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>UC Browser</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>328</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-danger"
+                                                                         role="progressbar"
+                                                                         style="width: 20.14%"
+                                                                         aria-valuenow="20.14"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">20.14%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="navs-pills-os" role="tabpanel">
+                                        <div class="table-responsive text-start">
+                                            <table class="table table-borderless">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>System</th>
+                                                        <th>Visits</th>
+                                                        <th class="w-50">Data In Percentage</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/windows.png' %}"
+                                                                     alt="Windows"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Windows</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>875.24k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-success"
+                                                                         role="progressbar"
+                                                                         style="width: 71.5%"
+                                                                         aria-valuenow="71.50"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">71.50%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/mac.png' %}"
+                                                                     alt="Mac"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Mac</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>89.68k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-primary"
+                                                                         role="progressbar"
+                                                                         style="width: 66.67%"
+                                                                         aria-valuenow="66.67"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">66.67%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/ubuntu.png' %}"
+                                                                     alt="Ubuntu"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Ubuntu</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>37.68k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-info"
+                                                                         role="progressbar"
+                                                                         style="width: 62.82%"
+                                                                         aria-valuenow="62.82"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">62.82%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/chrome.png' %}"
+                                                                     alt="Chrome"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Chrome</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>35.34k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-info"
+                                                                         role="progressbar"
+                                                                         style="width: 56.25%"
+                                                                         aria-valuenow="56.25"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">56.25%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>5</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/cent.png' %}"
+                                                                     alt="Cent"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Cent</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>32.25k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-info"
+                                                                         role="progressbar"
+                                                                         style="width: 42.76%"
+                                                                         aria-valuenow="42.76"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">42.76%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>6</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/linux.png' %}"
+                                                                     alt="Linux"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Linux</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>22.15k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-warning"
+                                                                         role="progressbar"
+                                                                         style="width: 37.77%"
+                                                                         aria-valuenow="37.77"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">37.77%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>7</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/fedora.png' %}"
+                                                                     alt="Fedora"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Fedora</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>1.13k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-danger"
+                                                                         role="progressbar"
+                                                                         style="width: 29.16%"
+                                                                         aria-valuenow="29.16"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">29.16%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>8</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/img/icons/brands/vivaldi-os.png' %}"
+                                                                     alt="Vivaldi"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Vivaldi</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>1.09k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-danger"
+                                                                         role="progressbar"
+                                                                         style="width: 26.26%"
+                                                                         aria-valuenow="26.26"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">26.26%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="navs-pills-country" role="tabpanel">
+                                        <div class="table-responsive text-start">
+                                            <table class="table table-borderless">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Country</th>
+                                                        <th>Visits</th>
+                                                        <th class="w-50">Data In Percentage</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/svg/flags/us.svg' %}"
+                                                                     alt="USA"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>USA</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>87.24k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-success"
+                                                                         role="progressbar"
+                                                                         style="width: 89.12%"
+                                                                         aria-valuenow="89.12"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">89.12%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/svg/flags/br.svg' %}"
+                                                                     alt="Brazil"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Brazil</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>62.68k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-primary"
+                                                                         role="progressbar"
+                                                                         style="width: 78.23%"
+                                                                         aria-valuenow="78.23"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">78.23%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/svg/flags/in.svg' %}"
+                                                                     alt="India"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>India</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>52.58k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-info"
+                                                                         role="progressbar"
+                                                                         style="width: 69.82%"
+                                                                         aria-valuenow="69.82"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">69.82%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/svg/flags/au.svg' %}"
+                                                                     alt="Australia"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Australia</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>44.13k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-warning"
+                                                                         role="progressbar"
+                                                                         style="width: 59.9%"
+                                                                         aria-valuenow="59.90"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">59.90%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>5</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/svg/flags/de.svg' %}"
+                                                                     alt="Germany"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Germany</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>32.21k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-warning"
+                                                                         role="progressbar"
+                                                                         style="width: 57.11%"
+                                                                         aria-valuenow="57.11"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">57.11%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>6</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/svg/flags/fr.svg' %}"
+                                                                     alt="France"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>France</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>37.87k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-warning"
+                                                                         role="progressbar"
+                                                                         style="width: 41.23%"
+                                                                         aria-valuenow="41.23"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">41.23%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>7</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/svg/flags/pt.svg' %}"
+                                                                     alt="Portugal"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>Portugal</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>20.29k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-danger"
+                                                                         role="progressbar"
+                                                                         style="width: 37.11%"
+                                                                         aria-valuenow="37.11"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">37.11%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>8</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{% static 'assets/svg/flags/cn.svg' %}"
+                                                                     alt="China"
+                                                                     height="24"
+                                                                     class="me-2" />
+                                                                <span>China</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>12.21k</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                <div class="progress w-100" style="height: 10px">
+                                                                    <div class="progress-bar bg-danger"
+                                                                         role="progressbar"
+                                                                         style="width: 17.61%"
+                                                                         aria-valuenow="17.61"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small class="fw-medium">17.61%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ pill table -->
+                    </div>
+                </div>
+                <!-- / Content -->
+                <!-- Footer -->
+                <footer class="content-footer footer bg-footer-theme">
+                    <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                        <div class="mb-2 mb-md-0">
+                            ©
+                            <script>document.write(new Date().getFullYear());</script>
+                            , made with ❤️ by
+                            <a href="https://themeselection.com"
+                               target="_blank"
+                               class="footer-link fw-medium">ThemeSelection</a>
+                        </div>
+                        <div class="d-none d-lg-inline-block">
+                            <a href="https://themeselection.com/license/"
+                               class="footer-link me-4"
+                               target="_blank">License</a>
+                            <a href="https://themeselection.com/"
+                               target="_blank"
+                               class="footer-link me-4">More Themes</a>
+                            <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/documentation/"
+                               target="_blank"
+                               class="footer-link me-4">Documentation</a>
+                            <a href="https://themeselection.com/support/"
+                               target="_blank"
+                               class="footer-link d-none d-sm-inline-block">Support</a>
+                        </div>
+                    </div>
+                </footer>
+                <!-- / Footer -->
+                <div class="content-backdrop fade"></div>
+            </div>
+            <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+    </div>
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+</div>
+<!-- / Layout wrapper -->
+<!-- Core JS -->
+<!-- build:js assets/vendor/js/core.js -->
+{% include 'footer.html' %}

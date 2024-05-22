@@ -1,0 +1,57 @@
+{% include 'header.html' %}
+{% load static %}
+   <body>
+        <!-- Content -->
+        <div class="authentication-wrapper authentication-cover">
+            <div class="authentication-inner row m-0">
+                <!-- /Left Text -->
+                <!-- Register -->
+                <div class="d-flex col-12 align-items-center authentication-bg p-sm-5 p-4">
+                    <div class="w-px-400 mx-auto">
+                        <!-- Logo -->
+                        <!-- /Logo -->
+                        <h4 class="mb-2">회원정보</h4>
+                        <a class="btn btn-primary d-grid w-100 mb-2" href="/register/register">개인 회원으로 가입</a>
+                        <a class="btn btn-light text-primary border d-grid w-100"
+                           href="/register/register">법인 / 개인사업자 회원으로 가입</a>
+                        <div class="divider my-4">
+                            <div class="divider-text">or</div>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <a href="javascript:;" class="btn btn-icon btn-label-facebook me-3">
+                                <i class="tf-icons bx bxl-facebook"></i>
+                            </a>
+                            <a href="javascript:;" class="btn btn-icon btn-label-google-plus me-3">
+                                <i class="tf-icons bx bxl-google-plus"></i>
+                            </a>
+                            <a href="javascript:;" class="btn btn-icon btn-label-twitter">
+                                <i class="tf-icons bx bxl-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Register -->
+            </div>
+        </div>
+        <!-- / Content -->
+        <!-- Core JS -->
+        <!-- build:js assets/vendor/js/core.js -->
+        <script src="{% static '/assets/vendor/libs/jquery/jquery.js' %}"></script>
+        <script src="{% static '/assets/vendor/libs/popper/popper.js' %}"></script>
+        <script src="{% static '/assets/vendor/js/bootstrap.js' %}"></script>
+        <script src="{% static '/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+        <script src="{% static '/assets/vendor/libs/hammer/hammer.js' %}"></script>
+        <script src="{% static '/assets/vendor/libs/i18n/i18n.js' %}"></script>
+        <script src="{% static '/assets/vendor/libs/typeahead-js/typeahead.js' %}"></script>
+        <script src="{% static '/assets/vendor/js/menu.js' %}"></script>
+        <!-- endbuild -->
+        <!-- Vendors JS -->
+        <script src="{% static '/assets/vendor/libs/@form-validation/umd/bundle/popular.min.js' %}"></script>
+        <script src="{% static '/assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js' %}"></script>
+        <script src="{% static '/assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js' %}"></script>
+        <!-- Main JS -->
+        <script src="{% static '/assets/js/main.js' %}"></script>
+        <!-- Page JS -->
+        <script src="{% static '/assets/js/pages-auth.js' %}"></script>
+    </body>
+</html>

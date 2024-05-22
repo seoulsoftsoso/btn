@@ -1,0 +1,173 @@
+{% include "header.html" %}
+{% include 'menu.html' %}
+{% load static %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class='d-flex justify-content-between align-items-center mb-4'>
+        <div>
+            <span class="badge bg-secondary rounded ms-auto">온도센서</span>
+            <span class="badge bg-secondary rounded ms-auto">습도센서</span>
+            <span class="badge bg-secondary rounded ms-auto">Co2센서</span>
+        </div>
+        <div class="ml-auto d-flex">
+            <input type="text" class="form-control mx-2" placeholder="검색어를 입력하세요">
+            <span class="btn btn-primary align-content-end inline"><i class="fas fa-edit"></i></span>
+        </div>
+    </div>
+
+    <hr class="container-m-nx mt-5">
+
+        <h5 class="py-3 my-4">Tabs</h5>
+        
+        <!-- Tabs -->
+
+        <div class="row">
+          <div class="col-xl-6">
+            <h6 class="text-muted">
+                온도센서
+            </h6>
+            <div class="nav-align-top mb-4">
+              <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-home" aria-controls="navs-top-home" aria-selected="false" tabindex="-1">
+                    TS-PI
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-profile" aria-controls="navs-top-profile" aria-selected="true">
+                    TS-SM
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-messages" aria-controls="navs-top-messages" aria-selected="false" tabindex="-1">
+                    TS-CM
+                  </button>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade" id="navs-top-home" role="tabpanel">
+                    <p>
+                        <h2> 전원 문제 [TS-PI-01]</h2>
+                        <div> 전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                            전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+                    </p>
+                </div>
+                <div class="tab-pane fade active show" id="navs-top-profile" role="tabpanel">
+                  <p>
+                    <h2> 센서 이상 [TS-PI-01]</h2>
+                    <div> 전원 문제로 인한 센서 이상이 발생했습니다. <br>
+                        전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                        전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+                  </p>
+                </div>
+                <div class="tab-pane fade" id="navs-top-messages" role="tabpanel">
+                  <p>
+                    <h2> 통신 오류 [TS-PI-01]</h2>
+                    <div> 전원 문제로 인한 통신 오류가 발생했습니다. <br>
+                        전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                        전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-6">
+            <h6 class="text-muted">습도 센서</h6>
+            <div class="nav-align-top mb-4">
+              <ul class="nav nav-tabs nav-fill" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-home" aria-controls="navs-justified-home" aria-selected="true">
+                    <i class="tf-icons bx bx-home me-1"></i> HS-PI
+                    <span class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-danger ms-1">3</span>
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-profile" aria-controls="navs-justified-profile" aria-selected="false" tabindex="-1">
+                    <i class="tf-icons bx bx-user me-1"></i> HS-SM
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-messages" aria-controls="navs-justified-messages" aria-selected="false" tabindex="-1">
+                    <i class="tf-icons bx bx-message-square me-1"></i> HS-CM
+                  </button>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="navs-justified-home" role="tabpanel">
+                  <p>
+                    <h3> 전원 문제 [HS-PI-02]</h3>
+                    <div> 전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                        전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+                  </p>
+                </div>
+                <div class="tab-pane fade" id="navs-justified-profile" role="tabpanel">
+                  <p>
+                    <h3> 센서 이상 [HS-PI-02]</h3>
+                    <div> 전원 문제로 인한 센서 이상이 발생했습니다. <br>
+                        전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                        전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+                  </p>
+                </div>
+                <div class="tab-pane fade" id="navs-justified-messages" role="tabpanel">
+                  <p>
+                    <h3> 통신 오류 [HS-PI-02]</h3>
+                    <div> 전원 문제로 인한 통신 오류가 발생했습니다. <br>
+                        전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                        전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-6">
+            <h6 class="text-muted">CO2센서</h6>
+            <div class="nav-align-left mb-4">
+              <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-left-home" aria-controls="navs-left-home" aria-selected="true">
+                    CS-PI
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-left-profile" aria-controls="navs-left-profile" aria-selected="false" tabindex="-1">
+                    CS-SM
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-left-messages" aria-controls="navs-left-messages" aria-selected="false" tabindex="-1">
+                    CS-CM
+                  </button>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="navs-left-home" role="tabpanel">
+                  <p>
+                    <h3> 전원 문제 [CS-PI-03]</h3>
+                    <div> 전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                        전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+                  </p>
+                </div>
+                <div class="tab-pane fade" id="navs-left-profile" role="tabpanel">
+                  <p>
+                    <h3> 센서 이상 [CS-PI-03]</h3>
+                    <div> CO2 데이터 이상값 감지 알고리즘에 의해 센서 이상이 발생했습니다. <br>
+                        CO2 데이터 일관성 및 범위 분석을 통해 센서 교체 또는 점검을 진행해주세요.</div>
+                  </p>
+                </div>
+                <div class="tab-pane fade" id="navs-left-messages" role="tabpanel">
+                  <p>
+                    <h3> 통신 오류 [CS-PI-03]</h3>
+                    <div> 전원 문제로 인한 통신 오류가 발생했습니다. <br>
+                        전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                        전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Pills -->
+      </div>
+</div>
+{% include 'footer.html' %}

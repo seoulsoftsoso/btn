@@ -1,0 +1,113 @@
+{% load static %}
+<html lang="en"
+      class="light-style layout-navbar-fixed layout-menu-fixed layout-compact"
+      dir="ltr"
+      data-theme="theme-default"
+      data-assets-path="{% static 'assets/' %}"
+      data-template="vertical-menu-template">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <title>서울소프트 관리자페이지</title>
+        <meta name="description" content="">
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="{% static '/img/logo.png' %}">
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&amp;display=swap"
+              rel="stylesheet">
+        <link rel="stylesheet"
+              as="style"
+              crossorigin=""
+              href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+        <!-- Icons -->
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/fonts/boxicons.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/fonts/fontawesome.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/fonts/flag-icons.css' %}">
+        <!-- Core CSS -->
+        <link rel="stylesheet" href="{% static 'assets/vendor/css/rtl/core.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/css/rtl/theme-default.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/css/core.css' %}"
+              class="template-customizer-core-css">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/css/theme-default.css' %}"
+              class="template-customizer-theme-css">
+        <link rel="stylesheet" href="{% static 'assets/css/demo.css' %}">
+        <!-- Vendors CSS -->
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/typeahead-js/typeahead.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/select2/select2.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/%40form-validation/umd/styles/index.min.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/apex-charts/apex-charts.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/jquery-timepicker/jquery-timepicker.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/pickr/pickr-themes.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css' %}" />
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/flatpickr/flatpickr.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/sweetalert2/sweetalert2.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/bootstrap-select/bootstrap-select.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/tagify/tagify.css' %}" />
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/jstree/jstree.css' %}" />
+        <link rel="stylesheet" href="{% static '/assets/app.css' %}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!-- Helpers -->
+        <script src="{% static 'assets/vendor/js/helpers.js' %}"></script>
+        <style type="text/css">
+      .layout-menu-fixed .layout-navbar-full .layout-menu,
+      .layout-menu-fixed-offcanvas .layout-navbar-full .layout-menu {
+        top: 62px !important;
+      }
+
+      .layout-page {
+        padding-top: 62px !important;
+      }
+
+      .content-wrapper {
+        padding-bottom: 0 !important;
+      }
+        </style>
+        <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+        <!--? Config: Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file. -->
+        <script src="{% static 'assets/js/config.js' %}"></script>
+        <style>
+      @font-face {
+        font-family: 'Pretendard';
+        src: url("{% static 'assets/vendor/fonts/pretendard/Pretendard-Medium.woff' %}") format('woff');
+      }
+        </style>
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/fullcalendar/fullcalendar.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/vendor/libs/flatpickr/flatpickr.css' %}">
+    </head>
+    <body>
+        <!-- Layout wrapper -->
+        <!--    <div class="layout-wrapper layout-content-navbar">-->
+

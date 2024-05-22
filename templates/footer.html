@@ -1,0 +1,57 @@
+{% load static %}
+<!-- Overlay -->
+</div>
+</div>
+</div>
+<div class="layout-overlay layout-menu-toggle"></div>
+<!-- Drag Target Area To SlideIn Menu On Small Screens -->
+<div class="drag-target"></div>
+</div>
+<!-- Flat Picker -->
+<script src="{% static 'assets/vendor/libs/moment/moment.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/flatpickr/flatpickr.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js' %}"></script>
+<!-- Form Validation -->
+<script src="{% static 'assets/vendor/libs/@form-validation/umd/bundle/popular.min.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/jquery/jquery.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/popper/popper.js' %}"></script>
+<script src="{% static 'assets/vendor/js/bootstrap.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/hammer/hammer.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/i18n/i18n.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/typeahead-js/typeahead.js' %}"></script>
+<script src="{% static 'assets/vendor/js/menu.js' %}"></script>\
+<script src="{% static 'assets/vendor/libs/bootstrap-select/bootstrap-select.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/select2/select2.js' %}"></script>
+<!-- endbuild -->
+<!-- Vendors JS -->
+<script src="{% static 'assets/vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/jstree/jstree.js' %} "></script>
+<!-- Main JS -->
+<script src="{% static 'assets/vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/tagify/tagify.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/bootstrap-select/bootstrap-select.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/typeahead-js/typeahead.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/bloodhound/bloodhound.js' %}"></script>
+<!-- Page JS -->
+<script src="{% static 'assets/js/main.js' %}"></script>
+<script src="{% static 'assets/js/forms-selects.js' %}"></script>
+<script src="{% static 'assets/js/forms-typeahead.js' %}"></script>
+<script src="{% static 'assets/js/dashboards-analytics.js' %}"></script>
+<script src="{% static 'assets/js/forms-pickers.js' %}"></script>
+<script src="{% static 'assets/js/extended-ui-treeview.js' %}"></script>
+<script src="{% static 'assets/app.js' %}"></script>
+<script>
+        let pageName = {
+            'dashboard':  "관리자용 대쉬보드",
+            'breakDown': '고장식별 기준관리'
+        }
+        let url_name = '{{ request.resolver_match.url_name }}'
+        console.log(url_name)
+        document.getElementById("menuTitle").innerHTML = pageName[url_name] || url_name
+</script>
+</body>
+</html>

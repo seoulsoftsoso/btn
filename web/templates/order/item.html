@@ -1,0 +1,540 @@
+{% include "header.html" %}
+{% include 'menu.html' %}
+{% load static %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- DataTable with Buttons -->
+    <div class="card">
+        <div class="card-datatable table-responsive">
+            <table class="datatables-basic table border-top">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>id</th>
+                        <th>품번</th>
+                        <th>품명</th>
+                        <th>유형</th>
+                        <th>규격</th>
+                        <th>모델</th>
+                        <th>제조사</th>
+                        <th>레벨</th>
+                        <th>표준단가</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" id="item" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+            <div class="modal-content p-3 p-md-5">
+                <div class="modal-body">
+                    <button type="button"
+                            class="btn-close"
+                            atda-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    <div class="text-center mb-4">
+                        <h3 class="title">추가</h3>
+                    </div>
+                    <form class="add-new-record pt-0 row g-2 "
+                          id="form-add-new-record"
+                          href="javascript:;"
+                          action="/api/items/add"
+                          method="POST">
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="code">품번</label>
+                            <input type="text"
+                                   id="code"
+                                   name="code"
+                                   class="form-control"
+                                   placeholder="Enter item code"
+                                   aria-label="Enter item code" />
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="name">품명</label>
+                            <input type="text"
+                                   id="name"
+                                   name="name"
+                                   class="form-control"
+                                   placeholder="Enter item name"
+                                   aria-label="Enter item name" />
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="type">유형</label>
+                            <input type="text"
+                                   id="type"
+                                   name="type"
+                                   class="form-control"
+                                   placeholder="Enter item type"
+                                   aria-label="Enter item type" />
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="specification">규격</label>
+                            <input type="text"
+                                   id="specification"
+                                   name="specification"
+                                   class="form-control"
+                                   placeholder="Enter specification"
+                                   aria-label="Enter specification" />
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="model">모델</label>
+                            <input type="text"
+                                   id="model"
+                                   name="model"
+                                   class="form-control"
+                                   placeholder="Enter model"
+                                   aria-label="Enter model" />
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="brand">제조사</label>
+                            <input type="text"
+                                   id="brand"
+                                   name="brand"
+                                   class="form-control"
+                                   placeholder="Enter brand"
+                                   aria-label="Enter brand" />
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="level">레벨</label>
+                            <select class="form-select select2" id="level" name="level">
+                                <option value="1">
+                                    컨테이너<span>(level1)</span>
+                                </option>
+                                <option value="2">
+                                    컨트롤러<span>(level2)</span>
+                                </option>
+                                <option value="3">
+                                    제품<span>(level3)</span>
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="standardPrice">표준단가</label>
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-text"><i class="bx bx-dollar"></i></span>
+                                <input type="number"
+                                       id="standard_price"
+                                       name="standard_price"
+                                       class="form-control dt-salary"
+                                       placeholder="Enter standard price"
+                                       aria-label="Enter standard price"
+                                       aria-describedby="standard_price" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12 mt-3">
+                            <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">추가</button>
+                            <button type="reset" class="btn btn-outline-info" data-bs-dismiss="modal">초기화</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function (e) {
+        (function () {
+          const formAddNewRecord = document.getElementById('form-add-new-record');
+          
+          fv = FormValidation.formValidation(formAddNewRecord, {
+            fields: {
+              standard_price: {
+                validators: {
+                  notEmpty: {
+                    message: '가격은 필수입력입니다.'
+                  }
+                }
+              },
+              code: {
+                validators: {
+                  notEmpty: {
+                    message: '품번은 필수입력입니다.'
+                  }
+                }
+              },
+              name: {
+                validators: {
+                  notEmpty: {
+                    message: '품명은 필수입력입니다.'
+                  }
+                }
+              },
+              type: {
+                validators: {
+                  notEmpty: {
+                    message: '제품 유형은 필수입력입니다.'
+                  },
+                }
+              },
+              basicSalary: {
+                validators: {
+                  notEmpty: {
+                    message: '가격은 필수입력입니다.'
+                  }
+                }
+              }
+            },
+            plugins: {
+              trigger: new FormValidation.plugins.Trigger(),
+              bootstrap5: new FormValidation.plugins.Bootstrap5({
+                // Use this for enabling/changing valid/invalid class
+                // eleInvalidClass: '',
+                eleValidClass: '',
+                rowSelector: '.col-sm-12'
+              }),
+              defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+              autoFocus: new FormValidation.plugins.AutoFocus()
+            },
+            init: instance => {
+              instance.on('plugins.message.placed', function (e) {
+                if (e.element.parentElement.classList.contains('input-group')) {
+                  e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+                }
+              });
+            }
+          });
+          document.querySelector("#form-add-new-record").addEventListener('submit', function (e2) {
+            e2.preventDefault();
+            const form = e2.target;
+            const formData = new FormData(form);
+            const url = form.action;
+            const method = form.method;
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            fetch(url, {
+              method: method,
+              body: formData
+            }).then(response => {
+              if (response.ok) {
+                dt_basic.ajax.reload();
+                $('#item').modal('hide');
+              }
+            });
+          });
+
+        })();
+      });
+      $(function () {
+      var dt_basic_table = $('.datatables-basic')
+      dt_basic = dt_basic_table.DataTable({
+        ajax: {
+          url: '/api/items/list',
+          dataSrc: function (json) {
+            return json.data;
+          },          
+        },
+        columns: [
+          { data: '' },
+          { data: 'id' },
+          { data: 'id' },
+          { data: 'item_code' },
+          { data: 'item_name' },
+          { data: 'item_type' },
+          { data: 'specification' },
+          { data: 'model' },
+          { data: 'brand' },
+          { data: 'level' },
+          { data: 'standard_price' },
+          { data: '' }
+        ],
+        columnDefs: [
+          {
+            // For Responsive
+            className: 'control',
+            orderable: false,
+            searchable: false,
+            responsivePriority: 2,
+            targets: 0,
+            render: function (data, type, full, meta) {
+              return '';
+            }
+          },
+          {
+            // For Checkboxes
+            targets: 1,
+            orderable: false,
+            searchable: false,
+            responsivePriority: 3,
+            checkboxes: false,
+            render: function () {
+              return '';
+            }
+          },
+          {
+            targets: 2,
+            searchable: false,
+            visible: false
+          },
+          {
+            responsivePriority: 1,
+            targets: 4
+          },{
+            // Label
+            targets: -3,
+            render: function (data, type, full, meta) {
+              var $status_number = full['level'];
+              var $status = {
+                1: {
+                  title: 'level 1',
+                  class: 'bg-label-primary'
+                },
+                2: {
+                  title: 'level 2',
+                  class: ' bg-label-success'
+                },
+                3: {
+                  title: 'level 3',
+                  class: ' bg-label-danger'
+                },
+                4: {
+                  title: 'level 4',
+                  class: ' bg-label-warning'
+                },
+                5: {
+                  title: 'level 5',
+                  class: ' bg-label-info'
+                }
+              };
+              if (typeof $status[$status_number] === 'undefined') {
+                return data;
+              }
+              return ('<span class="badge ' + $status[$status_number].class + '">' + $status[$status_number].title + '</span>');
+            }
+          },
+          {
+            // Actions
+            targets: -1,
+            title: 'Actions',
+            orderable: false,
+            searchable: false,
+            render: function (data, type, full, meta) {
+                const htmlCode = `
+                <div class="d-inline-block">
+                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end m-0">
+                        <li><a href="javascript:;" class="dropdown-item" data-bs-toggle="modal" action="patch" data-bs-target="#item"><i class="bx bxs-edit"></i> 수정</a></li>
+                        <li><a href="javascript:;" class="dropdown-item text-danger delete-record" data-bs-toggle="modal" action="delete" data-bs-target="#item"><i class="bx bxs-trash"></i> 삭제</a></li>
+                    </ul>
+                </div>
+            `;
+              return (htmlCode );
+            }
+          }
+        ],
+        order: [[2, 'desc']],
+        dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+        displayLength: 5,
+        lengthMenu: [5, 10, 25, 50, 75, 100],
+        buttons: [
+          {
+            extend: 'collection',
+            className: 'btn btn-label-primary dropdown-toggle me-2',
+            text: '<i class="bx bx-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
+            buttons: [
+              {
+                extend: 'print',
+                text: '<i class="bx bx-printer me-1"></i>Print',
+                className: 'dropdown-item',
+                exportOptions: {
+                  columns: [3, 4, 5, 6, 7],
+                  // prevent avatar to be display
+                  format: {
+                    body: function (inner, coldex, rowdex) {
+                      if (inner.length <= 0) return inner;
+                      var el = $.parseHTML(inner);
+                      var result = '';
+                      $.each(el, function (index, item) {
+                        if (item.classList !== undefined && item.classList.contains('user-name')) {
+                          result = result + item.lastChild.firstChild.textContent;
+                        } else if (item.innerText === undefined) {
+                          result = result + item.textContent;
+                        } else result = result + item.innerText;
+                      });
+                      return result;
+                    }
+                  }
+                },
+                customize: function (win) {
+                  //customize print view for dark
+                  $(win.document.body)
+                    .css('color', config.colors.headingColor)
+                    .css('border-color', config.colors.borderColor)
+                    .css('background-color', config.colors.bodyBg);
+                  $(win.document.body)
+                    .find('table')
+                    .addClass('compact')
+                    .css('color', 'inherit')
+                    .css('border-color', 'inherit')
+                    .css('background-color', 'inherit');
+                }
+              },
+              {
+                extend: 'csv',
+                text: '<i class="bx bx-file me-1"></i>Csv',
+                className: 'dropdown-item',
+                exportOptions: {
+                  columns: [3, 4, 5, 6, 7],
+                  // prevent avatar to be display
+                  format: {
+                    body: function (inner, coldex, rowdex) {
+                      if (inner.length <= 0) return inner;
+                      var el = $.parseHTML(inner);
+                      var result = '';
+                      $.each(el, function (index, item) {
+                        if (item.classList !== undefined && item.classList.contains('user-name')) {
+                          result = result + item.lastChild.firstChild.textContent;
+                        } else if (item.innerText === undefined) {
+                          result = result + item.textContent;
+                        } else result = result + item.innerText;
+                      });
+                      return result;
+                    }
+                  }
+                }
+              },
+              {
+                extend: 'excel',
+                text: '<i class="bx bxs-file-export me-1"></i>Excel',
+                className: 'dropdown-item',
+                exportOptions: {
+                  columns: [3, 4, 5, 6, 7, 8, 9],
+                  // prevent avatar to be display
+                  format: {
+                    body: function (inner, coldex, rowdex) {
+                      if (inner.length <= 0) return inner;
+                      var el = $.parseHTML(inner);
+                      var result = '';
+                      $.each(el, function (index, item) {
+                        if (item.classList !== undefined && item.classList.contains('user-name')) {
+                          result = result + item.lastChild.firstChild.textContent;
+                        } else if (item.innerText === undefined) {
+                          result = result + item.textContent;
+                        } else result = result + item.innerText;
+                      });
+                      return result;
+                    }
+                  }
+                }
+              },
+              {
+                extend: 'pdf',
+                text: '<i class="bx bxs-file-pdf me-1"></i>Pdf',
+                className: 'dropdown-item',
+                exportOptions: {
+                  columns: [3, 4, 5, 6, 7],
+                  // prevent avatar to be display
+                  format: {
+                    body: function (inner, coldex, rowdex) {
+                      if (inner.length <= 0) return inner;
+                      var el = $.parseHTML(inner);
+                      var result = '';
+                      $.each(el, function (index, item) {
+                        if (item.classList !== undefined && item.classList.contains('user-name')) {
+                          result = result + item.lastChild.firstChild.textContent;
+                        } else if (item.innerText === undefined) {
+                          result = result + item.textContent;
+                        } else result = result + item.innerText;
+                      });
+                      return result;
+                    }
+                  }
+                }
+              },
+              {
+                extend: 'copy',
+                text: '<i class="bx bx-copy me-1"></i>Copy',
+                className: 'dropdown-item',
+                exportOptions: {
+                  columns: [3, 4, 5, 6, 7],
+                  // prevent avatar to be display
+                  format: {
+                    body: function (inner, coldex, rowdex) {
+                      if (inner.length <= 0) return inner;
+                      var el = $.parseHTML(inner);
+                      var result = '';
+                      $.each(el, function (index, item) {
+                        if (item.classList !== undefined && item.classList.contains('user-name')) {
+                          result = result + item.lastChild.firstChild.textContent;
+                        } else if (item.innerText === undefined) {
+                          result = result + item.textContent;
+                        } else result = result + item.innerText;
+                      });
+                      return result;
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            text: '<a href=" javascript:void(0)" class="d-none d-sm-inline-block text-white" action="post" data-bs-toggle="modal" data-bs-target="#item"> <i class="bx bx-plus me-sm-1"></i> 추가</a>',
+            className: 'create-new btn btn-primary',
+          }
+        ],
+        responsive: {
+          details: {
+            display: $.fn.DataTable.Responsive.display.modal({
+              header: function (row) {
+                var data = row.data();
+                return 'Details of ' + data['full_name'];
+              }
+            }),
+            type: 'column',
+            renderer: function (api, rowIdx, columns) {
+              var data = $.map(columns, function (col, i) {
+                return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
+                  ? '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' +
+                      '<td>' +
+                      col.title +
+                      ':' +
+                      '</td> ' +
+                      '<td>' +
+                      col.data +
+                      '</td>' +
+                      '</tr>'
+                  : '';
+              }).join('');
+  
+              return data ? $('<table class="table" /><tbody />').append(data) : false;
+            }
+          }
+        }
+      })
+      $('div.head-label').html('<h5 class="card-title mb-0">품목</h5>');
+      $("#item").on('show.bs.modal', function (e) {
+        const formRecord = document.getElementById('form-add-new-record');
+        let tr = $(e.relatedTarget).closest('tr');
+        let rest = e.relatedTarget.getAttribute('action');
+        switch (rest) {
+          case 'patch':
+            formRecord.action = `/order/item/edit/${dt_basic.row(tr).data().id}`;
+            $(formRecord).find('button[type="submit"]').text('수정');
+            formRecord.href = 'javascript:;'
+            $('h3.title').text('수정');
+            break;
+          case 'delete':
+            formRecord.action = `/order/item/delete/${dt_basic.row(tr).data().id}`;
+            $(formRecord).find('input').attr('readonly', true);
+            $(formRecord).find('button[type="submit"]').text('삭제');
+            formRecord.href = 'javascript:;'
+            $('h3.title').text('삭제');
+            break;
+          default:
+            formRecord.action = '/api/items/add';
+            $(formRecord).find('button[type="submit"]').text('추가');
+            formRecord.href = 'javascript:;'
+            $('h3.title').text('추가');
+            break;
+        }
+        console.log(rest)
+        let data = dt_basic.row(tr).data();
+        if(data){
+          ['code', 'name', 'type', 'specification', 'model', 'brand','standard_price'].forEach((key) => {
+            formRecord.querySelector(`#${key}`).value = data[key];
+          });
+          $("#level").val(data.level).trigger("change");
+        }
+      });
+      });
+    </script>
+</div>
+{% include 'footer.html' %}

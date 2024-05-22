@@ -1,0 +1,242 @@
+{% include "header.html" %}
+{% include 'menu.html' %}
+{% load static %}
+{% comment %} | 장비유형 | 고장코드 | 고장 유형 | 식별기준 | 식별 알고리즘 | 대응조치 |
+| --- | --- | --- | --- | --- | --- |
+| AC | AC-PI-01 | 전원 문제 | 전원 공급 중단 | 전력 모니터링 | 전원 점검 및 복구 |
+| AC | AC-CE-01 | 성능
+고장의심 | 설정온도와 실제온도의 차이가 1시간 이상 변동이 없거나, 설정값과 반대로 상승 또는 하락 | 환경 설정 값 / 실제 값 조회
+장비 작동내역, 센서 측정내역 비교 | 기기 제조사 연락 |
+| AC | AC-CM-01 | 통신 오류 | 제어 패널과 통신 불가 | 통신 상태 점검 | 통신 회로 점검 및 복구 |
+|  |  |  |  |  |  |
+| VF | VF-PI-02 | 전원 문제 | 전원 공급 중단 | 전력 모니터링 | 전원 점검 및 복구 |
+| VF | VF-CM-02 | 통신 오류 | 시스템과의 신호 손실 | 통신 상태 점검 | 통신 회로 점검 및 복구 |
+|  |  |  |  |  |  |
+| EF | EF-PI-03 | 전원 문제 | 전원 공급 중단 | 전력 모니터링 | 전원 점검 및 복구 |
+| EF | EF-CE-01 | 성능
+고장의심 | 장비 작동 1시간 후에도
+설정습도와 실제습도의 차가 변동이 없거나, 설정값과 반대로 상승 또는 하락 | 환경 설정 값 / 실제 값 조회
+장비 작동시, 센서 측정내역 비교  | 기기
+제조사 연락 |
+| EF | EF-CM-03 | 통신 오류 | 제어 시스템과의 연결 끊김 | 통신 상태 점검 | 통신 회로 점검 및 복구 |
+|  |  |  |  |  |  |
+| HM | HM-PI-01 | 전원 문제 | 전원 공급 중단 감지 | 전력 공급 모니터링 | 전원 연결 점검 및 복구 |
+| HM | HM-CE-01 | 성능
+고장의심 | 장비 작동 1시간 후에도
+설정습도와 실제습도의 차가 변동이 없거나, 설정값과 반대로 상승 또는 하락 | 실제 (센서) 습도 측정데이터 비교  | 기기
+제조사 연락 |
+| HM | HM-CM-01 | 통신 오류 | 센서 데이터 미수신 | 통신 상태 및 데이터 전송 점검 | 통신 경로 점검 및 복구 |
+|  |  |  |  |  |  |
+| DH | DH-PI-01 | 전원 문제 | 전원 공급 중단 | 전력 모니터링 | 전원 점검 및 복구 |
+| DH | DH-CE-01 | 성능
+고장의심 | 장비 작동 1시간 후에도
+설정습도와 실제습도의 차가 변동이 없거나, 설정값과 반대로 상승 또는 하락 | 설정 / 실제 습도 비교 | 기기 
+제조사 연락 |
+| DH | DH-CM-01 | 통신 오류 | 시스템 모니터링 데이터 누락 | 통신 상태 및 데이터 전송 점검 | 통신 회로 점검 및 복구 |
+|  |  |  |  |  |  |
+| GL | GL-PI-01 | 전원 문제 | 전원 공급 중단 | 전력 모니터링 | 전원 점검 및 복구 |
+| GL | GL-CM-01 | 통신 오류 | 제어 정보 전송 실패 | 통신 상태 및 제어 명령 전송 점검 | 통신 회로 점검 및 복구 |
+|  |  |  |  |  |  |
+| SP | SP-PI-01 | 전원 문제 | 전원 공급 중단 | 전력 모니터링 | 전원 점검 및 복구 |
+| SP | SP-CM-01 | 통신 오류 | 제어 정보 전송 실패 | 통신 상태 및 제어 신호 전송 점검 | 통신 회로 점검 및 복구 | {% endcomment %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class='d-flex justify-content-between align-items-center mb-4'>
+        <div>
+            <span class="badge bg-secondary rounded ms-auto">냉난방기</span>
+            <span class="badge bg-secondary rounded ms-auto">환기팬</span>
+            <span class="badge bg-secondary rounded ms-auto">배기팬</span>
+            <span class="badge bg-secondary rounded ms-auto">가습기</span>
+            <span class="badge bg-secondary rounded ms-auto">제습기</span>
+            <span class="badge bg-secondary rounded ms-auto">생장LED</span>
+            <span class="badge bg-secondary rounded ms-auto">스프링쿨러</span>
+        </div>
+        <div class="ml-auto d-flex">
+            <input type="text" class="form-control mx-2" placeholder="검색어를 입력하세요">
+            <span class="btn btn-primary align-content-end inline"><i class="fas fa-edit"></i></span>
+        </div>
+    </div>
+
+    <hr class="container-m-nx mt-5">
+
+    <!-- Pills -->
+    <h5 class="py-3 my-4">Pills</h5>
+
+    <div class="row">
+      <div class="col-xl-6">
+        <h6 class="text-muted">냉난방기</h6>
+        <div class="nav-align-top mb-4">
+          <ul class="nav nav-pills mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-home" aria-controls="navs-pills-top-home" aria-selected="true">
+                AC-PI
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-profile" aria-controls="navs-pills-top-profile" aria-selected="false" tabindex="-1">
+                AC-CE
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-messages" aria-controls="navs-pills-top-messages" aria-selected="false" tabindex="-1">
+                AC-CM
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+              <p>
+                <h3> 전원 문제 [AC-PI-01]</h3>
+                <div> 전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                    전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+              </p>
+            </div>
+            <div class="tab-pane fade" id="navs-pills-top-profile" role="tabpanel">
+              <p>
+                <h3> 성능 고장 의심[AC-CM-01]</h3>
+                <div> 설정온도와 실제온도의 차이가 1시간 이상 변동이 없거나, 설정값과 반대로 상승 또는 하락이 발생했습니다. <br>
+                    환경 설정 값과 실제 값 조회, 장비 작동 내역, 센서 측정 내역을 비교해주세요. <br>
+                    기기 제조사에 문의해주세요.</div>
+              </p>
+            </div>
+            <div class="tab-pane fade" id="navs-pills-top-messages" role="tabpanel">
+              <p>
+                <h3> 통신 오류 [AC-CM-01]</h3>
+                <div> 전원 문제로 인한 통신 오류가 발생했습니다. <br>
+                    전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                    전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-6">
+        <h6 class="text-muted">환기팬 </h6>
+        <div class="nav-align-top mb-4">
+          <ul class="nav nav-pills mb-3 nav-fill" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-justified-home" aria-controls="navs-pills-justified-home" aria-selected="true">
+                <i class="tf-icons bx bx-home me-1"></i> VF-PI
+                <span class="badge rounded-pill badge-center h-px-20 w-px-20 bg-danger ms-1">3</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-justified-profile" aria-controls="navs-pills-justified-profile" aria-selected="false" tabindex="-1">
+                <i class="tf-icons bx bx-user me-1"></i> VF-CM
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade active show" id="navs-pills-justified-home" role="tabpanel">
+              <p>
+                <h3> 전원 문제 [VF-PI-02]</h3>
+                <div> 전원 공급 중단 감지 알고리즘에 의해 전원 공급이 중단되었습니다. <br>
+                    전력 공급 모니터링을 통해 전원 연결 상태를 확인하고 전원 연결을 점검해주세요.</div>
+              </p>
+            </div>
+            <div class="tab-pane fade" id="navs-pills-justified-profile" role="tabpanel">
+              <p>
+                <h3> 통신 오류 [VF-PI-02]</h3>
+                <div> 시스템과의 신호 손실로 인한 통신 오류가 발생했습니다. <br>
+                    통신 상태 점검을 통해 통신 회로를 점검하고 복구해주세요.</div>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-6">
+        <h6 class="text-muted">배기팬</h6>
+        <div class="nav-align-left mb-4">
+          <ul class="nav nav-pills me-3" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-left-home" aria-controls="navs-pills-left-home" aria-selected="true">
+                EF-PI
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-left-profile" aria-controls="navs-pills-left-profile" aria-selected="false" tabindex="-1">
+                 EF-CE
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-left-messages" aria-controls="navs-pills-left-messages" aria-selected="false" tabindex="-1">
+                EF-CM
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="navs-pills-left-home" role="tabpanel">
+              <p>
+                <
+              </p>
+            </div>
+            <div class="tab-pane fade" id="navs-pills-left-profile" role="tabpanel">
+              <p>
+                Donut dragée jelly pie halvah. Danish gingerbread bonbon cookie wafer candy oat cake ice
+                cream. Gummies halvah tootsie roll muffin biscuit icing dessert gingerbread. Pastry ice cream
+                cheesecake fruitcake.
+              </p>
+              <p class="mb-0">
+                Jelly-o jelly beans icing pastry cake cake lemon drops. Muffin muffin pie tiramisu halvah
+                cotton candy liquorice caramels.
+              </p>
+            </div>
+            <div class="tab-pane fade" id="navs-pills-left-messages" role="tabpanel">
+              <p>
+                Oat cake chupa chups dragée donut toffee. Sweet cotton candy jelly beans macaroon gummies
+                cupcake gummi bears cake chocolate.
+              </p>
+              <p class="mb-0">
+                Cake chocolate bar cotton candy apple pie tootsie roll ice cream apple pie brownie cake. Sweet
+                roll icing sesame snaps caramels danish toffee. Brownie biscuit dessert dessert. Pudding jelly
+                jelly-o tart brownie jelly.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-6">
+        <h6 class="text-muted">Within cards</h6>
+        <div class="card text-center">
+          <div class="card-header">
+            <ul class="nav nav-pills card-header-pills" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-within-card-active" aria-controls="navs-pills-within-card-active" aria-selected="true">
+                  Active
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-within-card-link" aria-controls="navs-pills-within-card-link" aria-selected="false" tabindex="-1">
+                  Link
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link disabled" role="tab" data-bs-toggle="tab" aria-selected="false" tabindex="-1">
+                  Disabled
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="tab-content p-0">
+              <div class="tab-pane fade show active" id="navs-pills-within-card-active" role="tabpanel">
+                <h4 class="card-title">Special active title</h4>
+                <p class="card-text">
+                  With supporting text below as a natural lead-in to additional content.
+                </p>
+                <a href="javascript:void(0)" class="btn btn-primary">Go somewhere</a>
+              </div>
+              <div class="tab-pane fade" id="navs-pills-within-card-link" role="tabpanel">
+                <h4 class="card-title">Special link title</h4>
+                <p class="card-text">
+                  With supporting text below as a natural lead-in to additional content.
+                </p>
+                <a href="javascript:void(0)" class="btn btn-secondary">Go somewhere</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+{% include 'footer.html' %}

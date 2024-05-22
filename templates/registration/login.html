@@ -1,0 +1,130 @@
+    {% include "header.html" %}
+{%  load static %}
+<body>
+        <!-- Login -->
+        <div class="d-flex col-12 vh-100 align-items-center justify-content-center authentication-bg p-sm-5 p-4">
+            <div class="w-px-400 mx-auto">
+                <!-- Logo -->
+                <div class="app-brand mb-5 d-flex justify-content-center">
+                    <a href="index.html" class="app-brand-link gap-2">
+                        <div class="app-brand-text demo text-body fw-bold">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="239"
+                                 height="82"
+                                 viewbox="0 0 239 82"
+                                 fill="none">
+                                <g clip-path="url(#clip0_3777_31534)">
+                                <path d="M32.0438 26.9119C36.2887 24.5596 38.561 20.3181 38.561 15.5452C38.561 7.9674 33.2589 3.04184 26.8943 1.59996C24.9271 1.14739 21.971 0.915848 17.9576 0.915848H0V57.002H18.6361C27.4992 57.002 30.3764 56.3179 34.7738 53.2131C39.0186 50.2557 41.2909 45.3301 41.2909 39.952C41.2909 33.5109 38.1875 29.0379 32.0491 26.9171L32.0438 26.9119ZM13.7128 13.4981H19.4672C23.0282 13.4981 24.8482 14.7874 24.8482 17.7449C24.8482 20.7023 22.9546 22.2179 19.3936 22.2179H13.7128V13.5034V13.4981ZM21.061 44.4197H13.7128V34.1897H21.1346C25.3794 34.1897 27.5729 35.7789 27.5729 39.0416C27.5729 42.6779 25.0744 44.425 21.0557 44.425L21.061 44.4197Z" fill="#3D170F" />
+                                <path d="M71.8094 38.2785C71.8094 43.4304 69.3845 46.6141 64.6137 46.6141C59.8429 46.6141 57.8704 44.0356 57.8704 38.5048V14.9348H45.2938V41.0834C45.2938 53.0605 52.642 58.365 61.505 58.365C67.1858 58.365 70.5207 56.3968 72.3406 52.529H72.4932V57.002H84.386V14.94H71.8094V38.2838V38.2785Z" fill="#3D170F" />
+                                <path d="M154.901 13.5718C142.325 13.5718 132.252 22.8914 132.252 35.9316C132.252 48.9717 142.099 58.2913 154.901 58.2913C167.704 58.2913 177.551 48.9717 177.551 35.7789C177.551 22.5862 167.552 13.5718 154.901 13.5718ZM154.901 46.5405C149.221 46.5405 144.823 41.6886 144.823 35.9316C144.823 30.1745 149.294 25.3226 154.822 25.3226C160.729 25.3226 164.974 30.3271 164.974 35.9316C164.974 41.536 160.808 46.5405 154.896 46.5405H154.901Z" fill="#3D170F" />
+                                <path d="M204.761 13.4929C199.685 13.4929 195.971 15.0821 193.32 19.4025H193.168V14.9295H181.427V56.9915H194.004V33.8003C194.004 28.117 196.124 25.3121 201.2 25.3121C205.823 25.3121 207.791 27.9644 207.791 33.6477V56.9915H220.367V30.164C220.367 17.7343 212.335 13.4929 204.761 13.4929Z" fill="#3D170F" />
+                                <path d="M231.355 42.3727C227.316 42.3727 224.044 45.6458 224.044 49.6873C224.044 53.7288 227.316 57.002 231.355 57.002C235.395 57.002 238.667 53.7288 238.667 49.6873C238.667 45.6458 235.395 42.3727 231.355 42.3727Z" fill="#3D170F" />
+                                <path d="M123.725 14.9348V0.915848H111.149V14.9348H101.712V0.915848H89.1358V41.8359C89.1358 53.8025 96.4892 59.1175 105.347 59.1175C105.826 59.1175 106.294 59.1069 108.724 59.0701V47.2298C102.033 47.2298 101.712 44.0777 101.712 39.2573V26.4014H111.138V41.8412C111.138 53.8078 118.492 59.1227 127.35 59.1227C127.828 59.1227 128.296 59.1122 130.726 59.0754V47.2351C124.036 47.2351 123.715 44.0829 123.715 39.2626V26.4067H130.726V14.9453H123.71L123.725 14.9348Z" fill="#3D170F" />
+                                <path d="M53.8623 70.2003H55.3193L62.1257 79.2515V70.2003H63.5512V81.6617H62.1625L55.2877 72.421V81.6617H53.8623V70.2003Z" fill="#3D170F" />
+                                <path d="M70.0735 70.2H78.6V71.5524H71.5516V75.0782H77.7689V76.4306H71.5516V80.3037H78.7736V81.6561H70.0735V70.1947V70.2Z" fill="#3D170F" />
+                                <path d="M87.1738 75.757L83.1446 70.2H84.9488L88.2468 74.7677L91.4396 70.2H93.1912L89.1463 75.9307L93.3122 81.6614H91.508L88.089 76.92L84.7752 81.6614H83.0236L87.1738 75.757Z" fill="#3D170F" />
+                                <path d="M100.834 71.5735H96.91V70.2H106.231V71.5735H102.307V81.6667H100.829V71.5735H100.834Z" fill="#3D170F" />
+                                <path d="M118.329 70.2H126.576V71.5524H119.807V75.2361H125.745V76.5885H119.807V81.6614H118.329V70.2Z" fill="#3D170F" />
+                                <path d="M134.508 70.2H135.844L140.673 81.6614H139.095L137.948 78.9355H132.357L131.21 81.6614H129.68L134.508 70.2ZM137.375 77.562L135.155 72.0892L132.936 77.562H137.38H137.375Z" fill="#3D170F" />
+                                <path d="M145.633 70.2H150.478C153.118 70.2 154.486 71.3314 154.486 73.5521C154.486 75.3781 153.55 76.4674 151.761 76.799L155.322 81.6614H153.481L149.994 76.9042H147.111V81.6614H145.633V70.2ZM150.478 75.5518C152.214 75.5518 152.997 74.9414 152.997 73.5521C152.997 72.1628 152.214 71.5524 150.478 71.5524H147.111V75.5465H150.478V75.5518Z" fill="#3D170F" />
+                                <path d="M160.456 70.2H162.018L166.41 77.6357L170.787 70.2H172.401V81.6614H170.929V72.647L166.831 79.5933H165.947L161.887 72.7154V81.6614H160.461V70.2H160.456Z" fill="#3D170F" />
+                                </g>
+                                <defs>
+                                <clippath id="clip0_3777_31534">
+                                <rect width="238.667" height="81.3333" fill="white" transform="translate(0 0.333328)" />
+                                </clippath>
+                                </defs>
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+                <!-- /Logo -->
+                {% block content %}
+                    <form id="formAuthentication"
+                          class="mb-3"
+                          action="/auth/login/"
+                          method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="text"
+                                   name="{{ form.username.name }}"
+                                   value="{{ form.username.value|default_if_none:'' }}"
+                                   class="form-control p-2"
+                                   id="id_username"
+                                   placeholder="아이디">
+                        </div>
+                        <div class="mb-3 form-password-toggle">
+                            <div class="input-group input-group-merge">
+                                <input type="password"
+                                       name="{{ form.password.name }}"
+                                       value="{{ form.password.value|default_if_none:'' }}"
+                                       class="form-control p-2"
+                                       id="id_password"
+                                       placeholder="비밀번호">
+                                <span class="input-group-text cursor-pointer">
+                                    <i class="bx bx-hide"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check d-flex align-items-center justify-content-between">
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="remember-me" />
+                                    <label class="form-check-label" for="remember-me">계정 기억</label>
+                                </div>
+                                <div>
+                                    <a href="{% url 'password_reset' %}">비밀번호 찾기</a>
+                                </div>
+                            </div>
+                        </div>
+                        <button type='submit' value="login" class="btn btn-primary d-grid w-100">로그인</button>
+                        <input type="hidden" name="next" value="/">
+                    </form>
+                {% endblock %}
+                <p class="text-center">
+                    <span>회원정보가 없으신가요?</span>
+                    <a href="/register/select">
+                        <span>회원가입</span>
+                    </a>
+                </p>
+                <div class="divider my-4">
+                    <div class="divider-text">or</div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <a href="javascript:;" class="btn btn-icon btn-label-facebook me-3">
+                        <i class="tf-icons bx bxl-facebook"></i>
+                    </a>
+                    <a href="javascript:;" class="btn btn-icon btn-label-google-plus me-3">
+                        <i class="tf-icons bx bxl-google-plus"></i>
+                    </a>
+                    <a href="javascript:;" class="btn btn-icon btn-label-twitter">
+                        <i class="tf-icons bx bxl-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- /Login -->
+    </div>
+</div>
+<!-- / Content -->
+<!-- Core JS -->
+<!-- build:js assets/vendor/js/core.js' %} -->
+<script src="{% static 'assets/vendor/libs/jquery/jquery.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/popper/popper.js' %}"></script>
+<script src="{% static 'assets/vendor/js/bootstrap.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/hammer/hammer.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/i18n/i18n.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/typeahead-js/typeahead.js' %}"></script>
+<script src="{% static 'assets/vendor/js/menu.js' %}"></script>
+<!-- endbuild -->
+<!-- Vendors JS -->
+<script src="{% static 'assets/vendor/libs/@form-validation/umd/bundle/popular.min.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js' %}"></script>
+<script src="{% static 'assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js' %}"></script>
+<!-- Main JS -->
+<script src="{% static 'assets/js/main.js' %}"></script>
+<!-- Page JS -->
+<script src="{% static 'assets/js/pages-auth.js' %}"></script>
+</body>
+</html>

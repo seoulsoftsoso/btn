@@ -1,0 +1,1090 @@
+{% load static %}
+{% include "header.html" %}
+{% include 'menutemp.html' %}
+
+<div class="flex-grow-1 container-p-y"
+     xmlns="http://www.w3.org/1999/html"
+     style="background-color:#F6F6F6 !important;
+            padding-right:1.625rem;
+            padding-left:2.625rem">
+    <!--    row1-->
+    <div class="row" style="display:flex;--bs-gutter-x: 2.625rem;">
+        <!-- 재배동 실시간 현황 -->
+        <div class="col-lg-8 order-lg-2 mb-4"
+             style="border-radius: 15px;
+                    width: 75%;
+                    min-width: 1359px !important;
+                    background: var(--Gray-0, #FFF)">
+            <div class="card"
+                 style="box-shadow: 0 0px red;
+                        --bs-card-cap-padding-x: 1.0rem">
+                <div class="card-header "
+                     style="justify-content: space-between;
+                            display: flex;
+                            flex-direction: row;
+                            padding-bottom:0.3rem">
+                    <div style="justify-content:flex-start; display: flex; ">
+                        <h5 class="m-0 me-2 pb-3"
+                            style="color: var(--original-brown, #3D170F);
+                                   font-family: Pretendard;
+                                   font-size: 22px;
+                                   width:201; font-style: normal;
+                                   font-weight: 600;
+                                   line-height: normal;
+                                   padding-right:1.2rem">참송이재배 실시간 현황</h5>
+                        <h5 class="m-0 me-2 pb-3"
+                            style="color: var(--40-w, #B5B6B6);
+                                   font-family: Pretendard;
+                                   font-size: 22px;
+                                   width:201; font-style: normal;
+                                   font-weight: 600;
+                                   line-height: normal">와사비 실시간 현황</h5>
+                    </div>
+                    <div style=" display: flex; flex-direction: row; justify-content: center;">
+                        <h5 class="m-0 me-2 pb-3"
+                            style="color: var(--60-w, #898989);
+                                   text-align: center;
+                                   font-family: Pretendard;
+                                   font-size: 12px;
+                                   font-style: normal;
+                                   font-weight: 400;
+                                   line-height: normal;
+                                   margin-right:0.0rem !important;
+                                   padding-top:0.3rem;
+                                   padding-right:0.6rem">2024. 04. 24. AM11:13 업데이트</h5>
+                        <h5 class="m-0 me-2 pb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="24"
+                                 height="24"
+                                 viewBox="0 0 24 24"
+                                 fill="none">
+                                <path d="M17.6498 6.35C16.9097 5.60485 16.0294 5.01356 15.0597 4.61023C14.09 4.2069 13.05 3.99951 11.9998 4C7.57977 4 4.00977 7.58 4.00977 12C4.00977 16.42 7.57977 20 11.9998 20C15.7298 20 18.8398 17.45 19.7298 14H17.6498C17.2378 15.1695 16.4731 16.1824 15.4611 16.8988C14.4491 17.6153 13.2397 18 11.9998 18C8.68977 18 5.99977 15.31 5.99977 12C5.99977 8.69 8.68977 6 11.9998 6C13.6598 6 15.1398 6.69 16.2198 7.78L12.9998 11H19.9998V4L17.6498 6.35Z" fill="#595757" />
+                            </svg>
+                        </h5>
+                    </div>
+                </div>
+                <div class="text-nowrap" style="padding-bottom: 2rem; padding-left: 2.0rem;padding-right: 1.625rem;">
+                    <table id="dashboard-table" class="datatables-ajax table table-bordered" style="--bs-table-border-color:transparent">
+                        <thead>
+                            <tr>
+                                <td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);width:180;">재배동 이름</td>
+                                <script>
+                                    let initialData = JSON.parse('{{ initial_data_json|safe }}');
+
+                                    let socket = new WebSocket(`ws://118.44.218.236:7000/ws/aa/bb/c/`);
+                                    socket.addEventListener("message", (error) => {
+                                      console.log("Error has occured:", error);
+                                      updateTable(initialData);
+                                    });
+                                    socket.addEventListener("open", () => {
+                                        console.log("WebSocket is open");
+                                        updateTable(initialData);
+                                    });
+                                    socket.addEventListener("message", (event) => {
+                                        let data = JSON.parse(event.data);
+                                        updateTable(data);
+                                    });
+                                    socket.addEventListener("close", () => {
+                                      console.log("WebSocket is closed");
+                                    });
+                                    $(window).unload(function () {
+                                       socket.close();
+                                    });
+                                    function updateTable(data) {
+                                        let uniqueGtrSenids = data.unique_gtr_senids;
+                                        let uniqueStaSenids = data.unique_sta_senids;
+                                        let conIdSenidMap = data.con_id_senid_map;
+                                        let headerRow = document.querySelector("#dashboard-table thead tr");
+                                        headerRow.innerHTML = `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);width:180;">재배동 이름</td>`;
+                                        uniqueGtrSenids.forEach(senid => {
+                                            headerRow.innerHTML += `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);">${senid}</td>`;
+                                        });
+                                        uniqueStaSenids.forEach(senid => {
+                                            headerRow.innerHTML += `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);">${senid}</td>`;
+                                        });
+
+                                        let tableBody = document.querySelector("#dashboard-table tbody");
+                                        tableBody.innerHTML = "";
+
+                                        Object.entries(conIdSenidMap).forEach(([conId, senids]) => {
+                                            let row = `<tr><td style="border-bottom: 1px solid var(--30-b, #C9CACA);width:180;text-align: center; align-items: center;background: var(--5-b, #F6F6F6);">${conId}</td>`;
+                                            uniqueGtrSenids.forEach(uniqueSenid => {
+                                                let value = senids[uniqueSenid] || "-";
+                                                row += `<td style="border-bottom: 1px solid var(--30-b, #C9CACA);text-align: center;background: var(--5-b, #F6F6F6);">${value}</td>`;
+                                            });
+                                            uniqueStaSenids.forEach(uniqueSenid => {
+                                                let value = senids[uniqueSenid] || "-";
+                                                row += `<td style="border-bottom: 1px solid var(--30-b, #C9CACA);text-align: center;background: var(--5-b, #F6F6F6);">${value}</td>`;
+                                            });
+                                            row += "</tr>";
+                                            tableBody.innerHTML += row;
+                                        });
+                                    }
+                                </script>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table body will be dynamically updated -->
+
+                        </tbody>
+                    </table>
+<!--                    <table id="dashboard-table" class="datatables-ajax table table-bordered"style="&#45;&#45;bs-table-border-color:transparent">-->
+<!--                        <thead>-->
+<!--                            <tr>-->
+<!--                                <td style="border: 1px solid var(&#45;&#45;30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;-->
+<!--                                background: var(&#45;&#45;original-brown, #3D170F);width:180;">재배동 이름</td>-->
+<!--                                {% for senid in unique_gtr_senids %}-->
+<!--                                    <td style="border: 1px solid var(&#45;&#45;30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;-->
+<!--                                    background: var(&#45;&#45;original-brown, #3D170F);">{{ senid }}</td>-->
+<!--                                {% endfor %}-->
+<!--                                {% for senid in unique_sta_senids %}-->
+<!--                                    <td style="border: 1px solid var(&#45;&#45;30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;-->
+<!--                                    background: var(&#45;&#45;original-brown, #3D170F);">{{ senid }}</td>-->
+<!--                                {% endfor %}-->
+<!--                            </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody>-->
+<!--                            {% for con_id, senids in con_id_senid_map.items %}-->
+<!--                                <tr style="">-->
+<!--                                    <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);width:180;text-align: center; align-items: center;-->
+<!--                                    background: var(&#45;&#45;5-b, #F6F6F6);">{{ con_id }}</td>-->
+<!--                                    {% for unique_senid in unique_gtr_senids %}-->
+<!--                                        {% if unique_senid in senids %}-->
+<!--                                            {% load custom_tags %}-->
+<!--                                            <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);text-align: center;-->
+<!--                                            background: var(&#45;&#45;5-b, #F6F6F6);">{{ senids|get_item:unique_senid }}</td>-->
+<!--                                        {% else %}-->
+<!--                                            <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);text-align: center;-->
+<!--                                            background: var(&#45;&#45;5-b, #F6F6F6);">-</td>-->
+<!--                                        {% endif %}-->
+<!--                                    {% endfor %}-->
+<!--                                    {% for unique_senid in unique_sta_senids %}-->
+<!--                                        {% if unique_senid in senids %}-->
+<!--                                            {% load custom_tags %}-->
+<!--                                            <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);text-align: center;-->
+<!--                                            background: var(&#45;&#45;5-b, #F6F6F6);">{{ senids|get_item:unique_senid }}</td>-->
+<!--                                        {% else %}-->
+<!--                                            <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);text-align: center;-->
+<!--                                            background: var(&#45;&#45;5-b, #F6F6F6);">-</td>-->
+<!--                                        {% endif %}-->
+<!--                                    {% endfor %}-->
+<!--                                </tr>-->
+<!--                            {% endfor %}-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                    <script>-->
+<!--                        let url = `ws://${window.location.host}/ws/aa/bb/c/`;-->
+<!--                            let chatSocket = new WebSocket(url);-->
+<!--                            chatSocket.addEventListener("message", (event) => {-->
+<!--                              console.log("Message from server:", event.data);-->
+<!--                            });-->
+<!--                    </script>-->
+                </div>
+            </div>
+        </div>
+        <!--/ 재배동 실시간 현황 -->
+        <div class="col-lg-4 order-md-2" style="width:25%">
+            <div class="mb-4">
+                <div class="card"
+                     style="border-radius: 16px;
+                            background: #FFF;
+                            box-shadow: 0 0px red;
+                            display: flex;
+                            min-width: 488px;
+                            height: 245px;
+                            justify-content: center;
+                            align-items: center;
+                            flex-shrink: 0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
+                            <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                                <!--여기에 날씨api추가-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-4">
+                <div class="card"
+                     style="background: #FFF;
+                            box-shadow: 0 0px red;
+                            min-width: 488px;
+                            height: 245px;
+                            justify-content: center;
+                            align-items: flex-start;
+                            flex-shrink: 0;
+                            border-radius: 16px">
+                    <div class="card-body">
+                        <h5 class="text-nowrap mb-2"
+                            style="color: var(--original-brown, #3D170F);
+                                   font-family: Pretendard;
+                                   font-size: 22px;
+                                   font-style: normal;
+                                   font-weight: 600;
+                                   line-height: normal">오늘의 할일</h5>
+                        <br>
+                        <div style="display:flex">
+                            <input type='checkbox'
+                                   style="width: 17px;
+                                          height: 17px;
+                                          flex-shrink: 0;
+                                          border-radius: 2px;
+                                          border: 1px solid var(--40-w, #B5B6B6)" />
+                            &nbsp&nbsp&nbsp&nbsp
+                            <div style="color: var(--90-w, #3E3A39);
+                                        font-family: Pretendard;
+                                        font-size: 18px;
+                                        font-style: normal;
+                                        font-weight: 400;
+                                        line-height: 1.1">참송이버섯 시세 3월 2배 오를 것으로 전망</div>
+                        </div>
+                        <br>
+                        <div style="display:flex">
+                            <input type='checkbox'
+                                   style="width: 17px;
+                                          height: 17px;
+                                          flex-shrink: 0;
+                                          border-radius: 2px;
+                                          border: 1px solid var(--40-w, #B5B6B6)" />
+                            &nbsp&nbsp&nbsp&nbsp
+                            <div style="color: var(--90-w, #3E3A39);
+                                        font-family: Pretendard;
+                                        font-size: 18px;
+                                        font-style: normal;
+                                        font-weight: 400;
+                                        line-height: 1.1">참송이버섯 시세 3월 2배 오를 것으로 전망</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    row2-->
+    <div class="row" style="display:flex;--bs-gutter-x: 2.625rem;">
+        <div class=" col-lg-8 order-lg-2 mb-4"
+             style="border-radius: 15px;
+                    width:75%;
+                    min-width: 1359px !important;
+                    background: var(--Gray-0, #FFF)">
+            <div class="card"
+                 style="box-shadow: 0 0px red;
+                        padding: var(--bs-card-cap-padding-y) 0">
+                <div class="row "
+                     style="display:flex;
+                            color: var(--original-brown, #3D170F);
+                            font-family: Pretendard;
+                            font-size: 22px;
+                            font-style: normal;
+                            font-weight: 600;
+                            line-height: normal">
+                    <div class="mb-3" style="justify-content:space-between; display: flex;">
+                        <span style="color: var(--original-brown, #3D170F);
+                                     font-family: Pretendard;
+                                     font-size: 22px;
+                                     font-style: normal;
+                                     font-weight: 600;
+                                     line-height: 1.7">일정</span>
+                        <span style="width: 139px;
+                                     height: 40px;
+                                     border-radius: 6px;
+                                     border: 1px solid var(--original-brown, #3D170F);
+                                     box-shadow: 0px 0px 1px 0px #EAEA73;
+                                     text-align:center;
+                                     flex-shrink: 0">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="12"
+                                 height="12"
+                                 viewBox="0 0 12 12"
+                                 fill="none">
+                                <path d="M6 1L6 11" stroke="#3D170F" stroke-linecap="round" />
+                                <path d="M11 6L1 6" stroke="#3D170F" stroke-linecap="round" />
+                            </svg>
+                            <span style="color: var(--original-brown, #3D170F);
+                                         text-align: center;
+                                         font-family: Pretendard;
+                                         font-size: 16px;
+                                         font-style: normal;
+                                         font-weight: 500;
+                                         line-height: 2.6">일정추가</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="row ">
+                    <!-- Expense Overview -->
+                    <div class="col-lg-4 order-1 mb-4" style="width:62.66%;min-width: 483px;">
+                        <div class="card h-100"
+                             style="flex-shrink: 0;
+                                    border-radius: 15px;
+                                    background: var(--Gray-0, #FFF);
+                                    display: grid;
+                                    place-items: center;
+                                    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25)">
+                            <div class="calendar">
+                                <div class="calendar-header">
+                                    <div class="year-picker">
+                                        <span id="year">2024</span>년
+                                    </div>
+                                    &nbsp&nbsp
+                                    <span class="month-picker" id="month-picker"></span>
+                                    <span class="month-picker">월</span>
+                                </div>
+                                <div class="calendar-body">
+                                    <div class="calendar-week-day">
+                                        <div style="color: #FF8F8F;">Sun</div>
+                                        <div>Mon</div>
+                                        <div>Tue</div>
+                                        <div>Wed</div>
+                                        <div>Thu</div>
+                                        <div>Fri</div>
+                                        <div style="color: #6FA8FF;">Sat</div>
+                                    </div>
+                                    <div class="calendar-days"></div>
+                                </div>
+                                <div class="month-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 order-1 mb-4" style="width:37.34%;">
+                        <div class="card h-100"
+                             style="min-width: 483px;
+                                    height: 587px;
+                                    flex-shrink: 0;
+                                    border-radius: 15px;
+                                    background: var(--Gray-0, #FFF);
+                                    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25)">
+                            <li class="d-flex pb-4 pt-4"
+                                style="border-bottom: 0.6px solid var(--20-b, #DCDDDD);
+                                       padding-left: 1.5rem">
+                                <div class="avatar flex-shrink-0 me-3"
+                                     style="justify-content: center;
+                                            align-items: center">
+                                    <div class="">
+                                        <small style="color: #6FA8FF;
+                                                      text-align: center;
+                                                      font-family: Pretendard;
+                                                      font-size: 14px;
+                                                      font-style: normal;
+                                                      padding-left: 0.0rem !important;
+                                                      font-weight: 500;
+                                                      line-height: normal">SAT</small>
+                                        <h6 class="mb-0 me-2"
+                                            style="color: var(--original-brown, #3D170F);
+                                                   text-align: center;
+                                                   font-family: Pretendard;
+                                                   font-size: 24px;
+                                                   font-style: normal;
+                                                   font-weight: 500;
+                                                   line-height: normal">20</h6>
+                                    </div>
+                                </div>
+                                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                                     style="padding-left: 1.5rem;
+                                            padding-right: 1.2rem">
+                                    <div class="me-2">
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">9:00 허기준외 1명</h6>
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">12:00 배지 200상자 배송예정</h6>
+                                    </div>
+                                    <div class="user-progress d-flex gap-1">
+                                        <h6 class="mb-0"
+                                            style="color: var(--40-w, #B5B6B6);
+                                                   font-family: Pretendard;
+                                                   font-size: 14px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height:0.2;
+                                                   padding-top: 2.2rem !important;
+                                                   text-decoration-line: underline">더보기</h6>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="d-flex pb-4 pt-4"
+                                style="border-bottom: 0.6px solid var(--20-b, #DCDDDD);
+                                       padding-left: 1.5rem">
+                                <div class="avatar flex-shrink-0 me-3">
+                                    <div class="">
+                                        <small style="color: #FF8F8F;
+                                                      text-align: center;
+                                                      font-family: Pretendard;
+                                                      font-size: 14px;
+                                                      font-style: normal;
+                                                      font-weight: 500;
+                                                      padding-left: 0.0rem !important;
+                                                      line-height: normal">SUN</small>
+                                        <h6 class="mb-0 me-2"
+                                            style="color: var(--original-brown, #3D170F);
+                                                   text-align: center;
+                                                   font-family: Pretendard;
+                                                   font-size: 24px;
+                                                   font-style: normal;
+                                                   font-weight: 500;
+                                                   line-height: normal">21</h6>
+                                    </div>
+                                </div>
+                                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                                     style="padding-left: 1.5rem;
+                                            padding-right: 1.2rem">
+                                    <div class="me-2">
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">9:00 허기준외 1명</h6>
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">12:00 배지 200상자 배송예정</h6>
+                                    </div>
+                                    <div class="user-progress d-flex gap-1">
+                                        <h6 class="mb-0"
+                                            style="color: var(--40-w, #B5B6B6);
+                                                   font-family: Pretendard;
+                                                   font-size: 14px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height:0.2;
+                                                   padding-top: 2.2rem !important;
+                                                   text-decoration-line: underline">더보기</h6>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="d-flex pb-4 pt-4"
+                                style="border-bottom: 0.6px solid var(--20-b, #DCDDDD);
+                                       padding-left: 1.5rem">
+                                <div class="avatar flex-shrink-0 me-3">
+                                    <div class="">
+                                        <small style="color: var(--40-w, #B5B6B6);
+                                                      text-align: center;
+                                                      font-family: Pretendard;
+                                                      font-size: 14px;
+                                                      font-style: normal;
+                                                      font-weight: 500;
+                                                      line-height: normal">MON</small>
+                                        <h6 class="mb-0 me-2"
+                                            style="color: var(--original-brown, #3D170F);
+                                                   text-align: center;
+                                                   font-family: Pretendard;
+                                                   font-size: 24px;
+                                                   font-style: normal;
+                                                   font-weight: 500;
+                                                   line-height: normal">22</h6>
+                                    </div>
+                                </div>
+                                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                                     style="padding-left: 1.5rem;
+                                            padding-right: 1.2rem">
+                                    <div class="me-2">
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">9:00 허기준외 1명</h6>
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">12:00 배지 200상자 배송예정</h6>
+                                    </div>
+                                    <div class="user-progress d-flex gap-1">
+                                        <h6 class="mb-0"
+                                            style="color: var(--40-w, #B5B6B6);
+                                                   font-family: Pretendard;
+                                                   font-size: 14px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height:0.2;
+                                                   padding-top: 2.2rem !important;
+                                                   text-decoration-line: underline">더보기</h6>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="d-flex pb-4 pt-4"
+                                style="border-bottom: 0.6px solid var(--20-b, #DCDDDD);
+                                       padding-left: 1.5rem">
+                                <div class="avatar flex-shrink-0 me-3">
+                                    <div class="">
+                                        <small style="color: var(--40-w, #B5B6B6);
+                                                      text-align: center;
+                                                      font-family: Pretendard;
+                                                      font-size: 14px;
+                                                      font-style: normal;
+                                                      font-weight: 500;
+                                                      line-height: normal">TUE</small>
+                                        <h6 class="mb-0 me-2"
+                                            style="color: var(--original-brown, #3D170F);
+                                                   text-align: center;
+                                                   font-family: Pretendard;
+                                                   font-size: 24px;
+                                                   font-style: normal;
+                                                   font-weight: 500;
+                                                   line-height: normal">23</h6>
+                                    </div>
+                                </div>
+                                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                                     style="padding-left: 1.5rem;
+                                            padding-right: 1.2rem">
+                                    <div class="me-2">
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">9:00 허기준외 1명</h6>
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">12:00 배지 200상자 배송예정</h6>
+                                    </div>
+                                    <div class="user-progress d-flex gap-1">
+                                        <h6 class="mb-0"
+                                            style="color: var(--40-w, #B5B6B6);
+                                                   font-family: Pretendard;
+                                                   font-size: 14px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height:0.2;
+                                                   padding-top: 2.2rem !important;
+                                                   text-decoration-line: underline">더보기</h6>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="d-flex pb-4 pt-4"
+                                style="border-bottom: 0.6px solid var(--20-b, #DCDDDD);
+                                       padding-left: 1.5rem">
+                                <div class="avatar flex-shrink-0 me-3">
+                                    <div class="">
+                                        <small style="color: var(--40-w, #B5B6B6);
+                                                      text-align: center;
+                                                      font-family: Pretendard;
+                                                      font-size: 14px;
+                                                      font-style: normal;
+                                                      font-weight: 500;
+                                                      line-height: normal">WED</small>
+                                        <h6 class="mb-0 me-2"
+                                            style="color: var(--original-brown, #3D170F);
+                                                   text-align: center;
+                                                   font-family: Pretendard;
+                                                   font-size: 24px;
+                                                   font-style: normal;
+                                                   font-weight: 500;
+                                                   line-height: normal">24</h6>
+                                    </div>
+                                </div>
+                                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                                     style="padding-left: 1.5rem;
+                                            padding-right: 1.2rem">
+                                    <div class="me-2">
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">9:00 허기준외 1명</h6>
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">12:00 배지 200상자 배송예정</h6>
+                                    </div>
+                                    <div class="user-progress d-flex gap-1">
+                                        <h6 class="mb-0"
+                                            style="color: var(--40-w, #B5B6B6);
+                                                   font-family: Pretendard;
+                                                   font-size: 14px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height:0.2;
+                                                   padding-top: 2.2rem !important;
+                                                   text-decoration-line: underline">더보기</h6>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="d-flex pb-4 pt-4"
+                                style="border-bottom: 0.6px solid var(--20-b, #DCDDDD);
+                                       padding-left: 1.5rem">
+                                <div class="avatar flex-shrink-0 me-3">
+                                    <div class="">
+                                        <small style="color: var(--40-w, #B5B6B6);
+                                                      text-align: center;
+                                                      font-family: Pretendard;
+                                                      font-size: 14px;
+                                                      font-style: normal;
+                                                      font-weight: 500;
+                                                      line-height: normal">THU</small>
+                                        <h6 class="mb-0 me-2"
+                                            style="color: var(--original-brown, #3D170F);
+                                                   text-align: center;
+                                                   font-family: Pretendard;
+                                                   font-size: 24px;
+                                                   font-style: normal;
+                                                   font-weight: 500;
+                                                   line-height: normal">25</h6>
+                                    </div>
+                                </div>
+                                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                                     style="padding-left: 1.5rem;
+                                            padding-right: 1.2rem">
+                                    <div class="me-2">
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">9:00 허기준외 1명</h6>
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">12:00 배지 200상자 배송예정</h6>
+                                    </div>
+                                    <div class="user-progress d-flex gap-1">
+                                        <h6 class="mb-0"
+                                            style="color: var(--40-w, #B5B6B6);
+                                                   font-family: Pretendard;
+                                                   font-size: 14px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height:0.2;
+                                                   padding-top: 2.2rem !important;
+                                                   text-decoration-line: underline">더보기</h6>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="d-flex pb-4 pt-4" style="padding-left: 1.5rem;">
+                                <div class="avatar flex-shrink-0 me-3">
+                                    <div class="">
+                                        <small style="color: var(--40-w, #B5B6B6);
+                                                      text-align: center;
+                                                      font-family: Pretendard;
+                                                      font-size: 14px;
+                                                      font-style: normal;
+                                                      font-weight: 500;
+                                                      line-height: normal">FRI</small>
+                                        <h6 class="mb-0 me-2"
+                                            style="color: var(--original-brown, #3D170F);
+                                                   text-align: center;
+                                                   font-family: Pretendard;
+                                                   font-size: 24px;
+                                                   font-style: normal;
+                                                   font-weight: 500;
+                                                   line-height: normal">26</h6>
+                                    </div>
+                                </div>
+                                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                                     style="padding-left: 1.5rem;
+                                            padding-right: 1.2rem">
+                                    <div class="me-2">
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">9:00 허기준외 1명</h6>
+                                        <h6 class="mb-0"
+                                            style="color: var(--90-w, #3E3A39);
+                                                   font-family: Pretendard;
+                                                   font-size: 18px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height: normal">12:00 배지 200상자 배송예정</h6>
+                                    </div>
+                                    <div class="user-progress d-flex gap-1">
+                                        <h6 class="mb-0"
+                                            style="color: var(--40-w, #B5B6B6);
+                                                   font-family: Pretendard;
+                                                   font-size: 14px;
+                                                   font-style: normal;
+                                                   font-weight: 400;
+                                                   line-height:0.2;
+                                                   padding-top: 2.2rem !important;
+                                                   text-decoration-line: underline">더보기</h6>
+                                    </div>
+                                </div>
+                            </li>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Transactions -->
+        <div class="col-lg-4 order-2 mb-4"  style="width:25%">
+            <div class="card h-100"
+                 style="box-shadow: 0 0px red;
+                        min-width: 488px;
+                        height: 705px;
+                        flex-shrink: 0;
+                        background: #FFF;
+                        border-radius: 15px">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title m-0 me-2"
+                        style="color: var(--original-brown, #3D170F);
+                               font-family: Pretendard;
+                               font-size: 22px;
+                               font-style: normal;
+                               font-weight: 600;
+                               line-height: normal">문의현황</h5>
+                    <span style="color: var(--60-w, #898989);
+                                 text-align: right;
+                                 font-family: Pretendard;
+                                 font-size: 14px;
+                                 font-style: normal;
+                                 font-weight: 400;
+                                 line-height: normal">등록 12 대기 2 완료 2</span>
+                </div>
+                <ul class="p-0 m-0">
+                    <li class="d-flex mb-3 pb-3"
+                        style="border-bottom: 0.6px solid var(--20-b, #DCDDDD)">
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                             style="padding-left: 1.5rem;
+                                    padding-right: 1.5rem">
+                            <div class="me-2">
+                                <div class="d-flex">
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">2024.04.04.</small>&nbsp&nbsp&nbsp
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">스마트팜 1호</small>
+                                </div>
+                                <h6 class="mb-0"
+                                    style="color: var(--90-w, #3E3A39);
+                                           font-family: Pretendard;
+                                           font-size: 18px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">참송이버섯 시세 3월 2배 오를 것으로 전망</h6>
+                            </div>
+                            <div class="user-progress d-flex align-items-center gap-1">
+                                <h6 class="mb-0"
+                                    style="color: var(--toss, #06F);
+                                           font-family: Pretendard;
+                                           font-size: 14px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">답변완료</h6>
+                                <!--                  <span class="text-muted">USD</span>-->
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-3 pb-3"
+                        style="border-bottom: 0.6px solid var(--20-b, #DCDDDD)">
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                             style="padding-left: 1.5rem;
+                                    padding-right: 1.5rem">
+                            <div class="me-2">
+                                <div class="d-flex">
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">2024.04.04.</small>&nbsp&nbsp&nbsp
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">스마트팜 1호</small>
+                                </div>
+                                <h6 class="mb-0"
+                                    style="color: var(--90-w, #3E3A39);
+                                           font-family: Pretendard;
+                                           font-size: 18px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">참송이버섯 시세 3월 2배 오를 것으로 전망</h6>
+                            </div>
+                            <div class="user-progress d-flex align-items-center gap-1">
+                                <h6 class="mb-0"
+                                    style="color: var(--toss, #06F);
+                                           font-family: Pretendard;
+                                           font-size: 14px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">답변완료</h6>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-3 pb-3"
+                        style="border-bottom: 0.6px solid var(--20-b, #DCDDDD)">
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                             style="padding-left: 1.5rem;
+                                    padding-right: 1.5rem">
+                            <div class="me-2">
+                                <div class="d-flex">
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">2024.04.04.</small>&nbsp&nbsp&nbsp
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">스마트팜 1호</small>
+                                </div>
+                                <h6 class="mb-0"
+                                    style="color: var(--90-w, #3E3A39);
+                                           font-family: Pretendard;
+                                           font-size: 18px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">참송이버섯 시세 3월 2배 오를 것으로 전망</h6>
+                            </div>
+                            <div class="user-progress d-flex align-items-center gap-1">
+                                <h6 class="mb-0"
+                                    style="color: var(--40-w, #B5B6B6);
+                                           font-family: Pretendard;
+                                           font-size: 14px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">답변대기</h6>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-3 pb-3"
+                        style="border-bottom: 0.6px solid var(--20-b, #DCDDDD)">
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                             style="padding-left: 1.5rem;
+                                    padding-right: 1.5rem">
+                            <div class="me-2">
+                                <div class="d-flex">
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">2024.04.04.</small>&nbsp&nbsp&nbsp
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">스마트팜 1호</small>
+                                </div>
+                                <h6 class="mb-0"
+                                    style="color: var(--90-w, #3E3A39);
+                                           font-family: Pretendard;
+                                           font-size: 18px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">참송이버섯 시세 3월 2배 오를 것으로 전망</h6>
+                            </div>
+                            <div class="user-progress d-flex align-items-center gap-1">
+                                <h6 class="mb-0"
+                                    style="color: var(--40-w, #B5B6B6);
+                                           font-family: Pretendard;
+                                           font-size: 14px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">답변대기</h6>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-3 pb-3"
+                        style="border-bottom: 0.6px solid var(--20-b, #DCDDDD)">
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                             style="padding-left: 1.5rem;
+                                    padding-right: 1.5rem">
+                            <div class="me-2">
+                                <div class="d-flex">
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">2024.04.04.</small>&nbsp&nbsp&nbsp
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">스마트팜 1호</small>
+                                </div>
+                                <h6 class="mb-0"
+                                    style="color: var(--90-w, #3E3A39);
+                                           font-family: Pretendard;
+                                           font-size: 18px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">참송이버섯 시세 3월 2배 오를 것으로 전망</h6>
+                            </div>
+                            <div class="user-progress d-flex align-items-center gap-1">
+                                <h6 class="mb-0"
+                                    style="color: var(--40-w, #B5B6B6);
+                                           font-family: Pretendard;
+                                           font-size: 14px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">답변대기</h6>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-3 pb-3"
+                        style="border-bottom: 0.6px solid var(--20-b, #DCDDDD)">
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                             style="padding-left: 1.5rem;
+                                    padding-right: 1.5rem">
+                            <div class="me-2">
+                                <div class="d-flex">
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">2024.04.04.</small>&nbsp&nbsp&nbsp
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">스마트팜 1호</small>
+                                </div>
+                                <h6 class="mb-0"
+                                    style="color: var(--90-w, #3E3A39);
+                                           font-family: Pretendard;
+                                           font-size: 18px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">참송이버섯 시세 3월 2배 오를 것으로 전망</h6>
+                            </div>
+                            <div class="user-progress d-flex align-items-center gap-1">
+                                <h6 class="mb-0"
+                                    style="color: var(--40-w, #B5B6B6);
+                                           font-family: Pretendard;
+                                           font-size: 14px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">답변대기</h6>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-3 pb-3"
+                        style="border-bottom: 0.6px solid var(--20-b, #DCDDDD)">
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"
+                             style="padding-left: 1.5rem;
+                                    padding-right: 1.5rem">
+                            <div class="me-2">
+                                <div class="d-flex">
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">2024.04.04.</small>&nbsp&nbsp&nbsp
+                                    <small class="text-muted d-block mb-1"
+                                           style="color: var(--60-w, #898989);
+                                                  font-family: Pretendard;
+                                                  font-size: 14px;
+                                                  font-style: normal;
+                                                  font-weight: 400;
+                                                  line-height: normal">스마트팜 1호</small>
+                                </div>
+                                <h6 class="mb-0"
+                                    style="color: var(--90-w, #3E3A39);
+                                           font-family: Pretendard;
+                                           font-size: 18px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">참송이버섯 시세 3월 2배 오를 것으로 전망</h6>
+                            </div>
+                            <div class="user-progress d-flex align-items-center gap-1">
+                                <h6 class="mb-0"
+                                    style="color: var(--40-w, #B5B6B6);
+                                           font-family: Pretendard;
+                                           font-size: 14px;
+                                           font-style: normal;
+                                           font-weight: 400;
+                                           line-height: normal">답변대기</h6>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Content -->
+<!-- Footer -->
+<footer class="content-footer footer bg-footer-theme">
+    <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+        <div class="mb-2 mb-md-0">
+            ©
+            <script>document.write(new Date().getFullYear());</script>
+            , made with ❤️ by
+            <a href="https://themeselection.com"
+               target="_blank"
+               class="footer-link fw-medium">ThemeSelection</a>
+        </div>
+        <div class="d-none d-lg-inline-block">
+            <a href="https://themeselection.com/license/"
+               class="footer-link me-4"
+               target="_blank">License</a>
+            <a href="https://themeselection.com/"
+               target="_blank"
+               class="footer-link me-4">More Themes</a>
+            <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/documentation/"
+               target="_blank"
+               class="footer-link me-4">Documentation</a>
+            <a href="https://themeselection.com/support/"
+               target="_blank"
+               class="footer-link d-none d-sm-inline-block">Support</a>
+        </div>
+    </div>
+</footer>
+<!-- / Footer -->
+<div class="content-backdrop fade"></div>
+<!--/ Content wrapper -->
+{% include 'footer.html' %}
