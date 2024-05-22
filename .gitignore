@@ -12,8 +12,10 @@ api/migrations
 **/migrations/*
 data/
 log/
+button/settings.py
 uwsgi.ini
 /staticfiles/
 /my_settings.py
+/button/settings.py
 __init__.py
 
