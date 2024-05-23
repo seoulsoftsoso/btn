@@ -509,51 +509,41 @@ $(async function () {
     });
     $('div.head-label').html('<h5 class="card-title mb-0">주문 / 의뢰</h5>');
   const TagifyUserListEl = document.querySelector('#TagifyUserList');
-   dt_basic_table.on('draw.dt', function () {
-      setTimeout(() => {
-    let deleteOrder = document.querySelector('.delete-order');
-      if (deleteOrder) {
-        deleteOrder.addEventListener('click', function (e) {
-          e.preventDefault();
-          offCanvasEl.show();
-          const tr = $(e.target).closest('tr');
-          let data = dt_basic
-            .row(tr)
-            .data();
-          console.log(data)
-          $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
-          $(".data-submit").text('삭제')
-          formAddNewRecord.action = '/order/order/delete/' + data['id'];
-         orderInputs.forEach((item) => {
-            formAddNewRecord
-              .querySelector(`[name="${item}"]`)
-              .value = data[item]
-            formAddNewRecord
-              .querySelector(`[name="${item}"]`)
-              .setAttribute('readonly', true);
-          });
-        });
-      }
-  }, 200)
-
-  setTimeout(() => {
-    let editOrder = document.querySelector('.edit-order');
-    if (editOrder) {
-      editOrder.addEventListener('click', function (e) {
-        offCanvasEl.show();
-        const tr = $(e.target).closest('tr');
-        let data = dt_basic.row(tr).data()
-        orderInputs.forEach((item) => {
-          formAddNewRecord
-            .querySelector(`[name="${item}"]`)
-            .value = data[item]
-        });
-        $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
-        formAddNewRecord.action = '/order/order/edit/' + data['id'];
-        $(".data-submit").text('수정')
+   dt_basic_table.on('draw.dt', function () { 
+       
+    let deleteOrderBtn = document.querySelector('.delete-order');
+    deleteOrderBtn.addEventListener('click', function (event) {
+      event.preventDefault();
+      offCanvasEl.show();
+      const closetColumn = $(e.target).closest('tr');
+      let data = dt_basic
+        .row(closetColumn)
+        .data();
+      $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
+      $(".data-submit").text('삭제')
+      formAddNewRecord.action = '/order/order/delete/' + data['id'];
+     orderFormInputs.forEach((item) => {
+        const formInput = formAddNewRecord.getElementsById(item);
+        formInput.value = data[item];
+        formInput.setAttribute('readonly', true)
       });
-    }
-  }, 200)
+    });
+      
+
+    let editOrderBtn = document.querySelector('.edit-order');
+  editOrderBtn.addEventListener('click', function (e) {
+    offCanvasEl.show();
+    const closetColumn = $(e.target).closest('tr');
+    let data = dt_basic.row(closetColumn).data()
+    orderInputs.forEach((item) => {
+      formAddNewRecord
+        .querySelector(`[name="${item}"]`)
+        .value = data[item]
+    });
+    $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
+    formAddNewRecord.action = '/order/order/edit/' + data['id'];
+    $(".data-submit").text('수정')
+  });
 
   });
    function getUserList() {

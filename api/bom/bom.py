@@ -50,6 +50,7 @@ def bom_add(request, order):
     )
     total = item.standard_price * qty
     boms = []
+    bom = None
     if level == 2:
         bom = BomMaster.objects.create(
             level=level,
@@ -64,26 +65,25 @@ def bom_add(request, order):
             created_by=request.user,
             updated_by=request.user
         )
-        orderData.bom = bom
-        orderData.save()
-    for i in range(0, qty):
-        qty = qty if level == 2 else 1
-        bom = BomMaster.objects.create(
-            level=level,
-            part_code=item.item_name,
-            item=item,
-            parent=product['parent'],
-            tax=total * 0.1,
-            total=total,
-            op=orderData,
-            order_cnt=1,
-            delete_flag='N',
-            created_by=request.user,
-            updated_by=request.user
-        )
-        orderData.bom = bom
-        orderData.save()
-        boms.append(bom.id)
+    else:
+        for i in range(0, qty):
+            qty = qty if level == 2 else 1
+            bom = BomMaster.objects.create(
+                level=level,
+                part_code=item.item_name,
+                item=item,
+                parent=product['parent'],
+                tax=total * 0.1,
+                total=total,
+                op=orderData,
+                order_cnt=1,
+                delete_flag='N',
+                created_by=request.user,
+                updated_by=request.user
+            )
+    orderData.bom = bom
+    orderData.save()
+    boms.append(bom.id)
     return JsonResponse({'message': 'success', 'order_id': orderData.id, 'boms': boms})
 
 
