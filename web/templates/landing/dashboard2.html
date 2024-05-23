@@ -69,6 +69,31 @@
                             <tr>
                                 <td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);width:180;">재배동 이름</td>
                                 <script>
+
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        function fetchInitialData() {
+                                            fetch('/api/util/user-table-data/')
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    print(data); // Now you can use the data in your JavaScript code
+
+                                                    // Example of accessing data
+                                                    print("Unique GTR Sensor Names: ", data.unique_gtr_sen_name);
+                                                    print("Unique STA Sensor Names: ", data.unique_sta_sen_name);
+
+                                                    // Further processing of data
+                                                    for (const conId in data.con_id_senid_map) {
+                                                        if (data.con_id_senid_map.hasOwnProperty(conId)) {
+                                                            const conInfo = data.con_id_senid_map[conId];
+                                                            console.log(`Container ${conId} Info: `, conInfo);
+                                                        }
+                                                    }
+                                                })
+                                                .catch(error => console.error('Error fetching initial data:', error));
+                                        }fetchInitialData()
+                                    })
+
+
                                     let initialData = JSON.parse('{{ initial_data_json|safe }}');
 
                                     let socket = new WebSocket(`ws://118.44.218.236:7000/ws/aa/bb/c/`);
@@ -128,57 +153,7 @@
 
                         </tbody>
                     </table>
-<!--                    <table id="dashboard-table" class="datatables-ajax table table-bordered"style="&#45;&#45;bs-table-border-color:transparent">-->
-<!--                        <thead>-->
-<!--                            <tr>-->
-<!--                                <td style="border: 1px solid var(&#45;&#45;30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;-->
-<!--                                background: var(&#45;&#45;original-brown, #3D170F);width:180;">재배동 이름</td>-->
-<!--                                {% for senid in unique_gtr_senids %}-->
-<!--                                    <td style="border: 1px solid var(&#45;&#45;30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;-->
-<!--                                    background: var(&#45;&#45;original-brown, #3D170F);">{{ senid }}</td>-->
-<!--                                {% endfor %}-->
-<!--                                {% for senid in unique_sta_senids %}-->
-<!--                                    <td style="border: 1px solid var(&#45;&#45;30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;-->
-<!--                                    background: var(&#45;&#45;original-brown, #3D170F);">{{ senid }}</td>-->
-<!--                                {% endfor %}-->
-<!--                            </tr>-->
-<!--                        </thead>-->
-<!--                        <tbody>-->
-<!--                            {% for con_id, senids in con_id_senid_map.items %}-->
-<!--                                <tr style="">-->
-<!--                                    <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);width:180;text-align: center; align-items: center;-->
-<!--                                    background: var(&#45;&#45;5-b, #F6F6F6);">{{ con_id }}</td>-->
-<!--                                    {% for unique_senid in unique_gtr_senids %}-->
-<!--                                        {% if unique_senid in senids %}-->
-<!--                                            {% load custom_tags %}-->
-<!--                                            <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);text-align: center;-->
-<!--                                            background: var(&#45;&#45;5-b, #F6F6F6);">{{ senids|get_item:unique_senid }}</td>-->
-<!--                                        {% else %}-->
-<!--                                            <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);text-align: center;-->
-<!--                                            background: var(&#45;&#45;5-b, #F6F6F6);">-</td>-->
-<!--                                        {% endif %}-->
-<!--                                    {% endfor %}-->
-<!--                                    {% for unique_senid in unique_sta_senids %}-->
-<!--                                        {% if unique_senid in senids %}-->
-<!--                                            {% load custom_tags %}-->
-<!--                                            <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);text-align: center;-->
-<!--                                            background: var(&#45;&#45;5-b, #F6F6F6);">{{ senids|get_item:unique_senid }}</td>-->
-<!--                                        {% else %}-->
-<!--                                            <td style="border-bottom: 1px solid var(&#45;&#45;30-b, #C9CACA);text-align: center;-->
-<!--                                            background: var(&#45;&#45;5-b, #F6F6F6);">-</td>-->
-<!--                                        {% endif %}-->
-<!--                                    {% endfor %}-->
-<!--                                </tr>-->
-<!--                            {% endfor %}-->
-<!--                        </tbody>-->
-<!--                    </table>-->
-<!--                    <script>-->
-<!--                        let url = `ws://${window.location.host}/ws/aa/bb/c/`;-->
-<!--                            let chatSocket = new WebSocket(url);-->
-<!--                            chatSocket.addEventListener("message", (event) => {-->
-<!--                              console.log("Message from server:", event.data);-->
-<!--                            });-->
-<!--                    </script>-->
+
                 </div>
             </div>
         </div>
