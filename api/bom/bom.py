@@ -16,7 +16,7 @@ def bom_list(request):
         product_info=F('item__item_name'),
         image=F('item__brand'),
         product_name=F('item__item_name'),
-    ).values('id', 'product_name', 'qty', 'price', 'product_info', 'image', 'level', 'item_id', 'parent'))
+    ).values('id', 'part_code', 'qty', 'price', 'product_info', 'image', 'level', 'item_id', 'parent', 'product_name'))
     return JsonResponse(bomTree, safe=False)
 
 def bom_add(request, order):
@@ -87,18 +87,25 @@ def bom_add(request, order):
     return JsonResponse({'message': 'success', 'order_id': orderData.id, 'boms': boms})
 
 
-def bom_edit(request):
+def bom_edit(request,id):
     data = request.POST.dict()
-    bom_id = data['id']
-    qty = int(data['qty'])
+    bom_id = id
     orderProduct = OrderProduct.objects.get(id=bom_id)
-    bom = BomMaster.objects.get(op_id=orderProduct.id)
-    orderProduct.order_cnt = qty
-    orderProduct.save()
-    total = bom.item.standard_price * qty
-    bom.total = total
-    bom.tax = total * 0.1
-    bom.save()
+    bom = BomMaster.objects.get(id = bom_id)
+    try:
+        qty = int(data['qty'])
+        total = bom.item.standard_price * qty
+        orderProduct.order_cnt = qty
+        bom.total = total
+        bom.tax = total * 0.1
+        orderProduct.save()
+    except:
+        pass
+    try:
+        bom.part_code = data['part_code']
+        bom.save()
+    except:
+        pass
     return JsonResponse({'message': 'success'})
 
 
