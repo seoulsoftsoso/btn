@@ -49,9 +49,9 @@ class EnterpriseMaster(models.Model):
 
 
 class ItemMaster(models.Model):
-    item_code = models.CharField(max_length=255, unique=True)
-    item_name = models.CharField(max_length=255)
-    item_type = models.CharField(max_length=255)
+    code = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
     specification = models.TextField(blank=True, null=True)
     model = models.TextField(blank=True, null=True)
     brand = models.CharField(max_length=255, blank=True, null=True)
@@ -60,11 +60,11 @@ class ItemMaster(models.Model):
     delete_flag = models.CharField(max_length=1, choices=(('Y', 'Yes'), ('N', 'No')))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, related_name='item_created_by', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, related_name='item_updated_by', on_delete=models.CASCADE)
+    created_by_id = models.ForeignKey(User, related_name='item_created_by', on_delete=models.CASCADE)
+    updated_by_id = models.ForeignKey(User, related_name='item_updated_by', on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'itemMaster'
+        db_table = 'itemmaster'
 
 
 class BasicBom(models.Model):
@@ -80,51 +80,51 @@ class BasicBom(models.Model):
 
 class BomMaster(models.Model):
     level = models.IntegerField()  # root = 0
-    part_code = models.CharField(max_length=255)
-    order_cnt = models.IntegerField()
+    part = models.CharField(max_length=255)
     item = models.ForeignKey('ItemMaster', on_delete=models.SET_NULL, null=True)
     parent = models.ForeignKey('BomMaster', related_name='parent_bom', on_delete=models.SET_NULL, null=True,
                                default=None)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     tax = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     op = models.ForeignKey('OrderProduct', on_delete=models.SET_NULL, null=True)
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='bom_created_by', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, related_name='bom_updated_by', on_delete=models.CASCADE)
+    created_by_id = models.ForeignKey(User, related_name='bom_created_by', on_delete=models.CASCADE)
+    updated_by_id = models.ForeignKey(User, related_name='bom_updated_by', on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'bomMaster'
+        db_table = 'bommaster'
 
 
 class OrderMaster(models.Model):
     so_no = models.CharField(max_length=255)
     client = models.ForeignKey(UserMaster, on_delete=models.SET_NULL, null=True)
-    order_date = models.DateField()
-    order_cnt = models.IntegerField()
-    order_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    order_total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    order_tax = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    order_status = models.CharField(max_length=1, default=1)
+    date = models.DateField()
+    cnt = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    tax = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     place = models.CharField(max_length=255)
     comment = models.TextField()
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='order_created_by', on_delete=models.SET_NULL, null=True)
-    updated_by = models.ForeignKey(User, related_name='order_updated_by', on_delete=models.SET_NULL, null=True)
+    created_by_id = models.ForeignKey(User, related_name='order_created_by', on_delete=models.SET_NULL, null=True)
+    updated_by_id = models.ForeignKey(User, related_name='order_updated_by', on_delete=models.SET_NULL, null=True)
 
     class Meta:
-        db_table = 'orderMaster'
+        db_table = 'ordermaster'
 
 
 class OrderProduct(models.Model):
     unique_no = models.CharField(max_length=255)
     product_name = models.CharField(max_length=255)
+    bom = models.ForeignKey(BomMaster, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey('OrderMaster', on_delete=models.SET_NULL, null=True)
     delivery_date = models.DateTimeField(null=True)
-    op_cnt = models.IntegerField(null=True)
+    cnt = models.IntegerField(null=True)
     crops = models.CharField(max_length=255, null=True)
     delivery_addr = models.CharField(max_length=255, null=True)
     request_note = models.TextField(null=True)
@@ -132,11 +132,11 @@ class OrderProduct(models.Model):
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='order_product_created_by', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, related_name='order_product_updated_by', on_delete=models.CASCADE)
+    created_by_id = models.ForeignKey(User, related_name='order_product_created_by', on_delete=models.CASCADE)
+    updated_by_id = models.ForeignKey(User, related_name='order_product_updated_by', on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'orderProduct'
+        db_table = 'orderproduct'
 
 
 class PlanPart(models.Model):
