@@ -96,7 +96,7 @@
 
                                     let initialData = JSON.parse('{{ initial_data_json|safe }}');
 
-                                    let socket = new WebSocket(`ws://118.44.218.236:7000/ws/aa/bb/c/`);
+                                    let socket = new WebSocket(`ws://${window.location.host}/ws/landing/user/`);
                                     socket.addEventListener("message", (error) => {
                                       console.log("Error has occured:", error);
                                       updateTable(initialData);
