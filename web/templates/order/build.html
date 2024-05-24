@@ -644,7 +644,7 @@
                     part_code: data.part_code,
                     price: data.price,
                     qty: data.qty,
-                    text: data.part_code,
+                    text: data.product_name,
                     product_info: data.product_info,
                     image: data.image,
                     item_id: data.item_id
@@ -682,26 +682,11 @@
                                 컨테이너_변경: {
                                     label: '컨테이너 변경',
                                     action: function (data) {
-                                        console.log(data)
                                         var inst = $.jstree.reference(data.reference),
-                                        obj = inst.get_node(data.reference);
+                                            obj = inst.get_node(data.reference);
                                         inst.edit(obj);
-                                        $('#jstree').on('rename_node.jstree', function (e, data) {
-                                            console.log(data)
-                                            $.ajax({
-                                                url: `/api/bom/edit/${data.node.id}`,
-                                                method: 'POST',
-                                                data: {
-                                                    part_code: data.text
-                                                },
-                                                headers: {
-                                                    'X-CSRFToken': '{{ csrf_token }}'
-                                                }
-                                            }).done(function (res) {
-                                                console.log(res)
-                                            })
-                                        })
-                                }},
+                                    }
+                                },
                                 컨테이너_삭제: {
                                     label: '컨테이너 삭제',
                                     action: function (node) {
@@ -776,56 +761,6 @@
                                             })
                                             formButton.removeChild(deleteButton);
                                             $("#plus-item").removeClass('d-none');
-                                        })
-                                    }
-                                },
-                               컨트롤러_변경: {
-                                    label: '컨트롤러 변경',
-                                    action: function (data) {
-                                        console.log(data)
-                                        var inst = $.jstree.reference(data.reference),
-                                        obj = inst.get_node(data.reference);
-                                        inst.edit(obj);
-                                        $('#jstree').on('rename_node.jstree', function (e, data) {
-                                            console.log(data)
-                                            $.ajax({
-                                                url: `/api/bom/edit/${data.node.id}`,
-                                                method: 'POST',
-                                                data: {
-                                                    part_code: data.text
-                                                },
-                                                headers: {
-                                                    'X-CSRFToken': '{{ csrf_token }}'
-                                                }
-                                            }).done(function (res) {
-                                                console.log(res)
-                                            })
-                                        })
-                                }},
-                            }
-                        case 2:
-                            return {
-                                아이템_변경: {
-                                    label: '아이템 변경',
-                                    action: function (data) {
-                                        console.log(data)
-                                        var inst = $.jstree.reference(data.reference),
-                                            obj = inst.get_node(data.reference);
-                                        inst.edit(obj);
-                                        $('#jstree').on('rename_node.jstree', function (e, data) {
-                                            console.log(data)
-                                            $.ajax({
-                                                url: `/api/bom/edit/${data.node.id}`,
-                                                method: 'POST',
-                                                data: {
-                                                    part_code: data.text
-                                                },
-                                                headers: {
-                                                    'X-CSRFToken': '{{ csrf_token }}'
-                                                }
-                                            }).done(function (res) {
-                                                console.log(res)
-                                            })
                                         })
                                     }
                                 }
