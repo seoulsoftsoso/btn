@@ -641,6 +641,7 @@
                     id: data.id,
                     parent: data.parent || '#',
                     product_name: data.product_name,
+                    part_code: data.part_code,
                     price: data.price,
                     qty: data.qty,
                     text: data.part_code,
@@ -879,14 +880,15 @@
                     })).draw();
                     break;
                 case 2:
-                    item.deselect_all()
+                    let inst = $('#jstree').jstree(true);
+                    inst.deselect_all();
                     break;
                 default:
                     break;
             }
 
         });
-
+        console.log(tree)
         var dt_details_table = $('.datatables-order-details');
         if (dt_details_table.length) {
             var dt_products = dt_details_table.DataTable({
@@ -920,8 +922,7 @@
                         searchable: false,
                         orderable: false,
                         render: function (data, type, full, meta) {
-                            var $name = full['product_name'],
-                                $product_brand = full['product_info']
+                                $product_brand = full['product_name']
                             var stateNum = Math.floor(Math.random() * 6);
                             var states = [
                                 'success',
@@ -933,7 +934,7 @@
                                 'secondary'
                             ];
                             var $state = states[stateNum],
-                                $name = full['product_name'],
+                                $name = full['part_code'] || full['product_name'],
                                 $initials = $name.match(/\b\w/g) || [];
                             $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
                             $output = '<span class="avatar-initial rounded-2 bg-label-' + $state + '">' + $initials + '</span>';

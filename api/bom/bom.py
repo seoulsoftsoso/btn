@@ -67,8 +67,7 @@ def bom_add(request, order):
         )
     else:
         for i in range(0, qty):
-            qty = qty if level == 2 else 1
-            bom = BomMaster.objects.create(
+                bom = BomMaster.objects.create(
                 level=level,
                 part_code=item.item_name,
                 item=item,
@@ -90,10 +89,10 @@ def bom_add(request, order):
 def bom_edit(request,id):
     data = request.POST.dict()
     bom_id = id
-    orderProduct = OrderProduct.objects.get(id=bom_id)
     bom = BomMaster.objects.get(id = bom_id)
     try:
         qty = int(data['qty'])
+        orderProduct = OrderProduct.objects.get(id=BomMaster.objects.get(id=bom_id).op_id)
         total = bom.item.standard_price * qty
         orderProduct.order_cnt = qty
         bom.total = total
