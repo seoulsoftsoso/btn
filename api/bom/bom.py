@@ -16,7 +16,7 @@ def bom_list(request):
         product_info=F('item__item_name'),
         image=F('item__brand'),
         product_name=F('item__item_name'),
-    ).values('id', 'part_code', 'qty', 'price', 'product_info', 'image', 'level', 'item_id', 'parent', 'product_name'))
+    ).values('id', 'product_name', 'qty', 'price', 'product_info', 'image', 'level', 'item_id', 'parent'))
     return JsonResponse(bomTree, safe=False)
 
 def bom_add(request, order):
@@ -86,7 +86,7 @@ def bom_add(request, order):
     return JsonResponse({'message': 'success', 'order_id': orderData.id, 'boms': boms})
 
 
-def bom_edit(request,id):
+def bom_edit(request):
     data = request.POST.dict()
     bom_id = id
     bom = BomMaster.objects.get(id = bom_id)

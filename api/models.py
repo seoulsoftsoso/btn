@@ -5,7 +5,6 @@ class UserMaster(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_code = models.CharField(max_length=255)
     user_name = models.CharField(max_length=255)
-    join_date = models.DateField(null=True)
     address = models.CharField(max_length=255, null=True)
     tel = models.CharField(max_length=255, null=True)
     fax = models.CharField(max_length=255, null=True)
@@ -15,8 +14,6 @@ class UserMaster(models.Model):
     is_master = models.CharField(max_length=1, choices=(('Y', 'Yes'), ('N', 'No')))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='user_created_by', on_delete=models.SET_NULL, null=True)
-    updated_by = models.ForeignKey(User, related_name='user_updated_by', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         db_table = 'usermaster'
@@ -39,11 +36,6 @@ class EnterpriseMaster(models.Model):
     etc = models.TextField(null=True)
     cus_type = models.CharField(max_length=255, null=True)
     delete_flag = models.CharField(max_length=1, choices=(('Y', 'Yes'), ('N', 'No')))
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='customer_created_by', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, related_name='customer_updated_by', on_delete=models.CASCADE)
-
     class Meta:
         db_table = 'enterpriseMaster'
 
@@ -60,8 +52,8 @@ class ItemMaster(models.Model):
     delete_flag = models.CharField(max_length=1, choices=(('Y', 'Yes'), ('N', 'No')))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, related_name='item_created_by', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, related_name='item_updated_by', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(UserMaster, related_name='item_created_by', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='item_updated_by', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'itemMaster'
@@ -91,8 +83,8 @@ class BomMaster(models.Model):
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='bom_created_by', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, related_name='bom_updated_by', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(UserMaster, related_name='bom_created_by', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='bom_updated_by', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'bomMaster'
@@ -100,20 +92,20 @@ class BomMaster(models.Model):
 
 class OrderMaster(models.Model):
     so_no = models.CharField(max_length=255)
-    client = models.ForeignKey(UserMaster, on_delete=models.SET_NULL, null=True)
+    client = models.ForeignKey(UserMaster, on_delete=models.SET_NULL, null=True, related_name='client')
     order_date = models.DateField()
     order_cnt = models.IntegerField()
     order_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     order_total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     order_tax = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    order_status = models.CharField(max_length=1, default=1)
-    place = models.CharField(max_length=255)
+    order_sales_by = models.ForeignKey(UserMaster, on_delete=models.SET_NULL, null=True, related_name='sales_by')
+    order_place = models.CharField(max_length=255)
     comment = models.TextField()
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='order_created_by', on_delete=models.SET_NULL, null=True)
-    updated_by = models.ForeignKey(User, related_name='order_updated_by', on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(UserMaster, related_name='order_created_by', on_delete=models.SET_NULL, null=True)
+    updated_by = models.ForeignKey(UserMaster, related_name='order_updated_by', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         db_table = 'orderMaster'
@@ -132,15 +124,15 @@ class OrderProduct(models.Model):
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='order_product_created_by', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, related_name='order_product_updated_by', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(UserMaster, related_name='order_product_created_by', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='order_product_updated_by', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'orderProduct'
 
 
 class PlanPart(models.Model):
-    name = models.CharField(max_length=100)
+    p_name = models.CharField(max_length=100)
     part = models.ForeignKey(BomMaster, on_delete=models.SET_NULL, null=True)
     delete_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -153,10 +145,9 @@ class PlanPart(models.Model):
 
 
 class Plantation(models.Model):
-    code = models.CharField(max_length=50, unique=True)
-    name = models.CharField(max_length=100)
+    c_code = models.CharField(max_length=50, unique=True)
+    c_name = models.CharField(max_length=100)
     owner = models.CharField(max_length=100)
-    part = models.ForeignKey(PlanPart, on_delete=models.SET_NULL, null=True)
     bom = models.ForeignKey(BomMaster, on_delete=models.SET_NULL, null=True)
     delete_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)

@@ -24,7 +24,7 @@ def order_add(request):
     order['client'] = order['client'][0]['value']
     OrderMaster.objects.create(so_no=so_no, place=order['order_place'], client=UserMaster.objects.get(id=order['client']),
                                order_date=order['order_date'], order_cnt=order['order_cnt'], order_price=order['order_price'],
-                               order_tax=order['order_tax'],
+                               order_tax=order['order_tax'], order_place=order['order_place'],
                                order_total=order['order_total'], comment=order['order_comment'], delete_flag='N',
                                created_by=request.user,
                                updated_by=request.user)
