@@ -16,7 +16,7 @@ class UserMaster(models.Model):
     updated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'usermaster'
+        db_table = 'userMaster'
 
 
 class EnterpriseMaster(models.Model):
