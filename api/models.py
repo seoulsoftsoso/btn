@@ -60,8 +60,8 @@ class ItemMaster(models.Model):
     delete_flag = models.CharField(max_length=1, choices=(('Y', 'Yes'), ('N', 'No')))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by_id = models.ForeignKey(User, related_name='item_created_by', on_delete=models.CASCADE)
-    updated_by_id = models.ForeignKey(User, related_name='item_updated_by', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, related_name='item_created_by', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, related_name='item_updated_by', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'itemmaster'
@@ -91,8 +91,8 @@ class BomMaster(models.Model):
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by_id = models.ForeignKey(User, related_name='bom_created_by', on_delete=models.CASCADE)
-    updated_by_id = models.ForeignKey(User, related_name='bom_updated_by', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, related_name='bom_created_by', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, related_name='bom_updated_by', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'bommaster'
@@ -111,8 +111,8 @@ class OrderMaster(models.Model):
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by_id = models.ForeignKey(User, related_name='order_created_by', on_delete=models.SET_NULL, null=True)
-    updated_by_id = models.ForeignKey(User, related_name='order_updated_by', on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(User, related_name='order_created_by', on_delete=models.SET_NULL, null=True)
+    updated_by = models.ForeignKey(User, related_name='order_updated_by', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         db_table = 'ordermaster'
@@ -132,8 +132,8 @@ class OrderProduct(models.Model):
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by_id = models.ForeignKey(User, related_name='order_product_created_by', on_delete=models.CASCADE)
-    updated_by_id = models.ForeignKey(User, related_name='order_product_updated_by', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, related_name='order_product_created_by', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, related_name='order_product_updated_by', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'orderproduct'
