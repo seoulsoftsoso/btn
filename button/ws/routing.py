@@ -1,6 +1,6 @@
 from django.urls import re_path
 import logging
-from . import consumers
+from button.ws import consumers
 
 logger = logging.getLogger(__name__)
 
