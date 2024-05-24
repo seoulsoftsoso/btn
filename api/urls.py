@@ -3,6 +3,7 @@ from .bom.bom import *
 from .item.item import *
 from .order.order import *
 from .user.user import *
+from .util.utils import *
 
 urlpatterns = [
     path('bom/list', bom_list),
@@ -24,4 +25,7 @@ urlpatterns = [
     path('user/add', user_add),
     path('user/edit/<int:id>', user_edit),
     path('user/delete/<int:id>', user_delete),
+
+    path('util/user-table-data/', user_table_data),
+
 ]
