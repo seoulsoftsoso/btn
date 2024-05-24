@@ -79,18 +79,3 @@ def device_control(request):
 def device_explain(request):
     return render(request, 'device/explain.html')
 
-def build(request, order):
-    if not order:
-        return render(request, 'pages/Build.html', { 'order': 0, 'orderProduct': [], 'BomMaster': [] })
-    bomTree = []
-    orderProduct = OrderProduct.objects.filter(order_id=order, delete_flag="N").values_list('id')
-    bomTree = list(BomMaster.objects.filter(op_id__in=orderProduct).annotate(
-        qty=F('order_cnt'),
-        price=Round(Cast(F('item__standard_price'), FloatField()), 2),
-        product_info=F('item__item_name'),
-        image=F('item__brand'),
-        product_name=F('item__item_name'),
-    ).values('id', 'product_name', 'qty', 'price', 'product_info', 'image', 'level', 'item_id', 'parent'))
-    bomTree = json.dumps(bomTree ,cls=DjangoJSONEncoder)
-    context = { 'order': order, 'bomTree': bomTree }
-    return render(request, 'pages/Build.html', context)

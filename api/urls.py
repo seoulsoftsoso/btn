@@ -7,14 +7,14 @@ from .util.utils import *
 
 urlpatterns = [
     path('bom/list', bom_list),
-    path('bom/add', bom_add),
+    path('bom/add/<int:order>', bom_add),
     path('bom/edit/<int:id>', bom_edit),
     path('bom/delete/<int:id>', bom_delete),
 
-    path('items/list', item_list),
-    path('items/add', item_add),
-    path('items/edit/<int:id>', item_edit),
-    path('items/delete/<int:id>', item_delete),
+    path('item/list', item_list),
+    path('item/add', item_add),
+    path('item/edit/<int:id>', item_edit),
+    path('item/delete/<int:id>', item_delete),
 
     path('order/list', order_list),
     path('order/add', order_add),

@@ -39,7 +39,7 @@
                     <form class="add-new-record pt-0 row g-2 "
                           id="form-add-new-record"
                           href="javascript:;"
-                          action="/api/items/add"
+                          action="/api/item/add"
                           method="POST">
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="code">품번</label>
@@ -217,7 +217,7 @@
       var dt_basic_table = $('.datatables-basic')
       dt_basic = dt_basic_table.DataTable({
         ajax: {
-          url: '/api/items/list',
+          url: '/api/item/list',
           dataSrc: function (json) {
             return json.data;
           },          
@@ -519,7 +519,7 @@
             $('h3.title').text('삭제');
             break;
           default:
-            formRecord.action = '/api/items/add';
+            formRecord.action = '/api/item/add';
             $(formRecord).find('button[type="submit"]').text('추가');
             formRecord.href = 'javascript:;'
             $('h3.title').text('추가');

@@ -8,19 +8,19 @@
         <div class="card-datatable table-responsive">
             <table class="datatables-basic table border-top">
                 <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th>id</th>
-                        <th>주문자</th>
-                        <th>납품처</th>
-                        <th>주문일자</th>
-                        <th>수량</th>
-                        <th>공급가</th>
-                        <th>부가세</th>
-                        <th>현황</th>
-                        <th></th>
-                    </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>id</th>
+                    <th>주문자</th>
+                    <th>납품처</th>
+                    <th>주문일자</th>
+                    <th>수량</th>
+                    <th>공급가</th>
+                    <th>부가세</th>
+                    <th>현황</th>
+                    <th></th>
+                </tr>
                 </thead>
             </table>
         </div>
@@ -49,7 +49,7 @@
                            name="order_date"
                            class="form-control"
                            aria-label="Enter order date"
-                           placeholder="년/월/일" />
+                           placeholder="년/월/일"/>
                 </div>
                 <mdiv class="col-12">
                     <label class="form-label" for="TagifyUserList">주문자</label>
@@ -62,7 +62,7 @@
                                name="client"
                                class="form-control"
                                placeholder="Enter user"
-                               aria-label="Enter user" />
+                               aria-label="Enter user"/>
                     </div>
                 </mdiv>
                 <div class="col-sm-12 col-md-6">
@@ -72,7 +72,7 @@
                            name="order_cnt"
                            class="form-control"
                            placeholder="Enter order quantity"
-                           aria-label="Enter order quantity" />
+                           aria-label="Enter order quantity"/>
                 </div>
                 <div class="col-sm-12 col-md-6">
                     <label class="form-label" for="order_price">공급가</label>
@@ -86,7 +86,7 @@
                                class="form-control dt-salary"
                                placeholder="Enter supply price"
                                aria-label="Enter supply price"
-                               aria-describedby="price2" />
+                               aria-describedby="price2"/>
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-6">
@@ -96,7 +96,7 @@
                            name="order_tax"
                            class="form-control"
                            placeholder="Enter order_tax"
-                           readonly="readonly" />
+                           readonly="readonly"/>
                 </div>
                 <div class="col-sm-12 col-md-6">
                     <label class="form-label" for="order_total">합계</label>
@@ -108,7 +108,7 @@
                                id="order_total"
                                name="order_total"
                                class="form-control dt-salary"
-                               readonly="readonly" />
+                               readonly="readonly"/>
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-6">
@@ -118,7 +118,7 @@
                            class="form-control"
                            rows="3"
                            placeholder="Enter comment"
-                           aria-label="Enter comment" />
+                           aria-label="Enter comment"/>
                 </div>
                 <div class="col-sm-12 col-md-6">
                     <label class="form-label" for="order_place">납품처</label>
@@ -127,7 +127,7 @@
                            class="form-control"
                            rows="3"
                            placeholder="Enter comment"
-                           aria-label="Enter comment" />
+                           aria-label="Enter comment"/>
                 </div>
                 <div class="col-sm-12 mt-3">
                     <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">추가</button>
@@ -143,145 +143,145 @@
 </div>
 <script>
     // form order input 중 수정 혹은 추가가 필요한 항목
-      let orderInputs =   [
-          'order_date',
-          'order_cnt',
-          'order_price',
-          'order_tax',
-          'order_total',
-          'order_comment',
-          'order_place'
+    let orderInputs = [
+        'order_date',
+        'order_cnt',
+        'order_price',
+        'order_tax',
+        'order_total',
+        'order_comment',
+        'order_place'
     ]
-$(async function () {
-  var dt_basic_table = $('.datatables-basic')
-    dt_basic = dt_basic_table.DataTable({
-      ajax: '/api/order/list',
-      columns: [
-        {
-          data: ''
-        }, {
-          data: 'id'
-        }, {
-          data: 'id'
-        }, {
-          data: ''
-        }, {
-          data: 'place'
-        }, {
-          data: 'order_date'
-        }, {
-          data: 'order_cnt'
-        }, {
-          data: 'order_tax'
-        }, {
-          data: 'order_total'
-        }, {
-          data: ''
-        }, {
-          data: ''
-        }
-      ],
-      columnDefs: [
-        {
-          // For Responsive
-          className: 'control',
-          orderable: false,
-          searchable: false,
-          responsivePriority: 2,
-          targets: 0,
-          render: function (data, type, full, meta) {
-            return '';
-          }
-        }, {
-          // For Checkboxes
-          targets: 1,
-          orderable: false,
-          searchable: false,
-          responsivePriority: 3,
-          checkboxes: false,
-          render: function () {
-            return '';
-          }
-        }, {
-          targets: 2,
-          searchable: false,
-          visible: false
-        }, {
-          // Avatar image/badge, Name and post
-          targets: 3,
-          responsivePriority: 4,
-          render: function (data, type, full, meta) {
-            var $user_img = full['avatar'],
-              $name = full['full_name'],
-              $post = full['post'];
-            if ($user_img) {
-              // For Avatar image
-              var $output = '<img src="' + assetsPath + 'img/avatars/' + $user_img + '" alt="Avatar" class="rounded-circle">';
-            } else {
-              // For Avatar badge
-              var stateNum = Math.floor(Math.random() * 6);
-              var states = [
-                'success',
-                'danger',
-                'warning',
-                'info',
-                'dark',
-                'primary',
-                'secondary'
-              ];
-              var $state = states[stateNum],
-                $name = full['full_name'],
-                $initials = $name.match(/\b\w/g) || [];
-              $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
-              $output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
-            }
-            // Creates full output for row
-            var $row_output = '<div class="d-flex justify-content-start align-items-center user-name">' + '<div class="avatar-wrapper">' + '<div class="avatar me-2">' + $output + '</div>' + '</div>' + '<div class="d-flex flex-column">' + '<span class="emp_name text-truncate">' + $name + '</span>' + '<small class="emp_post text-truncate text-muted">' + $post + '</small>' + '</div>' + '</div>';
-            return $row_output;
-          }
-        }, {
-          responsivePriority: 1,
-          targets: 4
-        }, {
-          // Label
-          targets: -2,
-          render: function (data, type, full, meta) {
-            var $status_number = full['order_status'];
-            var $status = {
-              1: {
-                title: '견적 요청',
-                class: 'bg-label-primary'
-              },
-              2: {
-                title: '주문 완료',
-                class: ' bg-label-success'
-              },
-              3: {
-                title: '거절됨',
-                class: ' bg-label-danger'
-              },
-              4: {
-                title: '유예됨',
-                class: ' bg-label-warning'
-              },
-              5: {
-                title: '배송 중',
-                class: ' bg-label-info'
-              }
-            };
-            if (typeof $status[$status_number] === 'undefined') {
-              return data;
-            }
-            return ('<span class="badge ' + $status[$status_number].class + '">' + $status[$status_number].title + '</span>');
-          }
-        }, {
-          // Actions
-          targets: -1,
-          title: 'Actions',
-          orderable: false,
-          searchable: false,
-          render: function (data, type, full, meta) {
-            const htmlCode = `
+    $(async function () {
+        let dt_basic_table = $('.datatables-basic')
+        const dt_basic = dt_basic_table.DataTable({
+            ajax: '/api/order/list',
+            columns: [
+                {
+                    data: ''
+                }, {
+                    data: 'id'
+                }, {
+                    data: 'id'
+                }, {
+                    data: ''
+                }, {
+                    data: 'place'
+                }, {
+                    data: 'order_date'
+                }, {
+                    data: 'order_cnt'
+                }, {
+                    data: 'order_tax'
+                }, {
+                    data: 'order_total'
+                }, {
+                    data: ''
+                }, {
+                    data: ''
+                }
+            ],
+            columnDefs: [
+                {
+                    // For Responsive
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 2,
+                    targets: 0,
+                    render: function (data, type, full, meta) {
+                        return '';
+                    }
+                }, {
+                    // For Checkboxes
+                    targets: 1,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    checkboxes: false,
+                    render: function () {
+                        return '';
+                    }
+                }, {
+                    targets: 2,
+                    searchable: false,
+                    visible: false
+                }, {
+                    // Avatar image/badge, Name and post
+                    targets: 3,
+                    responsivePriority: 4,
+                    render: function (data, type, full, meta) {
+                        var $user_img = full['avatar'],
+                            $name = full['full_name'],
+                            $post = full['post'];
+                        if ($user_img) {
+                            // For Avatar image
+                            var $output = '<img src="' + assetsPath + 'img/avatars/' + $user_img + '" alt="Avatar" class="rounded-circle">';
+                        } else {
+                            // For Avatar badge
+                            var stateNum = Math.floor(Math.random() * 6);
+                            var states = [
+                                'success',
+                                'danger',
+                                'warning',
+                                'info',
+                                'dark',
+                                'primary',
+                                'secondary'
+                            ];
+                            var $state = states[stateNum],
+                                $name = full['full_name'],
+                                $initials = $name.match(/\b\w/g) || [];
+                            $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
+                            $output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
+                        }
+                        // Creates full output for row
+                        var $row_output = '<div class="d-flex justify-content-start align-items-center user-name">' + '<div class="avatar-wrapper">' + '<div class="avatar me-2">' + $output + '</div>' + '</div>' + '<div class="d-flex flex-column">' + '<span class="emp_name text-truncate">' + $name + '</span>' + '<small class="emp_post text-truncate text-muted">' + $post + '</small>' + '</div>' + '</div>';
+                        return $row_output;
+                    }
+                }, {
+                    responsivePriority: 1,
+                    targets: 4
+                }, {
+                    // Label
+                    targets: -2,
+                    render: function (data, type, full, meta) {
+                        var $status_number = full['order_status'];
+                        var $status = {
+                            1: {
+                                title: '견적 요청',
+                                class: 'bg-label-primary'
+                            },
+                            2: {
+                                title: '주문 완료',
+                                class: ' bg-label-success'
+                            },
+                            3: {
+                                title: '거절됨',
+                                class: ' bg-label-danger'
+                            },
+                            4: {
+                                title: '유예됨',
+                                class: ' bg-label-warning'
+                            },
+                            5: {
+                                title: '배송 중',
+                                class: ' bg-label-info'
+                            }
+                        };
+                        if (typeof $status[$status_number] === 'undefined') {
+                            return data;
+                        }
+                        return ('<span class="badge ' + $status[$status_number].class + '">' + $status[$status_number].title + '</span>');
+                    }
+                }, {
+                    // Actions
+                    targets: -1,
+                    title: 'Actions',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, full, meta) {
+                        const htmlCode = `
                 <div class="d-inline-block">
                     <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></a>
                     <ul class="dropdown-menu dropdown-menu-end m-0">
@@ -291,454 +291,451 @@ $(async function () {
                     </ul>
                 </div>
             `;
-            return (htmlCode);
-          }
-        }
-      ],
-      order: [
-        [2, 'desc']
-      ],
-      dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-      displayLength: 5,
-      lengthMenu: [
-        5,
-        10,
-        25,
-        50,
-        75,
-        100
-      ],
-      buttons: [
-        {
-          extend: 'collection',
-          className: 'btn btn-label-primary dropdown-toggle me-2',
-          text: '<i class="bx bx-export me-sm-1"></i> <span class="d-none d-sm-inline-block">출력</span>',
-          buttons: [
-            {
-              extend: 'print',
-              text: '<i class="bx bx-printer me-1"></i>pdf',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [
-                  3, 4, 5, 6, 7
-                ],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) 
-                      return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else 
-                        result = result + item.innerText;
-                      }
-                    );
-                    return result;
-                  }
+                        return (htmlCode);
+                    }
                 }
-              },
-              customize: function (win) {
-                //customize print view for dark
-                $(win.document.body)
-                  .css('color', config.colors.headingColor)
-                  .css('border-color', config.colors.borderColor)
-                  .css('background-color', config.colors.bodyBg);
-                $(win.document.body)
-                  .find('table')
-                  .addClass('compact')
-                  .css('color', 'inherit')
-                  .css('border-color', 'inherit')
-                  .css('background-color', 'inherit');
-              }
-            }, {
-              extend: 'csv',
-              text: '<i class="bx bx-file me-1"></i>Csv',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [
-                  3, 4, 5, 6, 7
-                ],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) 
-                      return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else 
-                        result = result + item.innerText;
-                      }
-                    );
-                    return result;
-                  }
+            ],
+            order: [
+                [2, 'desc']
+            ],
+            dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+            displayLength: 5,
+            lengthMenu: [
+                5,
+                10,
+                25,
+                50,
+                75,
+                100
+            ],
+            buttons: [
+                {
+                    extend: 'collection',
+                    className: 'btn btn-label-primary dropdown-toggle me-2',
+                    text: '<i class="bx bx-export me-sm-1"></i> <span class="d-none d-sm-inline-block">출력</span>',
+                    buttons: [
+                        {
+                            extend: 'print',
+                            text: '<i class="bx bx-printer me-1"></i>pdf',
+                            className: 'dropdown-item',
+                            exportOptions: {
+                                columns: [
+                                    3, 4, 5, 6, 7
+                                ],
+                                // prevent avatar to be display
+                                format: {
+                                    body: function (inner, coldex, rowdex) {
+                                        if (inner.length <= 0)
+                                            return inner;
+                                        var el = $.parseHTML(inner);
+                                        var result = '';
+                                        $.each(el, function (index, item) {
+                                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                                    result = result + item.lastChild.firstChild.textContent;
+                                                } else if (item.innerText === undefined) {
+                                                    result = result + item.textContent;
+                                                } else
+                                                    result = result + item.innerText;
+                                            }
+                                        );
+                                        return result;
+                                    }
+                                }
+                            },
+                            customize: function (win) {
+                                //customize print view for dark
+                                $(win.document.body)
+                                    .css('color', config.colors.headingColor)
+                                    .css('border-color', config.colors.borderColor)
+                                    .css('background-color', config.colors.bodyBg);
+                                $(win.document.body)
+                                    .find('table')
+                                    .addClass('compact')
+                                    .css('color', 'inherit')
+                                    .css('border-color', 'inherit')
+                                    .css('background-color', 'inherit');
+                            }
+                        }, {
+                            extend: 'csv',
+                            text: '<i class="bx bx-file me-1"></i>Csv',
+                            className: 'dropdown-item',
+                            exportOptions: {
+                                columns: [
+                                    3, 4, 5, 6, 7
+                                ],
+                                // prevent avatar to be display
+                                format: {
+                                    body: function (inner, coldex, rowdex) {
+                                        if (inner.length <= 0)
+                                            return inner;
+                                        var el = $.parseHTML(inner);
+                                        var result = '';
+                                        $.each(el, function (index, item) {
+                                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                                    result = result + item.lastChild.firstChild.textContent;
+                                                } else if (item.innerText === undefined) {
+                                                    result = result + item.textContent;
+                                                } else
+                                                    result = result + item.innerText;
+                                            }
+                                        );
+                                        return result;
+                                    }
+                                }
+                            }
+                        }, {
+                            extend: 'excel',
+                            text: '<i class="bx bxs-file-export me-1"></i>Excel',
+                            className: 'dropdown-item',
+                            exportOptions: {
+                                columns: [
+                                    3, 4, 5, 6, 7
+                                ],
+                                // prevent avatar to be display
+                                format: {
+                                    body: function (inner, coldex, rowdex) {
+                                        if (inner.length <= 0)
+                                            return inner;
+                                        var el = $.parseHTML(inner);
+                                        var result = '';
+                                        $.each(el, function (index, item) {
+                                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                                    result = result + item.lastChild.firstChild.textContent;
+                                                } else if (item.innerText === undefined) {
+                                                    result = result + item.textContent;
+                                                } else
+                                                    result = result + item.innerText;
+                                            }
+                                        );
+                                        return result;
+                                    }
+                                }
+                            }
+                        }, {
+                            extend: 'pdf',
+                            text: '<i class="bx bxs-file-pdf me-1"></i>Pdf',
+                            className: 'dropdown-item',
+                            exportOptions: {
+                                columns: [
+                                    3, 4, 5, 6, 7
+                                ],
+                                // prevent avatar to be display
+                                format: {
+                                    body: function (inner, coldex, rowdex) {
+                                        if (inner.length <= 0)
+                                            return inner;
+                                        var el = $.parseHTML(inner);
+                                        var result = '';
+                                        $.each(el, function (index, item) {
+                                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                                    result = result + item.lastChild.firstChild.textContent;
+                                                } else if (item.innerText === undefined) {
+                                                    result = result + item.textContent;
+                                                } else
+                                                    result = result + item.innerText;
+                                            }
+                                        );
+                                        return result;
+                                    }
+                                }
+                            }
+                        }, {
+                            extend: 'copy',
+                            text: '<i class="bx bx-copy me-1"></i>Copy',
+                            className: 'dropdown-item',
+                            exportOptions: {
+                                columns: [
+                                    3, 4, 5, 6, 7
+                                ],
+                                // prevent avatar to be display
+                                format: {
+                                    body: function (inner, coldex, rowdex) {
+                                        if (inner.length <= 0)
+                                            return inner;
+                                        var el = $.parseHTML(inner);
+                                        var result = '';
+                                        $.each(el, function (index, item) {
+                                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                                    result = result + item.lastChild.firstChild.textContent;
+                                                } else if (item.innerText === undefined) {
+                                                    result = result + item.textContent;
+                                                } else
+                                                    result = result + item.innerText;
+                                            }
+                                        );
+                                        return result;
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    text: '<i class="bx bx-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">주문 추가</span>',
+                    className: 'add-order btn btn-primary'
                 }
-              }
-            }, {
-              extend: 'excel',
-              text: '<i class="bx bxs-file-export me-1"></i>Excel',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [
-                  3, 4, 5, 6, 7
-                ],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) 
-                      return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else 
-                        result = result + item.innerText;
-                      }
-                    );
-                    return result;
-                  }
-                }
-              }
-            }, {
-              extend: 'pdf',
-              text: '<i class="bx bxs-file-pdf me-1"></i>Pdf',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [
-                  3, 4, 5, 6, 7
-                ],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) 
-                      return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else 
-                        result = result + item.innerText;
-                      }
-                    );
-                    return result;
-                  }
-                }
-              }
-            }, {
-              extend: 'copy',
-              text: '<i class="bx bx-copy me-1"></i>Copy',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [
-                  3, 4, 5, 6, 7
-                ],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) 
-                      return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else 
-                        result = result + item.innerText;
-                      }
-                    );
-                    return result;
-                  }
-                }
-              }
-            }
-          ]
-        }, {
-          text: '<i class="bx bx-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">주문 추가</span>',
-          className: 'add-order btn btn-primary'
-        }
-      ],
-      responsive: {
-        details: {
-          display: $
-            .fn
-            .DataTable
-            .Responsive
-            .display
-            .modal({
-              header: function (row) {
-                var data = row.data();
-                return 'Details of ' + data['full_name'];
-              }
-            }),
-          type: 'column',
-          renderer: function (api, rowIdx, columns) {
-            var data = $
-              .map(columns, function (col, i) {
-                return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
-                  ? `<tr data-dt-row="${col.rowIndex}" data-dt-column="${col.columnIndex}">
+            ],
+            responsive: {
+                details: {
+                    display: $
+                        .fn
+                        .DataTable
+                        .Responsive
+                        .display
+                        .modal({
+                            header: function (row) {
+                                var data = row.data();
+                                return 'Details of ' + data['full_name'];
+                            }
+                        }),
+                    type: 'column',
+                    renderer: function (api, rowIdx, columns) {
+                        var data = $
+                            .map(columns, function (col, i) {
+                                return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
+                                    ? `<tr data-dt-row="${col.rowIndex}" data-dt-column="${col.columnIndex}">
                     <td>${col.title}:</td>
                     <td>${col.data}</td>
                   </tr>`
-                  : '';
-              })
-              .join('');
+                                    : '';
+                            })
+                            .join('');
 
-            return data
-              ? $('<table class="table" /><tbody />').append(data)
-              : false;
-          }
+                        return data
+                            ? $('<table class="table" /><tbody />').append(data)
+                            : false;
+                    }
+                }
+            }
+        });
+        $('div.head-label').html('<h5 class="card-title mb-0">주문 / 의뢰</h5>');
+        const TagifyUserListEl = document.querySelector('#TagifyUserList');
+
+        function getUserList() {
+            return fetch('/api/user/list').then(response => response.json());
         }
-      }
-    });
-    $('div.head-label').html('<h5 class="card-title mb-0">주문 / 의뢰</h5>');
-  const TagifyUserListEl = document.querySelector('#TagifyUserList');
-   dt_basic_table.on('draw.dt', function () {
-      setTimeout(() => {
-    let deleteOrder = document.querySelector('.delete-order');
-      if (deleteOrder) {
-        deleteOrder.addEventListener('click', function (e) {
-          e.preventDefault();
-          offCanvasEl.show();
-          const tr = $(e.target).closest('tr');
-          let data = dt_basic
-            .row(tr)
-            .data();
-          console.log(data)
-          $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
-          $(".data-submit").text('삭제')
-          formAddNewRecord.action = '/order/order/delete/' + data['id'];
-         orderInputs.forEach((item) => {
-            formAddNewRecord
-              .querySelector(`[name="${item}"]`)
-              .value = data[item]
-            formAddNewRecord
-              .querySelector(`[name="${item}"]`)
-              .setAttribute('readonly', true);
-          });
-        });
-      }
-  }, 200)
 
-  setTimeout(() => {
-    let editOrder = document.querySelector('.edit-order');
-    if (editOrder) {
-      editOrder.addEventListener('click', function (e) {
-        offCanvasEl.show();
-        const tr = $(e.target).closest('tr');
-        let data = dt_basic.row(tr).data()
-        orderInputs.forEach((item) => {
-          formAddNewRecord
-            .querySelector(`[name="${item}"]`)
-            .value = data[item]
+        const usersList = await getUserList().then(data => {
+            return data.map(user => {
+                return {
+                    value: user.id,
+                    id: user.user_id,
+                    full_name: user.user_name,
+                    email: user.email,
+                    avatar: user.signature
+                }
+            });
         });
-        $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
-        formAddNewRecord.action = '/order/order/edit/' + data['id'];
-        $(".data-submit").text('수정')
-      });
-    }
-  }, 200)
 
-  });
-   function getUserList() {
-    return fetch('/api/user/list').then(response => response.json());
-  }
-  const usersList  = await getUserList().then(data => {
-    return data.map(user => {
-      return {
-        value: user.id,
-        id: user.user_id,
-        full_name: user.user_name,
-        email: user.email,
-        avatar: user.signature
-      }
-    });
-  });
-  function tagTemplate(tagData) {
-    console.log(tagData)
-    return `
-    <tag title="${tagData.title || tagData.email}"
-      contenteditable='false'
-      spellcheck='false'
-      tabIndex="-1"
-      class="${this.settings.classNames.tag} ${tagData.class
-      ? tagData.class
-      : ''}"
-      ${this.getAttributes(tagData)}
-    >
+        function tagTemplate(tagData) {
+            console.log(tagData)
+            return `
+            <tag title="${tagData.title || tagData.email}"
+              contenteditable='false'
+              spellcheck='false'
+              tabIndex="-1"
+              class="${this.settings.classNames.tag} ${tagData.class
+                ? tagData.class
+                : ''}"
+              ${this.getAttributes(tagData)}
+            >
       <div>
         <span class='tagify__tag-text'>${tagData.full_name}</span>
       </div>
     </tag>
   `;
-  }
+        }
 
-  function suggestionItemTemplate(tagData) {
-    return `
-    <div ${this.getAttributes(tagData)}
-      class='tagify__dropdown__item align-items-center ${tagData.class
-      ? tagData.class
-      : ''}'
-      tabindex="0"
-      role="option"
-    >
-      ${
-    tagData.avatar
-      ? `<div class='tagify__dropdown__item__avatar-wrap'>
-          <img onerror="this.style.visibility='hidden'" src="${tagData.avatar}">
-        </div>`
-      : ''}
-      <div class="fw-medium">${tagData.full_name}</div>
-      <span>${tagData.email}</span>
-    </div>
-  `;
-  }
+        function suggestionItemTemplate(tagData) {
+            return `
+            <div ${this.getAttributes(tagData)}
+              class='tagify__dropdown__item align-items-center ${tagData.class
+                ? tagData.class
+                : ''}'
+              tabindex="0"
+              role="option"
+            >
+                    ${
+                tagData.avatar
+                    ? `<div class='tagify__dropdown__item__avatar-wrap'>
+              <img onerror="this.style.visibility='hidden'" src="${tagData.avatar}">
+            </div>`
+                    : ''}
+          <div class="fw-medium">${tagData.full_name}</div>
+          <span>${tagData.email}</span>
+        </div>
+      `;
+        }
 
-  function dropdownHeaderTemplate(suggestions) {
-    return `
+        function dropdownHeaderTemplate(suggestions) {
+            return `
         <div class="${this.settings.classNames.dropdownItem}">
             <span>${suggestions.length} members</span>
         </div>
     `;
-  }
-  let TagifyUserList = new Tagify(TagifyUserListEl, {
-    mode: "select",
-    tagTextProp: 'full_name', // very important since a custom template is used with this property as text. allows typing a "value" or a "name" to match input with whitelist
-    enforceWhitelist: true,
-    skipInvalid: true, // do not remporarily add invalid tags
-    dropdown: {
-      classname: 'users-list',
-      searchKeys: ['full_name'] // very important to set by which keys to search for suggesttions when typing
-    },
-    templates: {
-      tag: tagTemplate,
-      dropdownItem: suggestionItemTemplate,
-      dropdownHeader: dropdownHeaderTemplate
-    },
-    whitelist: usersList
-  });
-  const formAddNewRecord = document.getElementById('form-add-new-record');
-
-
-let offCanvasElement = document.querySelector('#add-new-record');
-let offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
-
-  setTimeout(() => {
-    const addOrder = document.querySelector('.add-order')
-    if (addOrder) {
-      addOrder.addEventListener('click', function () {
-        offCanvasEl.show();
-        $(".data-submit").text('추가')
-      });
-    }
-  }, 200)
-
-  // Form validation for Add ne  record
-  fv = FormValidation.formValidation(formAddNewRecord, {
-    fields: {
-      order_date: {
-        validators: {
-          notEmpty: {
-            message: '주문일자는 필수입니다.'
-          }
         }
-      },
-      order_cnt: {
-        validators: {
-          notEmpty: {
-            message: '주문수량은 필수입니다.'
-          }
-        }
-      },
-      price: {
-        validators: {
-          notEmpty: {
-            message: '공급가는 필수입니다.'
-          }
-        }
-      }
-    },
-    plugins: {
-      trigger: new FormValidation
-        .plugins
-        .Trigger(),
-      bootstrap5: new FormValidation
-        .plugins
-        .Bootstrap5({
-          // Use this for enabling/changing valid/invalid class
-          // eleInvalidClass: '',
-          eleValidClass: '',
-          rowSelector: '.col-sm-12'
-        }),
-      defaultSubmit: new FormValidation
-        .plugins
-        .DefaultSubmit(),
-      autoFocus: new FormValidation
-        .plugins
-        .AutoFocus()
-    },
-    init: instance => {
-      instance.on('plugins.message.placed', function (e) {
-        if (e.element.parentElement.classList.contains('input-group')) {
-          e
-            .element
-            .parentElement
-            .insertAdjacentElement('afterend', e.messageElement);
-        }
-      });
-    }
-  });
 
-  // FlatPickr Initialization & Validation
-  flatpickr(formAddNewRecord.querySelector('[name="order_date"]'), {
-    enableTime: false,
-    // See https://flatpickr.js.org/formatting/
-    dateFormat: 'Y-m-d',
-    // After selecting a date, we need to revalidate the field
-    onChange: function () {
-      fv.revalidateField('order_date');
-    }
-  });
-  formAddNewRecord.addEventListener('submit', function (e2) {
-    e2.preventDefault();
-    const form = e2.target;
-    const formData = new FormData(form);
-    const url = form.action;
-    const method = form.method;
-    fetch(url, {
-      method: method,
-      body: formData
-    }).then(response => response.json()).then(data => {
-        $('#add-new-record').offcanvas('hide');
-        dt_basic.ajax.reload();
-        form.reset();
+        new Tagify(TagifyUserListEl, {
+            mode: "select",
+            tagTextProp: 'full_name', // very important since a custom template is used with this property as text. allows typing a "value" or a "name" to match input with whitelist
+            enforceWhitelist: true,
+            skipInvalid: true, // do not remporarily add invalid tags
+            dropdown: {
+                classname: 'users-list',
+                searchKeys: ['full_name'] // very important to set by which keys to search for suggesttions when typing
+            },
+            templates: {
+                tag: tagTemplate,
+                dropdownItem: suggestionItemTemplate,
+                dropdownHeader: dropdownHeaderTemplate
+            },
+            whitelist: usersList
+        });
+
+        const formAddNewRecord = document.getElementById('form-add-new-record');
+
+        let offCanvasElement = document.querySelector('#add-new-record');
+        let offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
+
+        setTimeout(() => {
+            const addOrder = document.querySelector('.add-order')
+            if (!addOrder) {
+                return;
+            }
+            addOrder.addEventListener('click', function () {
+                offCanvasEl.show();
+                $(".data-submit").text('추가')
+            });
+        }, 200)
+        setTimeout(() => {
+            let deleteOrderBtnMulti = document.querySelectorAll('.delete-order');
+            deleteOrderBtnMulti.forEach(el => {
+                el.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    $('#add-new-record').show()
+                    const closetColumn = $(e.target).closest('tr');
+                    let data = dt_basic
+                        .row(closetColumn)
+                        .data();
+                    $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
+                    $(".data-submit").text('삭제')
+                    formAddNewRecord.action = '/order/order/delete/' + data['id'];
+                    orderFormInputs.forEach((item) => {
+                        const formInput = formAddNewRecord.getElementsById(item);
+                        formInput.value = data[item];
+                        formInput.setAttribute('readonly', true)
+                    });
+                });
+            });
+        }, 200)
+        setTimeout(() => {
+            let editOrderBtnMulti = document.querySelectorAll('.edit-order');
+            editOrderBtnMulti.forEach(el => {
+                el.addEventListener('click', function (e) {
+                    offCanvasEl.show();
+                    const closetColumn = $(e.target).closest('tr');
+                    let data = dt_basic.row(closetColumn).data()
+                    orderInputs.forEach((item) => {
+                        formAddNewRecord
+                            .querySelector(`[name="${item}"]`)
+                            .value = data[item]
+                    });
+                    $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
+                    formAddNewRecord.action = '/order/order/edit/' + data['id'];
+                    $(".data-submit").text('수정')
+                })
+            })
+        }, 200)
+
+        // Form validation for Add ne  record
+        fv = FormValidation.formValidation(formAddNewRecord, {
+            fields: {
+                order_date: {
+                    validators: {
+                        notEmpty: {
+                            message: '주문일자는 필수입니다.'
+                        }
+                    }
+                },
+                order_cnt: {
+                    validators: {
+                        notEmpty: {
+                            message: '주문수량은 필수입니다.'
+                        }
+                    }
+                },
+                price: {
+                    validators: {
+                        notEmpty: {
+                            message: '공급가는 필수입니다.'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                trigger: new FormValidation
+                    .plugins
+                    .Trigger(),
+                bootstrap5: new FormValidation
+                    .plugins
+                    .Bootstrap5({
+                        // Use this for enabling/changing valid/invalid class
+                        // eleInvalidClass: '',
+                        eleValidClass: '',
+                        rowSelector: '.col-sm-12'
+                    }),
+                defaultSubmit: new FormValidation
+                    .plugins
+                    .DefaultSubmit(),
+                autoFocus: new FormValidation
+                    .plugins
+                    .AutoFocus()
+            },
+            init: instance => {
+                instance.on('plugins.message.placed', function (e) {
+                    if (e.element.parentElement.classList.contains('input-group')) {
+                        e
+                            .element
+                            .parentElement
+                            .insertAdjacentElement('afterend', e.messageElement);
+                    }
+                });
+            }
+        });
+
+        // FlatPickr Initialization & Validation
+        flatpickr(formAddNewRecord.querySelector('[name="order_date"]'), {
+            enableTime: false,
+            // See https://flatpickr.js.org/formatting/
+            dateFormat: 'Y-m-d',
+            // After selecting a date, we need to revalidate the field
+            onChange: function () {
+                fv.revalidateField('order_date');
+            }
+        });
+        formAddNewRecord.addEventListener('submit', function (e2) {
+            e2.preventDefault();
+            const form = e2.target;
+            const formData = new FormData(form);
+            const url = form.action;
+            const method = form.method;
+            fetch(url, {
+                method: method,
+                body: formData
+            }).then(response => response.json()).then(data => {
+                $('#add-new-record').offcanvas('hide');
+                dt_basic.ajax.reload();
+                form.reset();
+            });
+        });
     });
-  });
-});
 
-$("#order_price").on('input', function () {
-  var price = $(this).val();
-  var order_cnt = $("#order_cnt").val();
-  var order_total = price * order_cnt;
-  var order_tax = parseInt(order_total * 0.1);
-  $("#order_tax").val(order_tax);
-  $("#order_total").val(order_total);
-});
+    $("#order_price").on('input', function () {
+        var price = $(this).val();
+        var order_cnt = $("#order_cnt").val();
+        var order_total = price * order_cnt;
+        var order_tax = parseInt(order_total * 0.1);
+        $("#order_tax").val(order_tax);
+        $("#order_total").val(order_total);
+    });
 </script>
 {% include 'footer.html' %}

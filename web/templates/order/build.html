@@ -35,7 +35,7 @@
                             </div>
                         </h5>
                         <div class="card-body">
-                            <div id="jstree-checkbox"></div>
+                            <div id="jstree"></div>
                         </div>
                     </div>
                 </div>
@@ -560,6 +560,7 @@
                         name="bom_id"
                         data-allow-clear="true"
                         aria-label="Select item">
+                    <option value="">Select item</option>
                 </select>
             </div>
             <div class="col-sm-12 col-md-6">
@@ -627,29 +628,264 @@
 </div>
 <div class="content-backdrop fade"></div>
 <script>
-
     let tree = []
-    $(document).ready( function () {
-
-        function getBomTree () {
-            let order_id = window.location.href.split('/').pop().split('=').pop()
-            tree =  fetch(`/api/bom/list?order=${order_id}`).then(
-                res => res.json()
-            ).then(
-                res=> res.map(({parent, ...data}) => ({
-                    ...data,
-                    parent: parent || '#',
-                    text: data.product_name
-                }))
-            ).then(
-                res => {
-                    console.log(res)
-                    return res
+    let items = []
+    let checkboxTree = $('#jstree');
+    let order_id = window.location.href.split('/').pop().split('=').pop()
+    $(document).ready(async function () {
+        async function getBomTree() {
+            let res = fetch(`/api/bom/list?order=${order_id}`)
+            let data = await res.then(res => res.json())
+            tree = data.map(data => {
+                return {
+                    id: data.id,
+                    parent: data.parent || '#',
+                    product_name: data.product_name,
+                    price: data.price,
+                    qty: data.qty,
+                    text: data.part_code,
+                    product_info: data.product_info,
+                    image: data.image,
+                    item_id: data.item_id
                 }
-            )
+            })
         }
 
-        getBomTree()
+        async function getItemList() {
+            let res = fetch('/api/item/list')
+            let data = await res.then(res => res.json())
+            items = data.data
+        }
+
+        await getBomTree()
+        await getItemList()
+
+        let checkboxTree = $('#jstree');
+        items.forEach(item => {
+            $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
+        })
+        $('#jstree').jstree({
+            core: {
+                check_callback: true,
+                data:tree
+            },
+            plugins: [
+                'types', 'state', 'contextmenu'
+            ],
+            contextmenu: {
+                items: function (node) {
+                    console.log(node)
+                    switch (node.parents.length - 1) {
+                        case 0:
+                            return {
+                                컨테이너_변경: {
+                                    label: '컨테이너 변경',
+                                    action: function (data) {
+                                        console.log(data)
+                                        var inst = $.jstree.reference(data.reference),
+                                        obj = inst.get_node(data.reference);
+                                        inst.edit(obj);
+                                        $('#jstree').on('rename_node.jstree', function (e, data) {
+                                            console.log(data)
+                                            $.ajax({
+                                                url: `/api/bom/edit/${data.node.id}`,
+                                                method: 'POST',
+                                                data: {
+                                                    part_code: data.text
+                                                },
+                                                headers: {
+                                                    'X-CSRFToken': '{{ csrf_token }}'
+                                                }
+                                            }).done(function (res) {
+                                                console.log(res)
+                                            })
+                                        })
+                                }},
+                                컨테이너_삭제: {
+                                    label: '컨테이너 삭제',
+                                    action: function (node) {
+                                        data = $("#jstree").jstree(true).get_node(node.reference);
+                                        let offCanvasElement = document.querySelector('#add-new-record');
+                                        offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
+                                        offCanvasEl.show();
+                                        let formRecord = document.getElementById('form-add-new-record');
+                                        let formButton = document.getElementById('formButton');
+                                        $("#plus-item").addClass('d-none');
+                                        let deleteButton = document.createElement('button');
+                                        deleteButton.textContent = '삭제';
+                                        deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item');
+                                        formButton.appendChild(deleteButton);
+                                        formRecord.querySelector(`[name=price]`).value = data.data.price;
+                                        $("#item").val(data.data.item_id).trigger('change')
+                                        $("#order_cnt").val(data.data.qty).trigger('change')
+                                        formRecord.querySelector(`[name=comment]`).value = data.data.product_info;
+                                        deleteButton.addEventListener('click', function (e) {
+                                            $.ajax({
+                                                url: '/api/bom/delete',
+                                                method: 'POST',
+                                                data: {
+                                                    id: data.id
+                                                },
+                                                headers: {
+                                                    'X-CSRFToken': '{{ csrf_token }}'
+                                                }
+                                            }).done(function (res) {
+                                                inst = $('#jstree').jstree(true);
+                                                inst.delete_node(data);
+                                                offCanvasEl.hide();
+                                            })
+                                        })
+                                    }
+                                }
+                            }
+                        case 1:
+                            return {
+                                bom_삭제: {
+                                    label: 'bom 삭제',
+                                    action: function (node) {
+                                        data = $("#jstree").jstree(true).get_node(node.reference);
+                                        let offCanvasElement = document.querySelector('#add-new-record');
+                                        offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
+                                        offCanvasEl.show();
+                                        let formRecord = document.getElementById('form-add-new-record');
+                                        let formButton = document.getElementById('formButton');
+                                        $("#plus-item").addClass('d-none');
+                                        let deleteButton = document.createElement('button');
+                                        deleteButton.textContent = '삭제';
+                                        deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1');
+                                        formButton.appendChild(deleteButton);
+                                        formRecord.querySelector(`[name=price]`).value = data.data.price;
+                                        $("#item").val(data.data.item_id).trigger('change')
+                                        $("#order_cnt").val(data.data.qty).trigger('change')
+                                        formRecord.querySelector(`[name=comment]`).value = data.data.product_info;
+                                        deleteButton.addEventListener('click', function (e) {
+                                            $.ajax({
+                                                url: '/api/bom/delete',
+                                                method: 'POST',
+                                                data: {
+                                                    id: data.id
+                                                },
+                                                headers: {
+                                                    'X-CSRFToken': '{{ csrf_token }}'
+                                                }
+                                            }).done(function (res) {
+                                                inst = $('#jstree').jstree(true);
+                                                inst.delete_node(data);
+                                                offCanvasEl.hide();
+                                            })
+                                            formButton.removeChild(deleteButton);
+                                            $("#plus-item").removeClass('d-none');
+                                        })
+                                    }
+                                },
+                               컨트롤러_변경: {
+                                    label: '컨트롤러 변경',
+                                    action: function (data) {
+                                        console.log(data)
+                                        var inst = $.jstree.reference(data.reference),
+                                        obj = inst.get_node(data.reference);
+                                        inst.edit(obj);
+                                        $('#jstree').on('rename_node.jstree', function (e, data) {
+                                            console.log(data)
+                                            $.ajax({
+                                                url: `/api/bom/edit/${data.node.id}`,
+                                                method: 'POST',
+                                                data: {
+                                                    part_code: data.text
+                                                },
+                                                headers: {
+                                                    'X-CSRFToken': '{{ csrf_token }}'
+                                                }
+                                            }).done(function (res) {
+                                                console.log(res)
+                                            })
+                                        })
+                                }},
+                            }
+                        case 2:
+                            return {
+                                아이템_변경: {
+                                    label: '아이템 변경',
+                                    action: function (data) {
+                                        console.log(data)
+                                        var inst = $.jstree.reference(data.reference),
+                                            obj = inst.get_node(data.reference);
+                                        inst.edit(obj);
+                                        $('#jstree').on('rename_node.jstree', function (e, data) {
+                                            console.log(data)
+                                            $.ajax({
+                                                url: `/api/bom/edit/${data.node.id}`,
+                                                method: 'POST',
+                                                data: {
+                                                    part_code: data.text
+                                                },
+                                                headers: {
+                                                    'X-CSRFToken': '{{ csrf_token }}'
+                                                }
+                                            }).done(function (res) {
+                                                console.log(res)
+                                            })
+                                        })
+                                    }
+                                }
+                            }
+                    }
+                },
+            },
+            types: {
+                default: {
+                    icon: 'bx bx-folder'
+                },
+                html: {
+                    icon: 'bx bxl-html5 text-danger'
+                },
+                css: {
+                    icon: 'bx bxl-css3 text-info'
+                },
+                img: {
+                    icon: 'bx bx-image text-success'
+                },
+                js: {
+                    icon: 'bx bxl-nodejs text-warning'
+                }
+            }
+        });
+        checkboxTree.on('select_node.jstree', function (e, data) {
+            let filterdTree = $('#jstree').jstree(true).get_json('#', {
+                flat: true,
+                no_state: true
+            });
+            let selected = data.selected
+            let inst = $('#jstree').jstree(true);
+            let node = inst.get_node(selected);
+            let parent_level = node.parents.length - 1;
+            console.log(selected)
+            let child = tree.filter(item => item.parent === parseInt(selected[0]))
+            switch (parent_level) {
+                case 0:
+                    dt_products.data().clear().rows.add(child.map((item, index) => {
+                        return {
+                            ...item,
+                            product_info: 'level 2'
+                        }
+                    })).draw()
+                    break;
+                case 1:
+                    dt_products.data().clear().rows.add(child.map((item, index) => {
+                        return {
+                            ...item,
+                            product_info: 'level 3'
+                        }
+                    })).draw();
+                    break;
+                case 2:
+                    item.deselect_all()
+                    break;
+                default:
+                    break;
+            }
+
+        });
 
         var dt_details_table = $('.datatables-order-details');
         if (dt_details_table.length) {
@@ -685,28 +921,22 @@
                         orderable: false,
                         render: function (data, type, full, meta) {
                             var $name = full['product_name'],
-                                $product_brand = full['product_info'],
-                                $image = full['image'];
-                            console.log(full)
-                            if ($image) {
-                                var $output = '<img src="' + assetsPath + 'img/products/' + $image + '" alt="product-' + $name + '" class="rounded-2">';
-                            } else {
-                                var stateNum = Math.floor(Math.random() * 6);
-                                var states = [
-                                    'success',
-                                    'danger',
-                                    'warning',
-                                    'info',
-                                    'dark',
-                                    'primary',
-                                    'secondary'
-                                ];
-                                var $state = states[stateNum],
-                                    $name = full['product_name'],
-                                    $initials = $name.match(/\b\w/g) || [];
-                                $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
-                                $output = '<span class="avatar-initial rounded-2 bg-label-' + $state + '">' + $initials + '</span>';
-                            }
+                                $product_brand = full['product_info']
+                            var stateNum = Math.floor(Math.random() * 6);
+                            var states = [
+                                'success',
+                                'danger',
+                                'warning',
+                                'info',
+                                'dark',
+                                'primary',
+                                'secondary'
+                            ];
+                            var $state = states[stateNum],
+                                $name = full['product_name'],
+                                $initials = $name.match(/\b\w/g) || [];
+                            $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
+                            $output = '<span class="avatar-initial rounded-2 bg-label-' + $state + '">' + $initials + '</span>';
                             var $row_output = '<div class="d-flex justify-content-start align-items-center text-nowrap">' + '<div class="avatar-wrapper">' + '<div class="avatar me-2">' + $output + '</div>' + '</div>' + '<div class="d-flex flex-column">' + '<h6 class="text-body mb-0">' + $name + '</h6>' + '<small class="text-muted">' + $product_brand + '</small>' + '</div>' + '</div>';
                             return $row_output;
                         }
@@ -787,186 +1017,63 @@
                 $('.delete-item').remove();
                 offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
                 offCanvasEl.show();
-                let inst = $('#jstree-checkbox').jstree(true);
+                let inst = $('#jstree').jstree(true);
                 inst.deselect_all();
             });
-        }, 300);
-        let checkboxTree = $('#jstree-checkbox');
-        if (checkboxTree.length) {
-            checkboxTree.jstree({
-                core: {
-                    check_callback: true,
-                    data: tree
-                },
-                plugins: [
-                    'types', 'state', 'contextmenu'
-                ],
-                contextmenu: {
-                    items: function (node) {
-                        console.log(node)
-                        switch (node.parents.length - 1) {
-                            case 0:
-                                return {
-                                    컨테이너_변경: {
-                                        label: '컨테이너 변경',
-                                        action: function (data) {
-                                            var inst = $.jstree.reference(data.reference),
-                                                obj = inst.get_node(data.reference);
-                                            inst.edit(obj);
-                                        }
-                                    },
-                                    컨테이너_삭제: {
-                                        label: '컨테이너 삭제',
-                                        action: function (node) {
-                                            data = $("#jstree-checkbox").jstree(true).get_node(node.reference);
-                                            let offCanvasElement = document.querySelector('#add-new-record');
-                                            offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
-                                            offCanvasEl.show();
-                                            let formRecord = document.getElementById('form-add-new-record');
-                                            let formButton = document.getElementById('formButton');
-                                            $("#plus-item").addClass('d-none');
-                                            let deleteButton = document.createElement('button');
-                                            deleteButton.textContent = '삭제';
-                                            deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item');
-                                            formButton.appendChild(deleteButton);
-                                            formRecord.querySelector(`[name=price]`).value = data.data.price;
-                                            $("#item").val(data.data.item_id).trigger('change')
-                                            $("#order_cnt").val(data.data.qty).trigger('change')
-                                            formRecord.querySelector(`[name=comment]`).value = data.data.product_info;
-                                            deleteButton.addEventListener('click', function (e) {
-                                                $.ajax({
-                                                    url: '/api/bom/delete',
-                                                    method: 'POST',
-                                                    data: {
-                                                        id: data.id
-                                                    },
-                                                    headers: {
-                                                        'X-CSRFToken': '{{ csrf_token }}'
-                                                    }
-                                                }).done(function (res) {
-                                                    inst = $('#jstree-checkbox').jstree(true);
-                                                    inst.delete_node(data);
-                                                    offCanvasEl.hide();
-                                                })
-                                            })
-                                        }
-                                    }
-                                }
-                            case 1:
-                                return {
-                                    bom_삭제: {
-                                        label: 'bom 삭제',
-                                        action: function (node) {
-                                            data = $("#jstree-checkbox").jstree(true).get_node(node.reference);
-                                            let offCanvasElement = document.querySelector('#add-new-record');
-                                            offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
-                                            offCanvasEl.show();
-                                            let formRecord = document.getElementById('form-add-new-record');
-                                            let formButton = document.getElementById('formButton');
-                                            $("#plus-item").addClass('d-none');
-                                            let deleteButton = document.createElement('button');
-                                            deleteButton.textContent = '삭제';
-                                            deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1');
-                                            formButton.appendChild(deleteButton);
-                                            formRecord.querySelector(`[name=price]`).value = data.data.price;
-                                            $("#item").val(data.data.item_id).trigger('change')
-                                            $("#order_cnt").val(data.data.qty).trigger('change')
-                                            formRecord.querySelector(`[name=comment]`).value = data.data.product_info;
-                                            deleteButton.addEventListener('click', function (e) {
-                                                $.ajax({
-                                                    url: '/api/bom/delete',
-                                                    method: 'POST',
-                                                    data: {
-                                                        id: data.id
-                                                    },
-                                                    headers: {
-                                                        'X-CSRFToken': '{{ csrf_token }}'
-                                                    }
-                                                }).done(function (res) {
-                                                    inst = $('#jstree-checkbox').jstree(true);
-                                                    inst.delete_node(data);
-                                                    offCanvasEl.hide();
-                                                })
-                                                formButton.removeChild(deleteButton);
-                                                $("#plus-item").removeClass('d-none');
-                                            })
-                                        }
-                                    }
-                                }
-                        }
-                    },
-                },
-                types: {
-                    default: {
-                        icon: 'bx bx-folder'
-                    },
-                    html: {
-                        icon: 'bx bxl-html5 text-danger'
-                    },
-                    css: {
-                        icon: 'bx bxl-css3 text-info'
-                    },
-                    img: {
-                        icon: 'bx bx-image text-success'
-                    },
-                    js: {
-                        icon: 'bx bxl-nodejs text-warning'
-                    }
-                }
-            });
-            let formAddNewRecord = document.getElementById('form-add-new-record');
-            fv = FormValidation.formValidation(formAddNewRecord, {
-                fields: {
-                    order_cnt: {
-                        validators: {
-                            notEmpty: {
-                                message: '주문수량은 필수입니다.'
-                            }
+        }, 200);
+
+        let formAddNewRecord = document.getElementById('form-add-new-record');
+        fv = FormValidation.formValidation(formAddNewRecord, {
+            fields: {
+                order_cnt: {
+                    validators: {
+                        notEmpty: {
+                            message: '주문수량은 필수입니다.'
                         }
                     }
-                },
-                plugins: {
-                    trigger: new FormValidation
-                        .plugins
-                        .Trigger(),
-                    bootstrap5: new FormValidation
-                        .plugins
-                        .Bootstrap5({eleValidClass: '', rowSelector: '.col-sm-12'}),
-                    submitButton: new FormValidation
-                        .plugins
-                        .SubmitButton(),
-                    autoFocus: new FormValidation
-                        .plugins
-                        .AutoFocus()
-                },
-                init: instance => {
-                    instance.on('plugins.message.placed', function (e) {
-                        if (e.element.parentElement.classList.contains('input-group')) {
-                            e
-                                .element
-                                .parentElement
-                                .insertAdjacentElement('afterend', e.messageElement);
-                        }
-                    });
                 }
-            });
-            $("#item").on('change', (e) => {
-                if (!e.target.value) {
-                    $('#order_cnt').attr('disabled', 'disabled');
-                    $('#price').val('');
-                    $('#tax').val('');
-                    $('#order_total').val('');
-                } else {
-                    $('#order_cnt').removeAttr('disabled');
-                    $('#order_cnt').on('change', (e) => {
-                        $('#order_total').val(e.target.value * $('#price').val());
-                        let tax = $('#order_total').val() * 0.1;
-                        tax = tax.toFixed(2);
-                        $('#tax').val(tax);
-                    })
-                }
-            })
-        }
+            },
+            plugins: {
+                trigger: new FormValidation
+                    .plugins
+                    .Trigger(),
+                bootstrap5: new FormValidation
+                    .plugins
+                    .Bootstrap5({eleValidClass: '', rowSelector: '.col-sm-12'}),
+                submitButton: new FormValidation
+                    .plugins
+                    .SubmitButton(),
+                autoFocus: new FormValidation
+                    .plugins
+                    .AutoFocus()
+            },
+            init: instance => {
+                instance.on('plugins.message.placed', function (e) {
+                    if (e.element.parentElement.classList.contains('input-group')) {
+                        e
+                            .element
+                            .parentElement
+                            .insertAdjacentElement('afterend', e.messageElement);
+                    }
+                });
+            }
+        });
+        $("#item").on('change', (e) => {
+            if (!e.target.value) {
+                $('#order_cnt').attr('disabled', 'disabled');
+                $('#price').val('');
+                $('#tax').val('');
+                $('#order_total').val('');
+            } else {
+                $('#order_cnt').removeAttr('disabled');
+                $('#order_cnt').on('change', (e) => {
+                    $('#order_total').val(e.target.value * $('#price').val());
+                    let tax = $('#order_total').val() * 0.1;
+                    tax = tax.toFixed(2);
+                    $('#tax').val(tax);
+                })
+            }
+        })
         $("#plus-item").on('click', function (e) {
             let offCanvasElement = document.querySelector('#add-new-record');
             let offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
@@ -991,7 +1098,7 @@
                         "id": dt_products.data().length + 1,
                         ...formInput
                     }).draw();
-                    inst = $('#jstree-checkbox').jstree(true);
+                    inst = $('#jstree').jstree(true);
                     selectedTree = inst.get_selected();
                     parent = selectedTree[0] ? selectedTree[0] : '#';
                     let objNode = {
@@ -1001,7 +1108,7 @@
                         data: formInput
                     }
                     $.ajax({
-                        url: 'api/bom/add',
+                        url: `/api/bom/add/${order_id}`,
                         method: 'POST',
                         data: JSON.stringify(objNode),
                         headers: {
@@ -1084,13 +1191,14 @@
             let deleteButton = $(document).find('.delete-item');
             deleteButton.on('click', function (e2) {
                 let id = dt_products.row(e2.target.closest('tr')).data().id;
-                let inst = $('#jstree-checkbox').jstree(true);
+                let inst = $('#jstree').jstree(true);
                 let selected = tree.find(item => item.id == id);
                 let node = inst.get_node(selected);
                 dt_products
                     .row($(this).parents('tr'))
                     .remove()
                     .draw();
+                let checkboxTree = $('#jstree');
                 checkboxTree.jstree(true).delete_node(
                     node
                 );
@@ -1106,57 +1214,6 @@
                 }).done(message => {
                 })
 
-            })
-        })
-        $('#jstree-checkbox').on('select_node.jstree', function (e, data) {
-            let filterdTree = $('#jstree-checkbox').jstree(true).get_json('#', {
-                flat: true,
-                no_state: true
-            });
-            let selected = data.selected
-            let inst = $('#jstree-checkbox').jstree(true);
-            let node = inst.get_node(selected);
-            let parent_level = node.parents.length - 1;
-            console.log(selected)
-            let child = tree.filter(item => item.parent === parseInt(selected[0]))
-            switch (parent_level) {
-                case 0:
-                    dt_products.data().clear().rows.add(child.map((item, index) => {
-                        return {
-                            ...item,
-                            product_info: 'level 2'
-                        }
-                    })).draw()
-                    break;
-                case 1:
-                    dt_products.data().clear().rows.add(child.map((item, index) => {
-                        return {
-                            ...item,
-                            product_info: 'level 3'
-                        }
-                    })).draw();
-                    break;
-                case 2:
-                    item.deselect_all()
-                    break;
-                default:
-                    break;
-            }
-
-        });
-        $("#submit-order").on('click', function () {
-            let items = []
-            $.ajax({
-                url: '/api/items/list',
-                method: 'GET',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-            }).done(function (res) {
-                items = res.data
-                items.forEach(item => {
-                    $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
-                })
             })
         })
         $("#item").on('change', function (e) {
