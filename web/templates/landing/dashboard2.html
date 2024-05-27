@@ -76,75 +76,72 @@
                                                 .then(response => response.json())
                                                 .then(data => {
                                                     print(data); // Now you can use the data in your JavaScript code
-
-                                                    // Example of accessing data
-                                                    print("Unique GTR Sensor Names: ", data.unique_gtr_sen_name);
-                                                    print("Unique STA Sensor Names: ", data.unique_sta_sen_name);
-
-                                                    // Further processing of data
-                                                    for (const conId in data.con_id_senid_map) {
-                                                        if (data.con_id_senid_map.hasOwnProperty(conId)) {
-                                                            const conInfo = data.con_id_senid_map[conId];
-                                                            console.log(`Container ${conId} Info: `, conInfo);
-                                                        }
-                                                    }
                                                 })
                                                 .catch(error => console.error('Error fetching initial data:', error));
-                                        }fetchInitialData()
+                                        }
+                                        {#fetchInitialData()#}
+                                        console.log('hi')
+
+                                        function websocket(){
+                                            let socket = new WebSocket(`ws://${window.location.host}/ws/landing/user/`);
+                                            socket.addEventListener("message", (error) => {
+                                              console.log("Error has occured:", error);
+                                              updateTable(initialData);
+                                            });
+                                            socket.addEventListener("open", () => {
+                                                console.log("WebSocket is open");
+                                                updateTable(initialData);
+                                            });
+                                            socket.addEventListener("message", (event) => {
+                                                let data = JSON.parse(event.data);
+                                                updateTable(data);
+                                            });
+                                            socket.addEventListener("close", () => {
+                                              console.log("WebSocket is closed");
+                                            });
+                                            $(window).unload(function () {
+                                               socket.close();
+                                            });
+                                        }
+                                        websocket()
+
+                                        function updateTable(data) {
+                                            let uniqueGtrSenids = data.unique_gtr_senids;
+                                            let uniqueStaSenids = data.unique_sta_senids;
+                                            let conIdSenidMap = data.con_id_senid_map;
+                                            let headerRow = document.querySelector("#dashboard-table thead tr");
+                                            headerRow.innerHTML = `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);width:180;">재배동 이름</td>`;
+                                            uniqueGtrSenids.forEach(senid => {
+                                                headerRow.innerHTML += `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);">${senid}</td>`;
+                                            });
+                                            uniqueStaSenids.forEach(senid => {
+                                                headerRow.innerHTML += `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);">${senid}</td>`;
+                                            });
+
+                                            let tableBody = document.querySelector("#dashboard-table tbody");
+                                            tableBody.innerHTML = "";
+
+                                            Object.entries(conIdSenidMap).forEach(([conId, senids]) => {
+                                                let row = `<tr><td style="border-bottom: 1px solid var(--30-b, #C9CACA);width:180;text-align: center; align-items: center;background: var(--5-b, #F6F6F6);">${conId}</td>`;
+                                                uniqueGtrSenids.forEach(uniqueSenid => {
+                                                    let value = senids[uniqueSenid] || "-";
+                                                    row += `<td style="border-bottom: 1px solid var(--30-b, #C9CACA);text-align: center;background: var(--5-b, #F6F6F6);">${value}</td>`;
+                                                });
+                                                uniqueStaSenids.forEach(uniqueSenid => {
+                                                    let value = senids[uniqueSenid] || "-";
+                                                    row += `<td style="border-bottom: 1px solid var(--30-b, #C9CACA);text-align: center;background: var(--5-b, #F6F6F6);">${value}</td>`;
+                                                });
+                                                row += "</tr>";
+                                                tableBody.innerHTML += row;
+                                            });
+                                        }
                                     })
 
 
-                                    let initialData = JSON.parse('{{ initial_data_json|safe }}');
+                                    {#let initialData = JSON.parse('{{ initial_data_json|safe }}');#}
 
-                                    let socket = new WebSocket(`ws://${window.location.host}/ws/landing/user/`);
-                                    socket.addEventListener("message", (error) => {
-                                      console.log("Error has occured:", error);
-                                      updateTable(initialData);
-                                    });
-                                    socket.addEventListener("open", () => {
-                                        console.log("WebSocket is open");
-                                        updateTable(initialData);
-                                    });
-                                    socket.addEventListener("message", (event) => {
-                                        let data = JSON.parse(event.data);
-                                        updateTable(data);
-                                    });
-                                    socket.addEventListener("close", () => {
-                                      console.log("WebSocket is closed");
-                                    });
-                                    $(window).unload(function () {
-                                       socket.close();
-                                    });
-                                    function updateTable(data) {
-                                        let uniqueGtrSenids = data.unique_gtr_senids;
-                                        let uniqueStaSenids = data.unique_sta_senids;
-                                        let conIdSenidMap = data.con_id_senid_map;
-                                        let headerRow = document.querySelector("#dashboard-table thead tr");
-                                        headerRow.innerHTML = `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);width:180;">재배동 이름</td>`;
-                                        uniqueGtrSenids.forEach(senid => {
-                                            headerRow.innerHTML += `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);">${senid}</td>`;
-                                        });
-                                        uniqueStaSenids.forEach(senid => {
-                                            headerRow.innerHTML += `<td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);">${senid}</td>`;
-                                        });
 
-                                        let tableBody = document.querySelector("#dashboard-table tbody");
-                                        tableBody.innerHTML = "";
 
-                                        Object.entries(conIdSenidMap).forEach(([conId, senids]) => {
-                                            let row = `<tr><td style="border-bottom: 1px solid var(--30-b, #C9CACA);width:180;text-align: center; align-items: center;background: var(--5-b, #F6F6F6);">${conId}</td>`;
-                                            uniqueGtrSenids.forEach(uniqueSenid => {
-                                                let value = senids[uniqueSenid] || "-";
-                                                row += `<td style="border-bottom: 1px solid var(--30-b, #C9CACA);text-align: center;background: var(--5-b, #F6F6F6);">${value}</td>`;
-                                            });
-                                            uniqueStaSenids.forEach(uniqueSenid => {
-                                                let value = senids[uniqueSenid] || "-";
-                                                row += `<td style="border-bottom: 1px solid var(--30-b, #C9CACA);text-align: center;background: var(--5-b, #F6F6F6);">${value}</td>`;
-                                            });
-                                            row += "</tr>";
-                                            tableBody.innerHTML += row;
-                                        });
-                                    }
                                 </script>
                             </tr>
                         </thead>
