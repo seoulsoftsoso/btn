@@ -15,7 +15,7 @@ def user_table_data(request):
     bom_level_1_masters = bom_masters.filter(level=1)
     bom_level_1_ids = bom_level_1_masters.values_list('item', flat=True)  # 6. 5에서 level=1인 애들의 item_id를 리스트로 만듬.
     header_item_masters = ItemMaster.objects.filter(id__in=bom_level_1_ids,
-                                                    type='A')  # 7. 6에서 해당되는것들이 타입A인지 itemMaster에서 골라냄. 컨트롤러!
+                                                    type='A')  # 7. 6에서 해당되는것들이 타입A인지 itemMaster에서 골라냄. 컨트롤러! #지금 A가 안나뉘어짐!!!!
     header_items_ids = header_item_masters.values_list('id', flat=True)  # 8. 7에서 골라낸것들의 id만 리스트로 만듬. 컨트롤러!
     controller_bom_masters = bom_masters.filter(level=1, item__in=header_items_ids)
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)  # 9. 5중에서 타입A인것들만 추려내고 id를 리스트로 만듬
