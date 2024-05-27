@@ -86,11 +86,9 @@
                                             let socket = new WebSocket(`ws://${window.location.host}/ws/landing/user/`);
                                             socket.addEventListener("message", (error) => {
                                               console.log("Error has occured:", error);
-                                              updateTable(initialData);
                                             });
                                             socket.addEventListener("open", () => {
                                                 console.log("WebSocket is open");
-                                                updateTable(initialData);
                                             });
                                             socket.addEventListener("message", (event) => {
                                                 let data = JSON.parse(event.data);
