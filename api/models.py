@@ -119,6 +119,7 @@ class OrderProduct(models.Model):
     op_cnt = models.IntegerField(null=True)
     crops = models.CharField(max_length=255, null=True)
     delivery_addr = models.CharField(max_length=255, null=True)
+    bom = models.ForeignKey('BomMaster', on_delete=models.SET_NULL, null=True)
     request_note = models.TextField(null=True)
     status = models.CharField(max_length=255, null=True)
     delete_flag = models.CharField(max_length=1)

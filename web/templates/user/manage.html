@@ -2,48 +2,47 @@
 {% include 'menu.html' %}
 {% load static %}
 <div class="col-md-12 order-3 order-lg-12 mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <span class="mx-2">
-                가입 순
-                <span>▼</span>
-            </span>
-            <span class="ml-2">
-                최근 접속 순
-                <span>▼</span>
-            </span>
-        </div>
-        <div class="ml-auto d-flex">
-            <input type="text" class="form-control mx-2" placeholder="검색어를 입력하세요" />
-            <button class="btn me-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
-                <i class="fas fa-edit"></i>
-            </button>
-        </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <span class="mx-2" id="register">
+        가입 순
+        <span>▼</span>
+      </span>
+      <span class="ml-2" id="lastLogin">
+        최근 접속 순
+        <span>▼</span>
+      </span>
     </div>
-    <div class="card text-center">
-        <div class="card-header py-3"></div>
-        <div class="tab-content pt-0">
-            <div class="tab-pane fade show active">
-                <div class="table-responsive text-start">
-                    <table class="table table-borderless text-nowrap">
-                        <thead>
-                            <tr>
-                                <th>아이디(이메일)</th>
-                                <th>법인명</th>
-                                <th>대표자명</th>
-                                <th>연락처</th>
-                                <th>가입일자</th>
-                                <th>마지막 로그인</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    <div class="ml-auto d-flex">
+      <input type="text" class="form-control mx-2" placeholder="검색어를 입력하세요"/>
+      <button class="btn me-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
+        <i class="fas fa-edit"></i>
+      </button>
     </div>
+  </div>
+  <div class="card text-center">
+    <div class="card-header py-3"></div>
+    <div class="tab-content pt-0">
+      <div class="tab-pane fade show active">
+        <div class="table-responsive text-start">
+          <table class="table table-borderless text-nowrap">
+            <thead>
+              <tr>
+                <th>아이디(이메일)</th>
+                <th>법인명</th>
+                <th>대표자명</th>
+                <th>연락처</th>
+                <th>가입일자</th>
+                <th>마지막 로그인</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <script>
   const TODAY = 0;
@@ -52,134 +51,62 @@
   const ONE_MONTHS_AGO = 30;
   const FOUR_MONTHS_AGO = 120;
   const A_LONG_TIME_AGO = 360;
-  async function getUserData(){
+  let data = []
+  async function getUserData() {
     let data = await fetch("/api/user/list");
-    return data;
+    return data.json();
   }
   const table = document.querySelector("table tbody");
   const thead = document.querySelector("table thead");
-  async function drawCustomer(){
-    let data = await getUserData()
-    let tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="7" class="p-0">
-        <div class="collapse p-2" id="collapseExample" style="">
-            <h3>
-                제품 추가
-            </h3>
-              <form class="row flex-wrap d-flex gap-2" action='' href="javascript:void(0)">
-                <div class="row">
-                  <div class="col-md-3 col-sm-12">
-                      <div class="input-group input-group-merge">
-                          <span class="input-group-text fs-tiny">
-                              ID(email)
-                          </span>
-                          <input type="text" id="email" name="email" class="form-control">
-                      </div>
-                    </div>
-                  <div class="col-md-3 col-sm-12">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text fs-tiny">
-                          비밀번호
-                        </span>
-                        <input type="password" id="password" name="password" class="form-control ">
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-sm-12">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text fs-tiny">
-                          비밀번호 확인
-                        </span>
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control ">
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-sm-12">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text fs-tiny">
-                          법인명
-                        </span>
-                        <input type="text" id="companyName" name="companyName" class="form-control">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-3 col-sm-12">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text fs-tiny">
-                          대표자명
-                        </span>
-                        <input type="text" id="userName" name="userName" class="form-control">
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-sm-12">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text fs-tiny">
-                          전화번호
-                        </span>
-                        <input type="text" id="tel" name="tel" class="form-control">
-                    </div>
-                  </div>
-                <div class="col-md-3 col-sm-12">
-                  <div class="input-group input-group-merge">
-                      <span class="input-group-text fs-tiny">
-                        서명
-                      </span>
-                      <input type="file" id="signature" name="signature" class="form-control" accept="image/*">
-                  </div>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                  <div class="input-group input-group-merge">
-                      <span class="input-group-text fs-tiny">
-                        주소
-                      </span>
-                      <input type="text" id="address" name="address" class="form-control">
-                  </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3 col-sm-12">
-                  <div class="input-group input-group-merge">
-                      <span class="input-group-text fs-tiny">
-                        라이센스 코드
-                      </span>
-                      <input type="text" id="licenseCode" name="licenseCode" class="form-control">
-                  </div>
-                </div>
-                </div>
-                <div class="col-12 d-flex align-items-end mt-3 mt-sm-0 justify-content-end align-content-center">
-                  <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
-                    <i class="fas fa-eye"> 닫기</i>
-                  </button>
-                  <button class="btn" type="sumbit" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true"> 
-                    <i class="fas fa-add"> 추가</i>
-                  </button>
-                </div>
-            </form>
-          <div class="d-flex align-items-center gap-2 justify-content-end align-content-center mt-3">
-            <span class="badge bg-primary">관리자</span>
-            <span class="badge bg-secondary">사용자</span>
-          </div>
-        </div>
-      </td>`;
-    thead.prepend(tr);
-    data = await data.json();
-    console.log(data);
-    data.forEach(({ email, name: company, name: user_name, owner_name, tel: phone, created_at: regDate, updated_at: lastLogin, address, license_code}, idx) => {
+  async function drawCustomer(data) {
+    table.innerHTML = '';
+    $('#collapseExample').on('submit', async function (e) {
+      e.preventDefault();
+      let formData = new FormData();
+      let elements = [
+        'email',
+        'password',
+        'confirm_password',
+        'company_name',
+        'owner_name',
+        'tel',
+        'signature',
+        'address',
+        'license_code',
+        'user_name'
+      ]
+      elements.forEach((el) => {
+        formData.append(el, document.getElementById(el).value);
+      });
+      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+      $
+        .ajax({url: "/api/user/add", type: "POST", data: formData, processData: false, contentType: false})
+        .then(async function () {
+          let data = await getUserData();
+          data = await data.json();
+          console.log(data);
+        });
+    });
+
+    data.forEach(({
+      id,
+      email,
+      user_name,
+      tel,
+      company_name,
+      owner_name,
+      address,
+      license_code,
+      charge_name,
+      charge_tel,
+      charge_pos,
+      created_at: regDate,
+      updated_at: lastLogin
+    }, idx) => {
       regDate = regDate.split("T")[0];
       lastLogin = lastLogin.split("T")[0];
-      let afterRegDate = (
-        (new Date() - new Date(regDate)) /
-        1000 /
-        60 /
-        60 /
-        24
-      ).toFixed(0);
-      lastLogin = (
-        (new Date() - new Date(lastLogin)) /
-        1000 /
-        60 /
-        60 /
-        24
-      ).toFixed(0);
+      let afterRegDate = ((new Date() - new Date(regDate)) / 1000 / 60 / 60 / 24).toFixed(0);
+      lastLogin = ((new Date() - new Date(lastLogin)) / 1000 / 60 / 60 / 24).toFixed(0);
       afterRegDate = parseInt(afterRegDate);
       lastLogin = parseInt(lastLogin);
       let regTable = {
@@ -188,44 +115,43 @@
         [THIRTY_DAYS_AGO]: '<span class="badge bg-info">그제</span>',
         [ONE_MONTHS_AGO]: '<span class="badge bg-success">한달 전</span>',
         [FOUR_MONTHS_AGO]: '<span class="badge bg-primary">4개월 전</span>',
-        [A_LONG_TIME_AGO]: '<span class="badge bg-secondary">오래 전</span>',
+        [A_LONG_TIME_AGO]: '<span class="badge bg-secondary">오래 전</span>'
       };
-      let regBadge =
-        afterRegDate < 1
-          ? regTable[TODAY]
-          : afterRegDate < 2
-            ? regTable[YESTERDAY]
-            : afterRegDate < 3
-              ? regTable[THIRTY_DAYS_AGO]
-              : afterRegDate < 30
-                ? regTable[ONE_MONTHS_AGO]
-                : afterRegDate < 120
-                  ? regTable[FOUR_MONTHS_AGO]
-                  : regTable[A_LONG_TIME_AGO];
-      let lastLoginBadge =
-        lastLogin < 1
-          ? regTable[TODAY]
-          : lastLogin < 2
-            ? regTable[YESTERDAY]
-            : lastLogin < 3
-              ? regTable[THIRTY_DAYS_AGO]
-              : lastLogin < 30
-                ? regTable[ONE_MONTHS_AGO]
-                : lastLogin < 120
-                  ? regTable[FOUR_MONTHS_AGO]
-                  : regTable[A_LONG_TIME_AGO];
+      let regBadge = afterRegDate < 1
+        ? regTable[TODAY]
+        : afterRegDate < 2
+          ? regTable[YESTERDAY]
+          : afterRegDate < 3
+            ? regTable[THIRTY_DAYS_AGO]
+            : afterRegDate < 30
+              ? regTable[ONE_MONTHS_AGO]
+              : afterRegDate < 120
+                ? regTable[FOUR_MONTHS_AGO]
+                : regTable[A_LONG_TIME_AGO];
+      let lastLoginBadge = lastLogin < 1
+        ? regTable[TODAY]
+        : lastLogin < 2
+          ? regTable[YESTERDAY]
+          : lastLogin < 3
+            ? regTable[THIRTY_DAYS_AGO]
+            : lastLogin < 30
+              ? regTable[ONE_MONTHS_AGO]
+              : lastLogin < 120
+                ? regTable[FOUR_MONTHS_AGO]
+                : regTable[A_LONG_TIME_AGO];
       let tr = document.createElement("tr");
-      tr.classList.add("btn-outline-light");
+      tr
+        .classList
+        .add("btn-outline-light");
       tr.innerHTML = `
           <td>${email}</td>
           <td>
             <div class="d-flex align-items-center">
-              <img src="../static/assets/img/icons/brands/${company}.png" alt="Chrome" height="24" class="me-2" />
-              <span>${company}</span>
+              <span>${company_name}</span>
             </div>
           </td>
-          <td>${name}</td>
-          <td>${phone || '010-****-****'}</td>
+          <td>${owner_name}</td>
+          <td>${tel || '010-****-****'}</td>
           <td>
             ${regBadge}
           </td>
@@ -233,24 +159,22 @@
             ${lastLoginBadge}
           </td>
           <td>
-            <div clsas="d-flex justify-content-between align-items-center gap-3">
+            <div class="d-flex justify-content-between align-items-center gap-3">
               <button class="btn me-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${idx}" aria-expanded="true" aria-controls="collapseExample${idx}">
                 <i class="fas fa-eye"></i>
               </button>
-              <i class="fas fa-trash"></i>
             </div>
           </td>
         `;
       table.appendChild(tr);
       tr = document.createElement("tr");
-      tr.innerHTML =  `<td colspan="7" class="p-0">
+      tr.innerHTML = `<td colspan="7" class="">
         <div class="collapse p-2" id="collapseExample${idx}" >
             <h3>
-                제품 추가
+                ${user_name} 정보
             </h3>
-              <form class="row flex-wrap d-flex gap-2" action='' href="javascript:void(0)">
-                <div class="row">
-                  <div class="col-md-3 col-sm-12">
+              <form class="row flex-wrap d-flex" action='' href="javascript:void(0)">
+                  <div class="col-md-3 col-sm-12 p-2">
                       <div class="input-group input-group-merge">
                           <span class="input-group-text fs-tiny">
                               ID(email)
@@ -258,49 +182,39 @@
                           <input type="text" id="email" name="email" class="form-control"  value="${email}">
                       </div>
                     </div>
-                  <div class="col-md-3 col-sm-12">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text fs-tiny">
-                          비밀번호
-                        </span>
-                        <input type="password" id="password" name="password" class="form-control ">
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-sm-12">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text fs-tiny">
-                          비밀번호 확인
-                        </span>
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control ">
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-sm-12">
+                  <div class="col-md-3 col-sm-12 p-2">
                     <div class="input-group input-group-merge">
                         <span class="input-group-text fs-tiny">
                           법인명
                         </span>
-                        <input type="text" id="companyName" name="companyName" class="form-control" value="${owner_name}">
+                        <input type="text" id="company_name" name="company_name" class="form-control" value="${ (company_name || '')}">
                     </div>
                   </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-3 col-sm-12">
+                    <div class="col-md-3 col-sm-12 p-2">
                     <div class="input-group input-group-merge">
                         <span class="input-group-text fs-tiny">
                           대표자명
                         </span>
-                        <input type="text" id="userName" name="userName" class="form-control" value="${name}">
+                        <input type="text" id="owner_name" name="owner_name" class="form-control" value="${owner_name}">
                     </div>
                   </div>
-                  <div class="col-md-3 col-sm-12">
+                  <div class="col-md-3 col-sm-12 p-2">
                     <div class="input-group input-group-merge">
                         <span class="input-group-text fs-tiny">
                           전화번호
                         </span>
-                        <input type="text" id="tel" name="tel" class="form-control" value="${phone}">
+                        <input type="text" id="tel" name="tel" class="form-control" value="${tel}">
                     </div>
                   </div>
-                <div class="col-md-3 col-sm-12">
+                    <div class="col-md-3 col-sm-12 p-2">
+                        <div class="input-group input-group-merge">
+                        <span class="input-group-text fs-tiny">
+                          회사 이름
+                        </span>
+                        <input type="text" id="owner_name" name="owner_name" class="form-control" value="${company_name}">
+                    </div>
+                  </div>
+                <div class="col-md-3 col-sm-12 p-2">
                   <div class="input-group input-group-merge">
                       <span class="input-group-text fs-tiny">
                         서명
@@ -308,7 +222,7 @@
                       <input type="file" id="signature" name="signature" class="form-control" accept="image/*">
                   </div>
                 </div>
-                <div class="col-md-3 col-sm-12">
+                <div class="col-md-3 col-sm-12 p-2">
                   <div class="input-group input-group-merge">
                       <span class="input-group-text fs-tiny">
                         주소
@@ -316,23 +230,47 @@
                       <input type="text" id="address" name="address" class="form-control" value="${address}">
                   </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3 col-sm-12">
+                <div class="col-md-3 col-sm-12 p-2">
                   <div class="input-group input-group-merge">
                       <span class="input-group-text fs-tiny">
                         라이센스 코드
                       </span>
-                      <input type="text" id="licenseCode" name="licenseCode" class="form-control" value="${license_code}">
+                      <input type="text" id="license_code" name="license_code" class="form-control" value="${license_code}">
                   </div>
                 </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                      <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            담당자 이름
+                          </span>
+                          <input type="text" id="charge_name" name="charge_name" class="form-control" value="${charge_name}">
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                      <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            담당자 전화번호
+                          </span>
+                          <input type="text" id="charge_tel" name="charge_tel" class="form-control" value="${charge_tel}">
+                      </div>
+                    </div>
+                        <div class="col-md-3 col-sm-12 p-2">
+                          <div class="input-group input-group-merge">
+                              <span class="input-group-text fs-tiny">
+                                담당자 직책
+                              </span>
+                              <input type="text" id="charge_pos" name="charge_pos" class="form-control" value="${charge_pos}">
+                          </div>
                 </div>
                 <div class="col-12 d-flex align-items-end mt-3 mt-sm-0 justify-content-end align-content-center">
                   <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${idx}" aria-expanded="true" aria-controls="collapseExample${idx}">
                     <i class="fas fa-eye"> 닫기</i>
                   </button>
-                  <button class="btn" type="sumbit" data-bs-toggle="collapse" data-bs-target="#collapseExample${idx}" aria-expanded="true"> 
-                    <i class="fas fa-add"> 추가</i>
+                  <button class="btn" type="sumbit" data-bs-toggle="collapse" data-bs-target="#collapseExample${idx}" aria-expanded="true">
+                    <i class="fas fa-edit"> 수정</i>
+                  </button>
+                  <button id="delete${idx}" class="btn" data-bs-toggle="collapse" data-bs-target="#collapseExample${idx}" aria-expanded="true">
+                    <i class="fas fa-trash"> 삭제</i>
                   </button>
                 </div>
             </form>
@@ -343,28 +281,196 @@
         </div>
       </td>`;
       table.appendChild(tr);
-    });
-    $('#collapseExample').on('submit', async function(e){
-      e.preventDefault();
-      let formData = new FormData();
-      let elements = ['email', 'password', 'confirmPassword', 'companyName', 'userName', 'tel', 'signature', 'address',  'licenseCode']
-      elements.forEach((el) => {
-        formData.append(el, document.getElementById(el).value);
+      $(`#collapseExample${idx}`).on('submit', async function (e) {
+        e.preventDefault();
+        let formData = new FormData();
+        let doc = document.getElementById(`collapseExample${idx}`);
+        let elements = [
+          'email',
+          'password',
+          'confirm_password',
+          'company_name',
+          'owner_name',
+          'tel',
+          'charge_name',
+            'charge_tel',
+        'charge_pos',
+          'signature',
+          'address',
+          'license_code'
+        ]
+        elements.forEach((el) => {
+          formData.append(el, doc.querySelector(`#${el}`).value);
+        });
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        console.log(formData);
+        $
+          .ajax({url: `/api/user/edit/${id}`, type: "POST", data: formData, processData: false, contentType: false})
+          .then(async function () {
+            let data = await getUserData();
+            data = await data.json();
+            console.log(data);
+          });
       });
-      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-      $.ajax({
-        url: "/api/user/add",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-      }).then (async function(){
-        let data = await getUserData();
-        data = await data.json();
-        console.log(data);
+      $(`#delete${idx}`).on('click', async function (e) {
+        let formData = new FormData();
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        $
+          .ajax({url: `/api/user/delete/${id}`, type: "POST", data: formData, processData: false, contentType: false})
+          .then(async function () {
+            let data = await getUserData();
+            data = await data.json();
+            console.log(data);
+          });
       });
     });
   }
   drawCustomer();
+  document
+    .getElementById("register")
+    .addEventListener("click", async function () {
+      data = data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      await drawCustomer(data);
+    });
+  document
+    .getElementById("lastLogin")
+    .addEventListener("click", async function () {
+      data = data.sort((a, b) => new Date(a.updated_at) - new Date(b.updated_at));
+      await drawCustomer(data);
+    });
+  async function init() {
+    let thead = document.querySelector("table thead");
+    let tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="7" class="">
+            <div class="collapse p-2" id="collapseExample" style="">
+                <h3>
+                    유저 추가
+                </h3>
+                  <form class="row flex-wrap d-flex" action='' href="javascript:void(0)">
+   
+                      <div class="col-md-3 col-sm-12 p-2">
+                          <div class="input-group input-group-merge">
+                              <span class="input-group-text fs-tiny">
+                                  ID(email)
+                              </span>
+                              <input type="text" id="email" name="email" class="form-control">
+                          </div>
+                        </div>
+                      <div class="col-md-3 col-sm-12 p-2">
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text fs-tiny">
+                              비밀번호
+                            </span>
+                            <input type="password" id="password" name="password" class="form-control ">
+                        </div>
+                      </div>
+                      <div class="col-md-3 col-sm-12 p-2">
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text fs-tiny">
+                              비밀번호 확인
+                            </span>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control ">
+                        </div>
+                      </div>
+                      <div class="col-md-3 col-sm-12 p-2">
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text fs-tiny">
+                              법인명
+                            </span>
+                            <input type="text" id="company_name" name="company_name" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3 col-sm-12 p-2">
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text fs-tiny">
+                              대표자명
+                            </span>
+                            <input type="text" id="owner_name" name="owner_name" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3 col-sm-12 p-2">
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text fs-tiny">
+                              전화번호
+                            </span>
+                            <input type="text" id="tel" name="tel" class="form-control">
+                        </div>
+                      </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                      <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            서명
+                          </span>
+                          <input type="file" id="signature" name="signature" class="form-control" accept="image/*">
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                      <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            주소
+                          </span>
+                          <input type="text" id="address" name="address" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                      <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            유저 이름
+                          </span>
+                          <input type="text" id="user_name" name="user_name" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                      <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            라이센스 코드
+                          </span>
+                          <input type="text" id="license_code" name="license_code" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                      <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            담당자 이름
+                          </span>
+                          <input type="text" id="charge_name" name="charge_name" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                       <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            담당자 전화번호
+                          </span>
+                          <input type="text" id="charge_tel" name="charge_tel" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 p-2">
+                        <div class="input-group input-group-merge">
+                          <span class="input-group-text fs-tiny">
+                            담당자 직책
+                          </span>
+                          <input type="text" id="charge_pos" name="charge_pos" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-12 d-flex align-items-end mt-3 mt-sm-0 justify-content-end align-content-center">
+                      <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
+                        <i class="fas fa-eye"> 닫기</i>
+                      </button>
+                      <button class="btn" type="sumbit" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true">
+                        <i class="fas fa-add"> 추가</i>
+                      </button>
+                    </div>
+                </form>
+              <div class="d-flex align-items-center gap-2 justify-content-end align-content-center mt-3">
+                <span class="badge bg-primary">관리자</span>
+                <span class="badge bg-secondary">사용자</span>
+              </div>
+          </td>`;
+
+    thead.prepend(tr);
+    data = await getUserData();
+    await drawCustomer(data);
+  }
+  init();
 </script>
 {% include 'footer.html' %}

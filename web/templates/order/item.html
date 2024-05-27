@@ -506,13 +506,13 @@
         let rest = e.relatedTarget.getAttribute('action');
         switch (rest) {
           case 'patch':
-            formRecord.action = `/order/item/edit/${dt_basic.row(tr).data().id}`;
+            formRecord.action = `/api/item/edit/${dt_basic.row(tr).data().id}`;
             $(formRecord).find('button[type="submit"]').text('수정');
             formRecord.href = 'javascript:;'
             $('h3.title').text('수정');
             break;
           case 'delete':
-            formRecord.action = `/order/item/delete/${dt_basic.row(tr).data().id}`;
+            formRecord.action = `/api/item/delete/${dt_basic.row(tr).data().id}`;
             $(formRecord).find('input').attr('readonly', true);
             $(formRecord).find('button[type="submit"]').text('삭제');
             formRecord.href = 'javascript:;'

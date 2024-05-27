@@ -16,18 +16,21 @@ def user_add(request):
         tel = request.POST.get('tel')
         signature = request.POST.get('signature')
         address = request.POST.get('address')
+        charge_name= request.POST.get('charge_name')
+        charge_tel = request.POST.get('charge_tel')
+        charge_pos = request.POST.get('charge_pos')
         if password != confirm_password:
             return render(request, "register/register.html", {"error": "비밀번호가 일치하지 않습니다."})
         user = User.objects.create_user(username=user_id, password=password, email=email)
-        created_user = request.user if request.user.id is not None else user
-        current_user = UserMaster.objects.create(user=user, created_by= created_user, updated_by= created_user, user_code=license_code,user_name= user_name, tel=tel, address=address, signature=signature)
+        current_user = UserMaster.objects.create(user=user, user_code=license_code,user_name= user_name, tel=tel, address=address, signature=signature, delete_flag='N')
         data = {}
         data['licensee_no'] = license_code
         data['owner_name'] = user_name
-        data['charge_name'] = company_name
-        data['charge_tel'] = tel
-        data['created_by'] = created_user
-        data['updated_by'] = created_user
+        data['charge_name'] = charge_name
+        data['customer_name'] = company_name
+        data['charge_pos'] = charge_pos
+        data['charge_tel'] = charge_tel
+        data['delete_flag'] = 'N'
         ent = EnterpriseMaster.objects.create(
             **data
         )
@@ -44,17 +47,31 @@ def user_list(request):
         email = F('user__email'),
         license_code = F('ent__licensee_no'),
         owner_name = F('ent__owner_name'),
-        ).values()
+        company_name = F('ent__customer_name'),
+        charge_name = F('ent__charge_name'),
+        charge_pos = F('ent__charge_pos'),
+        charge_tel= F('ent__charge_tel')
+        ).values().filter(delete_flag='N')
     return JsonResponse(list(users.values()), safe=False)
 
-def user_edit(request):
-    user = UserMaster.objects.get(id = request.POST['id'])
-    user.email = request.POST['email']
+def user_edit(request, id):
+    user = UserMaster.objects.get(id=id)
+    user.ent.owner_name = request.POST['owner_name']
+    user.tel = request.POST['tel']
+    user.signature = request.POST['signature']
+    user.address = request.POST['address']
+    user.ent.customer_name = request.POST['company_name']
+    user.ent.licensee_no = request.POST['license_code']
+    user.ent.charge_tel = request.POST['charge_tel']
+    user.ent.charge_name = request.POST['charge_name']
+    user.ent.charge_pos = request.POST['charge_pos']
+    user.ent.save()
     user.save()
     return JsonResponse({'status': 'success'})
 
 def user_delete(request, id):
     user = UserMaster.objects.get(id=id)
-    user.delete()
+    user.delete_flag = "N"
+    user.save()
     return JsonResponse({'status': 'success'})
 
