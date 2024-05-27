@@ -10,7 +10,7 @@ from api.models import OrderMaster, UserMaster
 def order_list(request):
     if request.user.id is None:
         return JsonResponse({'message': 'login required', 'data': []})
-    orders = OrderMaster.objects.annotate(avatar=F('client__signature'), full_name=F('client__user__username'),
+    orders = OrderMaster.objects.annotate(avatar=F('client__signature'), full_name=F('client__user_name'),
                                           post=F('client__tel'), ).filter(delete_flag='N').values()
     return JsonResponse({'data': list(orders.values())})
 
@@ -22,12 +22,12 @@ def order_add(request):
     so_no = str(uuid.uuid4())
     order['client'] = json.loads(order['client'])
     order['client'] = order['client'][0]['value']
-    OrderMaster.objects.create(so_no=so_no, place=order['order_place'], client=UserMaster.objects.get(id=order['client']),
+    user = UserMaster.objects.get(user_id = request.user.id)
+    OrderMaster.objects.create(so_no=so_no, client=UserMaster.objects.get(id=order['client']),
                                order_date=order['order_date'], order_cnt=order['order_cnt'], order_price=order['order_price'],
                                order_tax=order['order_tax'], order_place=order['order_place'],
                                order_total=order['order_total'], comment=order['order_comment'], delete_flag='N',
-                               created_by=request.user,
-                               updated_by=request.user)
+                               created_by_id=user.id, updated_by_id=user.id)
     return JsonResponse({'message': 'success'})
 
 

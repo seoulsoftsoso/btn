@@ -17,8 +17,8 @@
                     <th>주문일자</th>
                     <th>수량</th>
                     <th>공급가</th>
+                    <th>합계</th>
                     <th>부가세</th>
-                    <th>현황</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -166,17 +166,17 @@
                 }, {
                     data: ''
                 }, {
-                    data: 'place'
+                    data: 'order_place'
                 }, {
                     data: 'order_date'
                 }, {
                     data: 'order_cnt'
                 }, {
-                    data: 'order_tax'
+                    data: 'order_price'
                 }, {
                     data: 'order_total'
-                }, {
-                    data: ''
+                },{
+                    data: 'order_tax'
                 }, {
                     data: ''
                 }
@@ -242,38 +242,6 @@
                 }, {
                     responsivePriority: 1,
                     targets: 4
-                }, {
-                    // Label
-                    targets: -2,
-                    render: function (data, type, full, meta) {
-                        var $status_number = full['order_status'];
-                        var $status = {
-                            1: {
-                                title: '견적 요청',
-                                class: 'bg-label-primary'
-                            },
-                            2: {
-                                title: '주문 완료',
-                                class: ' bg-label-success'
-                            },
-                            3: {
-                                title: '거절됨',
-                                class: ' bg-label-danger'
-                            },
-                            4: {
-                                title: '유예됨',
-                                class: ' bg-label-warning'
-                            },
-                            5: {
-                                title: '배송 중',
-                                class: ' bg-label-info'
-                            }
-                        };
-                        if (typeof $status[$status_number] === 'undefined') {
-                            return data;
-                        }
-                        return ('<span class="badge ' + $status[$status_number].class + '">' + $status[$status_number].title + '</span>');
-                    }
                 }, {
                     // Actions
                     targets: -1,
@@ -637,7 +605,7 @@
                     orderInputs.forEach((item) => {
                         formAddNewRecord
                             .querySelector(`[name="${item}"]`)
-                            .value = data[item]
+                            .value = (data[item] || '')
                     });
                     $(TagifyUserListEl).val(data['full_name']).trigger('tagify:updated');
                     formAddNewRecord.action = '/order/order/edit/' + data['id'];
