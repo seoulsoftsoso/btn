@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from api.models import ItemMaster
+from api.models import ItemMaster, UserMaster
 
 
 def item_list(request):
@@ -11,6 +11,7 @@ def item_list(request):
 
 def item_add(request):
     item = request.POST.dict()
+    user = UserMaster.objects.get(user_id  = request.user.id)
     ItemMaster.objects.create(
         item_code=item['code'],
         item_name=item['name'],
@@ -21,8 +22,8 @@ def item_add(request):
         level=item['level'],
         standard_price=item['standard_price'],
         delete_flag='N',
-        created_by=request.user,
-        updated_by=request.user
+        created_by=user,
+        updated_by=user
     )
     return JsonResponse({'message': 'success'})
 

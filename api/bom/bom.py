@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from api.models import BomMaster, ItemMaster, OrderProduct
+from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster
 from datetime import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F, FloatField
@@ -9,14 +9,13 @@ import uuid
 
 def bom_list(request):
     order = request.GET.get('order')
-    orderProduct = OrderProduct.objects.filter(order_id=order, delete_flag="N").values_list('id')
-    bomTree = list(BomMaster.objects.filter(op_id__in=orderProduct).annotate(
+    bomTree = list(BomMaster.objects.filter(delete_flag='N', order_id=order).annotate(
         qty=F('order_cnt'),
-        price=Round(Cast(F('item__standard_price'), FloatField()), 2),
+        item_price=Round(Cast(F('item__standard_price'), FloatField()), 2),
         product_info=F('item__item_name'),
         image=F('item__brand'),
         product_name=F('item__item_name'),
-    ).values('id', 'product_name', 'qty', 'price', 'product_info', 'image', 'level', 'item_id', 'parent'))
+    ).values('id', 'product_name', 'qty', 'item_price', 'product_info', 'image', 'level', 'item_id', 'parent', 'part_code'))
     return JsonResponse(bomTree, safe=False)
 
 def bom_add(request, order):
@@ -26,6 +25,7 @@ def bom_add(request, order):
     data = product['data']
     item = ItemMaster.objects.get(id=data['item_id'])
     qty = int(data['qty'])
+    user = UserMaster.objects.get(user_id=request.user.id)
     product['item'] = item
     if product['parent'] == '#':
         product['parent'] = None
@@ -34,23 +34,8 @@ def bom_add(request, order):
         bom = BomMaster.objects.filter(id=parent).first()
         product['parent'] = bom
         level = bom.level + 1
-    print(level)
-    orderData = OrderProduct.objects.create(
-        unique_no=str(uuid.uuid4()),
-        product_name=item.item_name,
-        order_id=order,
-        delivery_date=datetime.now(),
-        op_cnt=qty,
-        delivery_addr='HCM',
-        request_note='Test',
-        status='1',
-        delete_flag='N',
-        created_by=request.user,
-        updated_by=request.user
-    )
     total = item.standard_price * qty
     boms = []
-    bom = None
     if level == 2:
         bom = BomMaster.objects.create(
             level=level,
@@ -59,34 +44,48 @@ def bom_add(request, order):
             parent=product['parent'],
             tax=total * 0.1,
             total=total,
-            op=orderData,
             order_cnt=qty,
             delete_flag='N',
-            created_by=request.user,
-            updated_by=request.user
+            created_by=user,
+            updated_by=user
         )
+        boms.append(bom.id)
+        return JsonResponse({'message': 'success', 'boms': boms})
     else:
         for i in range(0, qty):
-                bom = BomMaster.objects.create(
+            bom = BomMaster.objects.create(
                 level=level,
                 part_code=item.item_name,
                 item=item,
                 parent=product['parent'],
                 tax=total * 0.1,
                 total=total,
-                op=orderData,
                 order_cnt=1,
                 delete_flag='N',
-                created_by=request.user,
-                updated_by=request.user
+                created_by=user,
+                updated_by=user
             )
-    orderData.bom = bom
-    orderData.save()
-    boms.append(bom.id)
-    return JsonResponse({'message': 'success', 'order_id': orderData.id, 'boms': boms})
+            boms.append(bom.id)
+            if level ==  0:
+                op = OrderProduct.objects.create(
+                    unique_no=str(uuid.uuid4()),
+                    product_name=item.item_name,
+                    order_id=order,
+                    delivery_date=datetime.now(),
+                    op_cnt=qty,
+                    delivery_addr='HCM',
+                    request_note='Test',
+                    status='1',
+                    delete_flag='N',
+                    bom=bom,
+                    created_by=user,
+                    updated_by=user
+                )
+                bom.op = op
+        return JsonResponse({'message': 'success',  'boms': boms})
 
 
-def bom_edit(request):
+def bom_edit(request, id):
     data = request.POST.dict()
     bom_id = id
     bom = BomMaster.objects.get(id = bom_id)
@@ -108,19 +107,19 @@ def bom_edit(request):
     return JsonResponse({'message': 'success'})
 
 
-def bom_delete(request):
-    if request.method == "POST":
-        data = request.POST.dict()
-        bom_id = data['id']
-        bom = BomMaster.objects.get(id=bom_id)
+def bom_delete(request, id):
+        bom = BomMaster.objects.get(id=id)
         queue = [bom]
         while queue:
             current = queue.pop()
             current.delete_flag = 'Y'
             current.save()
-            orderProduct = OrderProduct.objects.get(id=current.op_id)
-            orderProduct.delete_flag = 'Y'
-            orderProduct.save()
+            try:
+                orderProduct = OrderProduct.objects.get(id=current.op_id)
+                orderProduct.delete_flag = 'Y'
+                orderProduct.save()
+            except:
+                pass
             children = BomMaster.objects.filter(parent_id=current.id)
             for child in children:
                 queue.append(child)
