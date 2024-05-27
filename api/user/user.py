@@ -39,7 +39,7 @@ def user_add(request):
         if request.user.id is not None:
             return JsonResponse({"status": "success"})
         login(request, user)
-        return redirect("dashboard")
+        return redirect('home')
     return render(request, "register/register.html")
 
 def user_list(request):

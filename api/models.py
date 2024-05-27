@@ -74,6 +74,7 @@ class BomMaster(models.Model):
     level = models.IntegerField()  # root = 0
     part_code = models.CharField(max_length=255)
     order_cnt = models.IntegerField()
+    order = models.ForeignKey('OrderMaster', on_delete=models.SET_NULL, null=True)
     item = models.ForeignKey('ItemMaster', on_delete=models.SET_NULL, null=True)
     parent = models.ForeignKey('BomMaster', related_name='parent_bom', on_delete=models.SET_NULL, null=True,
                                default=None)

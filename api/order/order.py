@@ -4,7 +4,7 @@ import uuid
 from django.db.models import F
 from django.http import JsonResponse
 
-from api.models import OrderMaster, UserMaster
+from api.models import OrderMaster, UserMaster, OrderProduct, ItemMaster, BomMaster
 
 
 def order_list(request):
@@ -22,12 +22,23 @@ def order_add(request):
     so_no = str(uuid.uuid4())
     order['client'] = json.loads(order['client'])
     order['client'] = order['client'][0]['value']
+    qty = int(order['order_cnt'])
     user = UserMaster.objects.get(user_id = request.user.id)
-    OrderMaster.objects.create(so_no=so_no, client=UserMaster.objects.get(id=order['client']),
+    order = OrderMaster.objects.create(so_no=so_no, client=UserMaster.objects.get(id=order['client']),
                                order_date=order['order_date'], order_cnt=order['order_cnt'], order_price=order['order_price'],
                                order_tax=order['order_tax'], order_place=order['order_place'],
                                order_total=order['order_total'], comment=order['order_comment'], delete_flag='N',
-                               created_by_id=user.id, updated_by_id=user.id)
+                               created_by=user, updated_by=user)
+    for i in range(0, qty):
+        container = ItemMaster.objects.get(created_by = user, level = 0)
+        op = OrderProduct.objects.create(unique_no=str(uuid.uuid4()),
+                                                product_name=container.item_name, order=order,
+                                                delete_flag='N', op_cnt=1, status=1, created_by=user, updated_by=user)
+        bom = BomMaster.objects.create(level=0, part_code=container.item_name, item=container,
+                                       order_cnt=1, total=container.standard_price, tax=container.standard_price*0.1,
+                                       op=op, delete_flag='N', created_by=user, updated_by=user, order = order)
+        op.bom = bom
+        op.save()
     return JsonResponse({'message': 'success'})
 
 

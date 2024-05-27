@@ -9,8 +9,7 @@ import uuid
 
 def bom_list(request):
     order = request.GET.get('order')
-    orderProduct = OrderProduct.objects.filter(order_id=order, delete_flag="N").values_list('id')
-    bomTree = list(BomMaster.objects.filter(delete_flag='N').annotate(
+    bomTree = list(BomMaster.objects.filter(delete_flag='N', order_id=order).annotate(
         qty=F('order_cnt'),
         item_price=Round(Cast(F('item__standard_price'), FloatField()), 2),
         product_info=F('item__item_name'),
