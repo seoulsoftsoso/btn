@@ -90,6 +90,4 @@ def user_table_data(request):
         'unique_sta_sen_name': unique_sta_items,
         'con_id_senid_map': cont
     }
-    print(cont)
-    initial_data_json = json.dumps(initial_data, cls=DjangoJSONEncoder)
-    return JsonResponse(initial_data_json, safe=False)
+    return JsonResponse(initial_data, encoder=DjangoJSONEncoder)
