@@ -4,40 +4,69 @@ from django.contrib.auth import login
 from django.db.models import F
 from django.contrib.auth.models import User
 from api.models import UserMaster, EnterpriseMaster
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+
+def format_data(data):
+    return {
+        'user': format_user_data(data),
+        'ent': format_ent_data(data)
+    }
+def format_user_data(userData):
+    return {
+        'user_code': userData['license_code'],
+        'user_name': userData['user_name'],
+        'tel': userData['tel'],
+        'address': userData['address'],
+        'signature': userData['signature'],
+        'email': userData['email'],
+        'password': userData['password'],
+        'confirm_password': userData['confirm_password'],
+    }
+
+def format_ent_data(entData):
+    return {
+        'licensee_no': entData['license_code'],
+        'owner_name': entData['user_name'],
+        'charge_name': entData['charge_name'],
+        'customer_name': entData['company_name'],
+        'charge_pos': entData['charge_pos'],
+        'charge_tel': entData['charge_tel'],
+    }
+@csrf_exempt
+@require_POST
 def user_add(request):
     if request.method == "POST":
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-        email = request.POST.get('email')
-        user_id= email[:email.find("@")]
-        user_name = request.POST.get('user_name')
-        company_name = request.POST.get('company_name')
-        license_code = request.POST.get('license_code')
-        tel = request.POST.get('tel')
-        signature = request.POST.get('signature')
-        address = request.POST.get('address')
-        charge_name= request.POST.get('charge_name')
-        charge_tel = request.POST.get('charge_tel')
-        charge_pos = request.POST.get('charge_pos')
-        if password != confirm_password:
+        rawData = request.POST.dict()
+
+        if rawData['password'] != rawData['confirm_password']:
             return render(request, "register/register.html", {"error": "비밀번호가 일치하지 않습니다."})
-        user = User.objects.create_user(username=user_id, password=password, email=email)
-        current_user = UserMaster.objects.create(user=user, user_code=license_code,user_name= user_name, tel=tel, address=address, signature=signature, delete_flag='N')
-        data = {}
-        data['licensee_no'] = license_code
-        data['owner_name'] = user_name
-        data['charge_name'] = charge_name
-        data['customer_name'] = company_name
-        data['charge_pos'] = charge_pos
-        data['charge_tel'] = charge_tel
-        data['delete_flag'] = 'N'
-        ent = EnterpriseMaster.objects.create(
-            **data
+
+        rawFormattedData = format_data(rawData)
+
+        rawUser = rawFormattedData['user']
+        rawEnt = rawFormattedData['ent']
+
+        user = User.objects.create_user(user_name=rawUser['user_name'], email=rawUser['email'], password=rawUser['password'])
+
+        createdUser = UserMaster.objects.create(
+            **rawUser,
+            user_id = user.id,
+            delete_flag='N'
         )
-        current_user.ent = ent
-        current_user.save()
+
+        ent = EnterpriseMaster.objects.create(
+            **rawEnt,
+            user_id = user.id,
+            delete_flag='N'
+        )
+
+        createdUser.ent = ent
+        createdUser.save()
         if request.user.id is not None:
             return JsonResponse({"status": "success"})
+
         login(request, user)
         return redirect('home')
     return render(request, "register/register.html")
@@ -53,24 +82,23 @@ def user_list(request):
         charge_tel= F('ent__charge_tel')
         ).values().filter(delete_flag='N')
     return JsonResponse(list(users.values()), safe=False)
-
-def user_edit(request, id):
-    user = UserMaster.objects.get(id=id)
-    user.ent.owner_name = request.POST['owner_name']
-    user.tel = request.POST['tel']
-    user.signature = request.POST['signature']
-    user.address = request.POST['address']
-    user.ent.customer_name = request.POST['company_name']
-    user.ent.licensee_no = request.POST['license_code']
-    user.ent.charge_tel = request.POST['charge_tel']
-    user.ent.charge_name = request.POST['charge_name']
-    user.ent.charge_pos = request.POST['charge_pos']
+@csrf_exempt
+@require_POST
+def user_edit(request, user_id):
+    rawUserData = request.POST.dict()
+    rawFormattedData = format_data(rawUserData)
+    rawUser = rawFormattedData['user']
+    rawEnt = rawFormattedData['ent']
+    user = UserMaster.objects.get(id=user_id)
+    user.__dict__.update(rawUser)
+    user.ent.__dict__.update(rawEnt)
     user.ent.save()
     user.save()
     return JsonResponse({'status': 'success'})
-
-def user_delete(request, id):
-    user = UserMaster.objects.get(id=id)
+@csrf_exempt
+@require_POST
+def user_delete(request, user_id):
+    user = UserMaster.objects.get(id=user_id)
     user.delete_flag = "N"
     user.save()
     return JsonResponse({'status': 'success'})

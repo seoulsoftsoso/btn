@@ -42,28 +42,28 @@
                           action="/api/item/add"
                           method="POST">
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="code">품번</label>
+                            <label class="form-label" for="item_code">품번</label>
                             <input type="text"
-                                   id="code"
-                                   name="code"
+                                   id="item_code"
+                                   name="item_code"
                                    class="form-control"
                                    placeholder="Enter item code"
                                    aria-label="Enter item code" />
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="name">품명</label>
+                            <label class="form-label" for="item_name">품명</label>
                             <input type="text"
-                                   id="name"
-                                   name="name"
+                                   id="item_name"
+                                   name="item_name"
                                    class="form-control"
                                    placeholder="Enter item name"
                                    aria-label="Enter item name" />
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="type">유형</label>
+                            <label class="form-label" for="item_type">유형</label>
                             <input type="text"
-                                   id="type"
-                                   name="type"
+                                   id="item_type"
+                                   name="item_type"
                                    class="form-control"
                                    placeholder="Enter item type"
                                    aria-label="Enter item type" />
@@ -145,21 +145,21 @@
                   }
                 }
               },
-              code: {
+              item_code: {
                 validators: {
                   notEmpty: {
                     message: '품번은 필수입력입니다.'
                   }
                 }
               },
-              name: {
+              item_name: {
                 validators: {
                   notEmpty: {
                     message: '품명은 필수입력입니다.'
                   }
                 }
               },
-              type: {
+              item_type: {
                 validators: {
                   notEmpty: {
                     message: '제품 유형은 필수입력입니다.'
@@ -528,7 +528,7 @@
         console.log(rest)
         let data = dt_basic.row(tr).data();
         if(data){
-          ['code', 'name', 'type', 'specification', 'model', 'brand','standard_price'].forEach((key) => {
+          ['item_code', 'item_name', 'item_type', 'specification', 'model', 'brand','standard_price'].forEach((key) => {
             formRecord.querySelector(`#${key}`).value = data[key];
           });
           $("#level").val(data.level).trigger("change");
