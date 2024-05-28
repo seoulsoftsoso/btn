@@ -7,13 +7,13 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.apps import apps
 
-def listen_to_changes():
+def listen_to_changes(request):
     OrderMaster = apps.get_model('api', 'OrderMaster')
     OrderProduct = apps.get_model('api', 'OrderProduct')
     BomMaster = apps.get_model('api', 'BomMaster')
     ItemMaster = apps.get_model('api', 'ItemMaster')
 
-    om_op = OrderMaster.objects.filter(client=1)  # 1. 로그인 계정이 한 주문들.
+    om_op = OrderMaster.objects.filter(client=request.user.id)  # 1. 로그인 계정이 한 주문들.
     order_ids = om_op.values_list('id', flat=True)  # 2. 1에서 id만 리스트로 만듬.
     op_oi = OrderProduct.objects.filter(order__in=order_ids)  # 3. orderProduct에서 2의 리스트에 해당되는게 있는 row만 고름.
     bom_ids = op_oi.values_list('bom', flat=True)  # 4. 3에서의 bom_id만 리스트로 만듬.
@@ -102,7 +102,6 @@ def send_initial_data(unique_gtr_items, unique_sta_items, cont):
             'unique_sta_sen_name': unique_sta_items,
             'con_id_senid_map': cont
         }
-        print(data)
         asyncio.run(send_update_to_ws(data))
         # self.send(text_data=json.dumps(data))
 
@@ -115,10 +114,5 @@ async def send_update_to_ws(document):
             'data': document
         }
     )
-def start_listening_to_changes():
-    threading.Thread(target=listen_to_changes, daemon=True).start()
-
-@receiver(post_migrate)
-def start_thread(sender, **kwargs):
-    start_listening_to_changes()
-
+def start_listening_to_changes(request):
+    threading.Thread(target=listen_to_changes, args=(request,), daemon=True).start()
