@@ -1,6 +1,21 @@
 from django.http import JsonResponse
 from api.models import ItemMaster, UserMaster
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
+@csrf_exempt
+@require_POST
+def format_item_data(itemData):
+    return {
+        'item_code': itemData['item_code'],
+        'item_name': itemData['item_name'],
+        'item_type': itemData['item_type'],
+        'specification': itemData['specification'],
+        'model': itemData['model'],
+        'brand': itemData['brand'],
+        'level': itemData['level'],
+        'standard_price': itemData['standard_price'],
+    }
 
 def item_list(request):
     if request.user.id is None:
@@ -8,37 +23,28 @@ def item_list(request):
     items = ItemMaster.objects.filter(delete_flag='N').values()
     return JsonResponse({'data': list(items.values())})
 
-
+@csrf_exempt
+@require_POST
 def item_add(request):
     item = request.POST.dict()
-    user = UserMaster.objects.get(user_id  = request.user.id)
+    user = UserMaster.objects.get(user_id = request.user.id)
+    addItemData = format_item_data(item)
+
     ItemMaster.objects.create(
-        item_code=item['code'],
-        item_name=item['name'],
-        item_type=item['type'],
-        specification=item['specification'],
-        model=item['model'],
-        brand=item['brand'],
-        level=item['level'],
-        standard_price=item['standard_price'],
+        **addItemData,
         delete_flag='N',
         created_by=user,
         updated_by=user
     )
     return JsonResponse({'message': 'success'})
 
-
-def item_edit(request, id):
-    data = request.POST.dict()
-    item = ItemMaster.objects.get(id=id)
-    item.item_code = data['item_code']
-    item.item_name = data['item_name']
-    item.item_type = data['item_type']
-    item.specification = data['specification']
-    item.model = data['model']
-    item.brand = data['brand']
-    item.level = data['level']
-    item.standard_price = data['standard_price']
+@csrf_exempt
+@require_POST
+def item_edit(request, item_id):
+    ItemEditData = request.POST.dict()
+    item = ItemMaster.objects.get(id=item_id)
+    itemData = format_item_data(ItemEditData)
+    item.__dict__.update(itemData)
     item.save()
     return JsonResponse({'message': 'success'})
 

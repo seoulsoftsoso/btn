@@ -269,7 +269,7 @@
                     product_name: data.product_name,
                     part_code: data.part_code,
                     item_price: data.item_price,
-                    qty: data.qty,
+                    order_cnt: data.order_cnt,
                     text: data.part_code,
                     product_info: data.product_info,
                     image: data.image,
@@ -294,7 +294,7 @@
         
         function drawOrderCalculation(){
             let items_price = tree.reduce((acc, item) => {
-                return acc + item.item_price * item.qty
+                return acc + item.item_price * item.order_cnt
             }, 0)
             $(".order-caculations").html(`
                     <div class="d-flex justify-content-between mb-2">
@@ -365,7 +365,7 @@
                                         let rawItem = data.original 
                                         formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price;
                                         $("#item").val(rawItem.item_id).trigger('change')
-                                        $("#order_cnt").val(rawItem.qty).trigger('change')
+                                        $("#order_cnt").val(rawItem.order_cnt).trigger('change')
                                         deleteButton.addEventListener('click', function (e) {
                                             $.ajax({
                                                 url: `/api/bom/delete/${data.id}`,
@@ -401,7 +401,7 @@
                                         let rawItem = data.original 
                                         formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price;
                                         $("#item").val(rawItem.item_id).trigger('change')
-                                        $("#order_cnt").val(rawItem.qty).trigger('change')
+                                        $("#order_cnt").val(rawItem.order_cnt).trigger('change')
                                         deleteButton.addEventListener('click', function (e) {
                                             $.ajax({
                                                 url: `/api/bom/delete/${data.id}`,
@@ -538,7 +538,7 @@
                     }, {
                         data: 'item_price'
                     }, {
-                        data: 'qty'
+                        data: 'order_cnt'
                     }, {
                         data: ''
                     }
@@ -592,8 +592,8 @@
                         searchable: false,
                         orderable: false,
                         render: function (data, type, full, meta) {
-                            var $qty = full['qty'];
-                            var $output = '<span class="text-body">' + $qty + '</span>';
+                            var $order_cnt = full['order_cnt'];
+                            var $output = '<span class="text-body">' + $order_cnt + '</span>';
                             return $output;
                         }
                     }, {
@@ -601,7 +601,7 @@
                         searchable: false,
                         orderable: false,
                         render: function (data, type, full, meta) {
-                            var $total = parseInt(full['qty']) * full['item_price'];
+                            var $total = parseInt(full['order_cnt']) * full['item_price'];
                             var $output = $total ? '<h6 class="mb-0">' + $total + '</h6>' : data;
                             return $output;
                         }
@@ -726,7 +726,7 @@
                     let formInput = {
                         'item_id': formData.bom_id,
                         'product_name': item_product_name,
-                        'qty': formData.order_cnt,
+                        'order_cnt': formData.order_cnt,
                         'item_price': formData.item_price,
                         'total': formData.order_total,
                         'product_info': formData.comment,
@@ -779,12 +779,12 @@
             dt_products
                 .rows()
                 .every(function (rowIdx, tableLoop, rowLoop) {
-                    let qty = dt_products
+                    let order_cnt = dt_products
                         .cell(rowIdx, 3)
                         .data();
                     dt_products
                         .cell(rowIdx, 3)
-                        .data('<input type="number" class="form-control" value="' + qty + '">');
+                        .data('<input type="number" class="form-control" value="' + order_cnt + '">');
                     dt_products
                         .cell(rowIdx, 4)
                         .data('<button class="btn btn-outline-danger delete-item"><i class="bx bx-trash"></i></button>');
@@ -799,22 +799,22 @@
                 dt_products
                     .rows()
                     .every(function (rowIdx, tableLoop, rowLoop) {
-                        let qty = dt_products
+                        let order_cnt = dt_products
                             .cell(rowIdx, 3)
                             .node()
                             .querySelector('input');
-                        qty = $(qty).val();
+                        order_cnt = $(order_cnt).val();
                         dt_products
                             .cell(rowIdx, 3)
-                            .data(qty);
+                            .data(order_cnt);
                         dt_products
                             .cell(rowIdx, 4)
-                            .data(qty * dt_products.cell(rowIdx, 2).data());
+                            .data(order_cnt * dt_products.cell(rowIdx, 2).data());
                         $.ajax({
                             url: 'api/bom/edit/${data.id}',
                             method: 'POST',
                             data: {
-                                qty: qty
+                                order_cnt: order_cnt
                             },
                             headers: {
                                 'X-CSRFToken': '{{ csrf_token }}'
