@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from button.ws.mongo_updates import start_listening_to_changes
 # 알람
 
 def alram_contact(request):
@@ -44,6 +44,7 @@ def harvest_manual(request):
 # 초기 화면
 
 def landing_user(request):
+    start_listening_to_changes(request)
     return render(request, 'landing/dashboard2.html')
 
 def landing_admin(request):
