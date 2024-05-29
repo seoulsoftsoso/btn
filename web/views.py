@@ -46,7 +46,10 @@ def harvest_manual(request):
 def landing_user(request):
     start_listening_to_changes(request)
     return render(request, 'landing/dashboard2.html')
-
+def landing_user_graph_all(request):
+    return render(request, 'landing/user_graphAll.html')
+def landing_user_graph_single(request):
+    return render(request, 'landing/user_graphSingle.html')
 def landing_admin(request):
     return render(request, 'landing/dashboard.html')
 
