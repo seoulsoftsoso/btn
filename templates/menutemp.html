@@ -45,19 +45,40 @@
                 </svg>
             </a>
             <span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
-            <a style="border-radius: 50px;
-                      background: var(--buton-original, #EAEA73);
-                      width: 165px;
-                      height: 54px;
-                      flex-shrink: 0;
-                      text-align:center;
-                      line-height: 54px;
-                      color: var(--original-brown, #3D170F);
-                      text-align: center;
-                      font-family: Pretendard;
-                      font-size: 20px;
-                      font-style: normal;
-                      font-weight: 500">환경그래프조회</a>
+            <a id="dynamicLink" href="/landing/user/graph/all" style="
+        flex-shrink: 0;
+        text-align: center;
+        line-height: 54px;
+        color: var(--original-brown, #3D170F);
+        text-align: center;
+        font-family: Pretendard;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500">환경그래프조회</a>
+
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch data from the server endpoint
+            fetch('/your-endpoint-url/') // replace with your actual endpoint URL
+                .then(response => response.json())
+                .then(data => {
+                    // Extract the necessary data from the JSON response
+                    const items = data.unique_gtr_sen_name; // Adjust based on your actual data structure
+
+                    // Get the dropdown element
+                    const dropdown = document.getElementById('myDropdown');
+
+                    // Populate the dropdown with options
+                    items.fo rEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.value; // Adjust based on your actual data structure
+                        option.textContent = item.text; // Adjust based on your actual data structure
+                        dropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
             <span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
             <a style="flex-shrink: 0;
                       text-align:center;

@@ -1,0 +1,129 @@
+{% load static %}
+{% include "header.html" %}
+{% include 'menutemp.html' %}
+
+<div class="flex-grow-1 container-p-y"
+     xmlns="http://www.w3.org/1999/html"
+     style="background-color:#F6F6F6 !important;
+            padding-right:9.625rem;
+            margin-top: 1.625rem;
+            padding-left:9.625rem">
+    <!--    row1-->
+    <div style="--bs-gutter-x: 2.625rem;">
+        <div class="row" style="display: flex">
+            <select id="myDropdown" style="border-radius: 6px;background: var(--0-b, #FFF);width: 10%" onchange="logSelectedOption(false)" onload="logSelectedOption(true)">
+            </select>
+        </div>
+        <div id="selectedOptionDisplay" style="margin-top: 10px;">
+            <!-- 선택된 옵션이 여기에 표시됩니다 -->
+        </div>
+        <script>
+
+            let conIdSenidMap = {};
+            let uniqueGtrSenName = [];
+            function logSelectedOption(init) {
+                const dropdown = document.getElementById('myDropdown');
+
+                const selectedIndex = dropdown.selectedIndex;
+                const selectedOption = dropdown.options[selectedIndex].value;
+                const displayDiv = document.getElementById('selectedOptionDisplay');
+                displayDiv.innerHTML = "";
+                Object.entries(conIdSenidMap).forEach(([conId, conInf]) => {
+                    if(conId === selectedOption){
+                        uniqueGtrSenName.forEach(uniqueSenName => {
+                        let sum = 0;
+                        let count = 0;
+                        let value;
+                        Object.entries(conInf.gtr || {}).forEach(([senid, senInf]) => {
+                            if (senInf.sen_name === uniqueSenName) {
+                                sum += senInf.value;
+                                count++;
+                                value = count > 0 ? sum / count : "-";
+                            }
+                        });
+                        if(count !== 0){
+                            let card = `${uniqueSenName}
+                                <div class="col-lg-8 order-lg-2 mb-4" style="border-radius: 15px; width: 100%; min-width: 1359px !important; background: var(--Gray-0, #FFF)">
+                                    <div class="card" style="box-shadow: 0 0px red; --bs-card-cap-padding-x: 1.0rem">
+                                        <div class="card-header" style="justify-content: space-between; display: flex; flex-direction: row; padding-bottom:0.3rem">
+                                            <div style="justify-content:flex-start; display: flex;">
+                                                <div class="m-0 me-2 pb-3" style="color: var(--80-w, #595757);font-family: Pretendard;font-size: 24px;font-style: normal;font-weight: 500;line-height: normal;padding-right:1.2rem">조회한 기간의 평균 수치</div>
+                                                <h5 class="m-0 me-2 pb-3" style="color: var(--40-w, #B5B6B6); font-family: Pretendard; font-size: 22px; width:201; font-style: normal; font-weight: 600; line-height: normal">${value}</h5>
+                                            </div>
+                                        </div>
+                                        <div class="text-nowrap" style="padding-bottom: 2rem; padding-left: 2.0rem; padding-right: 1.625rem;">
+                                            <!-- Additional content can be added here -->
+                                        </div>
+                                    </div>
+                                </div>`;
+
+                                displayDiv.innerHTML += card;
+                        }
+
+                    })
+                    }
+
+
+
+                });
+
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                // Fetch data from the server endpoint
+                fetch('/api/util/user-table-data/') // replace with your actual endpoint URL
+                    .then(response => response.json())
+                    .then(data => {
+                        const dropdown = document.getElementById('myDropdown');
+
+
+                        conIdSenidMap = data.con_id_senid_map;
+                        uniqueGtrSenName = data.unique_gtr_sen_name;
+                        Object.entries(conIdSenidMap).forEach(([conId, conInf]) =>{
+                            const option = document.createElement('option');
+                            option.value = conId; // Adjust based on your actual data structure
+                            option.textContent = conInf.con_name; // Adjust based on your actual data structure
+                            dropdown.appendChild(option);
+                        });
+                        const initialSelectedIndex = 0; // Set to the desired index
+                        dropdown.selectedIndex = initialSelectedIndex;
+                        logSelectedOption(true);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            });
+        </script>
+        <!-- 재배동 실시간 현황 -->
+    </div>
+    <!--    row2-->
+</div>
+<!--/ Content -->
+<!-- Footer -->
+<footer class="content-footer footer bg-footer-theme">
+    <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+        <div class="mb-2 mb-md-0">
+            ©
+            <script>document.write(new Date().getFullYear());</script>
+            , made with ❤️ by
+            <a href="https://themeselection.com"
+               target="_blank"
+               class="footer-link fw-medium">ThemeSelection</a>
+        </div>
+        <div class="d-none d-lg-inline-block">
+            <a href="https://themeselection.com/license/"
+               class="footer-link me-4"
+               target="_blank">License</a>
+            <a href="https://themeselection.com/"
+               target="_blank"
+               class="footer-link me-4">More Themes</a>
+            <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/documentation/"
+               target="_blank"
+               class="footer-link me-4">Documentation</a>
+            <a href="https://themeselection.com/support/"
+               target="_blank"
+               class="footer-link d-none d-sm-inline-block">Support</a>
+        </div>
+    </div>
+</footer>
+<!-- / Footer -->
+<div class="content-backdrop fade"></div>
+<!--/ Content wrapper -->
+{% include 'footer.html' %}

@@ -22,6 +22,8 @@ urlpatterns = [
 
     # 초기 화면
     path('landing/user', landing_user),
+    path('landing/user/graph/all', landing_user_graph_all),
+    path('landing/user/graph/single', landing_user_graph_all),
     path('', landing_admin),
 
     # 자동 재배 관리
