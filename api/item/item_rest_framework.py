@@ -10,6 +10,7 @@ from rest_framework.response import Response
 class ItemSerializer(serializers.ModelSerializer):
     created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
     updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
+    delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
     class Meta:
         model = ItemMaster
         fields = '__all__'
@@ -24,6 +25,7 @@ class ItemSerializer(serializers.ModelSerializer):
     def create(self, instance):
         instance['created_by'] = self.get_by_username()
         instance['updated_by'] = self.get_by_username()
+        instance['delete_flag'] = 'N'
 
         return super().create(instance)
 
@@ -31,6 +33,11 @@ class ItemSerializer(serializers.ModelSerializer):
         validated_data['updated_by'] = self.get_by_username()
 
         return super().update(instance, validated_data)
+
+    def delete (self, instance):
+        instance['delete_flag'] = 'Y'
+        return super().update(instance)
+
 
 class ItemViewSet(viewsets.ModelViewSet):
 

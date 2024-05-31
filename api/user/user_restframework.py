@@ -52,6 +52,7 @@ class EntSerializer(serializers.ModelSerializer):
     def create(self, instance):
         instance['created_by'] = self.get_by_username()
         instance['updated_by'] = self.get_by_username()
+        instance['delete_flag'] = 'N'
 
         return super().create(instance)
 
@@ -59,6 +60,10 @@ class EntSerializer(serializers.ModelSerializer):
         validated_data['updated_by'] = self.get_by_username()
 
         return super().update(instance, validated_data)
+
+    def delete (self, instance):
+        instance['delete_flag'] = 'Y'
+        return super().update(instance)
 
 
 class EntViewSet(viewsets.ModelViewSet):
@@ -106,6 +111,9 @@ class ClientSerializer(serializers.ModelSerializer):
             'updated_by': {'required': False}
         }
         read_only_fields = ['id']
+
+    def get_by_username(self):
+        return UserMaster.objects.get(user=self.context['request'].user)
 
 class UserViewSet(viewsets.ModelViewSet):
 
