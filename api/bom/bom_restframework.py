@@ -21,7 +21,7 @@ class BomMasterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BomMaster
-        fields = ['id', 'product_name', 'order_cnt', 'item_price', 'product_info', 'image', 'level', 'item_id', 'parent', 'part_code']
+        fields = ['id', 'product_name', 'order_cnt', 'item_price', 'product_info', 'image', 'level', 'item_id', 'parent', 'part_code', 'created_by', 'updated_by']
 
     def get_by_username(self):
         return UserMaster.objects.get(user =self.context['request'].user)
@@ -43,7 +43,7 @@ class BomCreateSerializer(serializers.ModelSerializer):
     updated_by = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = BomMaster
-        fields = ['item_id', 'order_cnt', 'parent']
+        fields = '__all__'
 
     def get_by_username(self):
         User = UserMaster.objects.get(user_id=self.context['request'].user.id)
@@ -123,8 +123,9 @@ class BomViewSet(viewsets.ModelViewSet):
                 bom = BomMaster.objects.create(
                     part_code=rawData.get('text', ''),
                     item_id=rawData['item_id'],
-                    order_cnt=order_cnt,
-                    **bomPriceData,
+                    order_cnt=1,
+                    total = item.standard_price,
+                    tax = item.standard_price * 0.1,
                     order_id=rawData['order_id'],
                     parent_id=parent,
                     level=level,
