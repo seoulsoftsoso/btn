@@ -7,6 +7,7 @@ from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from datetime import datetime
+from api.item.item_rest_framework import ItemSerializer
 import uuid
 import json
 
@@ -18,17 +19,17 @@ class BomMasterSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='item.item_name', read_only=True)
     created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
     updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
+    delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
 
     class Meta:
         model = BomMaster
-        fields = ['id', 'product_name', 'order_cnt', 'item_price', 'product_info', 'image', 'level', 'item_id', 'parent', 'part_code', 'created_by', 'updated_by']
+        fields = ['id', 'part_code', 'item_id', 'order_cnt', 'total', 'tax', 'order_id', 'parent_id', 'level', 'created_by', 'updated_by', 'delete_flag', 'item_price', 'product_info', 'image', 'product_name', 'parent', 'op']
 
-    def get_by_username(self):
-        return UserMaster.objects.get(user =self.context['request'].user)
 
     def create(self, instance):
         instance['created_by'] = self.get_by_username()
         instance['updated_by'] = self.get_by_username()
+        instance['delete_flag'] = 'N'
 
         return super().create(instance)
 
@@ -36,6 +37,10 @@ class BomMasterSerializer(serializers.ModelSerializer):
         validated_data['updated_by'] = self.get_by_username()
 
         return super().update(instance, validated_data)
+
+    def delete (self, instance):
+        instance['delete_flag'] = 'Y'
+        return super().update(instance)
 
 
 class BomCreateSerializer(serializers.ModelSerializer):
@@ -81,11 +86,6 @@ class BomViewSet(viewsets.ModelViewSet):
                 qs = qs.filter(order_id = order)
 
         return qs
-
-    def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update', 'delete_bom']:
-            return BomCreateSerializer
-        return BomMasterSerializer
 
     def create(self, request, *args, **kwargs):
         rawData = request.data
