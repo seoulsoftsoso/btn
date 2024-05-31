@@ -294,7 +294,7 @@
         
         function drawOrderCalculation(){
             let items_price = tree.reduce((acc, item) => {
-                return acc + item.item_price * item.order_cnt
+                return acc + item.standard_price * item.order_cnt
             }, 0)
             $(".order-caculations").html(`
                     <div class="d-flex justify-content-between mb-2">
@@ -722,7 +722,10 @@
                         acc[item.name] = item.value;
                         return acc;
                     }, {});
-                    let item_product_name = items[formData.bom_id - 1].item_name;
+                    console.log(formData)
+                    let item_product_name = items.find(
+                        item => item.id == formData.bom_id
+                    ).item_name
                     let formInput = {
                         'item_id': formData.bom_id,
                         'product_name': item_product_name,
