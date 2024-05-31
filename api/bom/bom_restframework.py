@@ -16,16 +16,51 @@ class BomMasterSerializer(serializers.ModelSerializer):
     product_info = serializers.CharField(source='item.item_name', read_only=True)
     image = serializers.CharField(source='item.brand', read_only=True)
     product_name = serializers.CharField(source='item.item_name', read_only=True)
+    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
+    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
 
     class Meta:
         model = BomMaster
         fields = ['id', 'product_name', 'order_cnt', 'item_price', 'product_info', 'image', 'level', 'item_id', 'parent', 'part_code']
 
+    def get_by_username(self):
+        return UserMaster.objects.get(user =self.context['request'].user)
+
+    def create(self, instance):
+        instance['created_by'] = self.get_by_username()
+        instance['updated_by'] = self.get_by_username()
+
+        return super().create(instance)
+
+    def update(self, instance, validated_data):
+        validated_data['updated_by'] = self.get_by_username()
+
+        return super().update(instance, validated_data)
+
 
 class BomCreateSerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField(read_only=True)
+    updated_by = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = BomMaster
         fields = ['item_id', 'order_cnt', 'parent']
+
+    def get_by_username(self):
+        User = UserMaster.objects.get(user_id=self.context['request'].user.id)
+        return User.id
+
+    def create(self, instance):
+        instance['created_by_id'] = self.get_by_username()
+
+        instance['updated_by_id'] = self.get_by_username()
+
+
+        return super().create(instance)
+
+    def update(self, instance, validated_data):
+        validated_data['updated_by'] = self.get_by_username()
+
+        return super().update(instance, validated_data)
 
 
 class BomViewSet(viewsets.ModelViewSet):

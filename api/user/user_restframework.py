@@ -34,6 +34,8 @@ def format_data(data):
 
 
 class EntSerializer(serializers.ModelSerializer):
+    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
+    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
     class Meta:
         model = EnterpriseMaster
         fields = '__all__'
@@ -43,6 +45,21 @@ class EntSerializer(serializers.ModelSerializer):
             'updated_by': {'required': False}
         }
         read_only_fields = ['id']
+
+    def get_by_username(self):
+        return UserMaster.objects.get(user=self.context['request'].user)
+
+    def create(self, instance):
+        instance['created_by'] = self.get_by_username()
+        instance['updated_by'] = self.get_by_username()
+
+        return super().create(instance)
+
+    def update(self, instance, validated_data):
+        validated_data['updated_by'] = self.get_by_username()
+
+        return super().update(instance, validated_data)
+
 
 class EntViewSet(viewsets.ModelViewSet):
         queryset = EnterpriseMaster.objects.all()
@@ -64,6 +81,8 @@ class EntViewSet(viewsets.ModelViewSet):
             return ent
 class UserSerializer(serializers.ModelSerializer):
     ent = EntSerializer()
+    created_by = serializers.StringRelatedField(read_only=True)
+    updated_by = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = UserMaster
         fields = '__all__'
@@ -75,6 +94,7 @@ class UserSerializer(serializers.ModelSerializer):
             'user': {'required': False},
         }
         read_only_fields = ['id']
+
 
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
