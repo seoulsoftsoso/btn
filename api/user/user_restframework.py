@@ -100,7 +100,6 @@ class UserSerializer(serializers.ModelSerializer):
         }
         read_only_fields = ['id']
 
-
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserMaster
@@ -149,11 +148,13 @@ class UserViewSet(viewsets.ModelViewSet):
             **user
         )
         Ent = EnterpriseMaster.objects.create(
-            **formattedData['ent']
+            **formattedData['ent'],
+            delete_flag='N'
         )
         user = UserMaster.objects.create(
             user=auth_user,
             **formattedData['user'],
+            delete_flag= 'N',
             ent=Ent
         )
         return Response({'status': 'success'})
