@@ -39,7 +39,7 @@
                     <form class="add-new-record pt-0 row g-2 "
                           id="form-add-new-record"
                           href="javascript:;"
-                          action="/api/item/add"
+                          action="/api/item"
                           method="POST">
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="item_code">품번</label>
@@ -61,12 +61,32 @@
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="item_type">유형</label>
-                            <input type="text"
-                                   id="item_type"
-                                   name="item_type"
-                                   class="form-control"
-                                   placeholder="Enter item type"
-                                   aria-label="Enter item type" />
+                            <select class="form-select select2" id="item_type" name="item_type">
+                                <optgroup label="level1">
+                                <option value="P">
+                                    P<span>(제품)</span>
+                                </option>
+                                </optgroup>
+                                <optgroup label="level2">
+                                <option value="AC">
+                                    AC<span>(컨트롤러)</span>
+                                </option>
+                                <option value="AM">
+                                    AM<span>(모니터링)</span>
+                                </option>
+                                </optgroup>
+                                <optgroup label="level3">
+                                <option value="C">
+                                    C<span>(제어)</span>
+                                </option>
+                                <option value="L">
+                                    L<span>(센서)</span>
+                                </option>
+                                <option value="E">
+                                    E<span>(기타)</span>
+                                </option>
+                            </optgroup>
+                            </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="specification">규격</label>
@@ -132,6 +152,8 @@
         </div>
     </div>
     <script>
+       let serverUrl = '/api/item/';
+       let reqeustMethod = 'POST'
       document.addEventListener('DOMContentLoaded', function (e) {
         (function () {
           const formAddNewRecord = document.getElementById('form-add-new-record');
@@ -197,12 +219,12 @@
             e2.preventDefault();
             const form = e2.target;
             const formData = new FormData(form);
-            const url = form.action;
-            const method = form.method;
-            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-            fetch(url, {
-              method: method,
-              body: formData
+            fetch(serverUrl, {
+              method: reqeustMethod,
+              body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
             }).then(response => {
               if (response.ok) {
                 dt_basic.ajax.reload();
@@ -210,16 +232,15 @@
               }
             });
           });
-
         })();
       });
       $(function () {
       var dt_basic_table = $('.datatables-basic')
       dt_basic = dt_basic_table.DataTable({
         ajax: {
-          url: '/api/item/list',
+          url: '/api/item',
           dataSrc: function (json) {
-            return json.data;
+            return json;
           },          
         },
         columns: [
@@ -254,10 +275,7 @@
             orderable: false,
             searchable: false,
             responsivePriority: 3,
-            checkboxes: false,
-            render: function () {
-              return '';
-            }
+            visible: false
           },
           {
             targets: 2,
@@ -504,24 +522,25 @@
         const formRecord = document.getElementById('form-add-new-record');
         let tr = $(e.relatedTarget).closest('tr');
         let rest = e.relatedTarget.getAttribute('action');
+        const formRecordBtn = $(formRecord).find('button[type="submit"]')
         switch (rest) {
           case 'patch':
-            formRecord.action = `/api/item/edit/${dt_basic.row(tr).data().id}`;
-            $(formRecord).find('button[type="submit"]').text('수정');
-            formRecord.href = 'javascript:;'
+            formRecordBtn.text('수정');
+            serverUrl = `/api/item/${dt_basic.row(tr).data().id}/`
+            reqeustMethod = 'PATCH'
             $('h3.title').text('수정');
             break;
           case 'delete':
-            formRecord.action = `/api/item/delete/${dt_basic.row(tr).data().id}`;
+            formRecordBtn.text('삭제');
+            serverUrl = `/api/item/${dt_basic.row(tr).data().id}/`
+            reqeustMethod = 'DELETE'
             $(formRecord).find('input').attr('readonly', true);
-            $(formRecord).find('button[type="submit"]').text('삭제');
-            formRecord.href = 'javascript:;'
             $('h3.title').text('삭제');
             break;
           default:
-            formRecord.action = '/api/item/add';
-            $(formRecord).find('button[type="submit"]').text('추가');
-            formRecord.href = 'javascript:;'
+            formRecordBtn.text('추가');
+            serverUrl = '/api/item/';
+            reqeustMethod = 'POST'
             $('h3.title').text('추가');
             break;
         }

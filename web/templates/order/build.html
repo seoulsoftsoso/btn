@@ -260,7 +260,7 @@
     let order_id = window.location.href.split('/').pop().split('=').pop()
     $(document).ready(async function () {
         async function getBomTree() {
-            let res = fetch(`/api/bom/list?order=${order_id}`)
+            let res = fetch(`/api/bom/?order=${order_id}`)
             let data = await res.then(res => res.json())
             tree = data.map(data => {
                 return {
@@ -279,9 +279,9 @@
         }
 
         async function getItemList() {
-            let res = fetch('/api/item/list')
+            let res = fetch('/api/item')
             let data = await res.then(res => res.json())
-            items = data.data
+            items = data
         }
 
         await getBomTree()
@@ -335,8 +335,8 @@
                                         $('#jstree').on('rename_node.jstree', function (e, data) {
                                             console.log(data)
                                             $.ajax({
-                                                url: `/api/bom/edit/${data.node.id}`,
-                                                method: 'POST',
+                                                url: `/api/bom/${data.node.id}/edit_part_code/`,
+                                                method: 'patch',
                                                 data: {
                                                     part_code: data.text
                                                 },
@@ -368,8 +368,8 @@
                                         $("#order_cnt").val(rawItem.order_cnt).trigger('change')
                                         deleteButton.addEventListener('click', function (e) {
                                             $.ajax({
-                                                url: `/api/bom/delete/${data.id}`,
-                                                method: 'POST',
+                                                url: `/api/bom/${data.id}/delete_bom/`,
+                                                method: 'delete',
                                                 headers: {
                                                     'X-CSRFToken': '{{ csrf_token }}'
                                                 }
@@ -404,8 +404,8 @@
                                         $("#order_cnt").val(rawItem.order_cnt).trigger('change')
                                         deleteButton.addEventListener('click', function (e) {
                                             $.ajax({
-                                                url: `/api/bom/delete/${data.id}`,
-                                                method: 'POST',
+                                                url: `/api/bom/${data.id}/delete_bom/`,
+                                                method: 'delete',
                                                 headers: {
                                                     'X-CSRFToken': '{{ csrf_token }}'
                                                 }
@@ -427,8 +427,8 @@
                                         $('#jstree').on('rename_node.jstree', function (e, data) {
                                             console.log(data)
                                             $.ajax({
-                                                url: `/api/bom/edit/${data.node.id}`,
-                                                method: 'POST',
+                                                url: `/api/bom/${data.node.id}/edit_part_code/`,
+                                                method: 'patch',
                                                 data: {
                                                     part_code: data.text
                                                 },
@@ -453,8 +453,8 @@
                                         $('#jstree').on('rename_node.jstree', function (e, data) {
                                             console.log(data)
                                             $.ajax({
-                                                url: `/api/bom/edit/${data.node.id}`,
-                                                method: 'POST',
+                                                url: `/api/bom/${data.node.id}/edit_part_code/`,
+                                                method: 'patch',
                                                 data: {
                                                     part_code: data.text
                                                 },
@@ -740,15 +740,16 @@
                     selectedTree = jstreeEl.get_selected();
                     parent = selectedTree[0] ? selectedTree[0] : '#';
                     let objNode = {
+                        order_id: order_id,
                         id: tree.length + 1,
                         parent,
                         text: item_product_name,
-                        data: formInput
+                       ...formInput
                     }
                     $.ajax({
-                        url: `/api/bom/add/${order_id}`,
+                        url: `/api/bom/`,
                         method: 'POST',
-                        data: JSON.stringify(objNode),
+                        data: objNode,
                         headers: {
                             'X-CSRFToken': '{{ csrf_token }}'
                         },
@@ -811,8 +812,8 @@
                             .cell(rowIdx, 4)
                             .data(order_cnt * dt_products.cell(rowIdx, 2).data());
                         $.ajax({
-                            url: 'api/bom/edit/${data.id}',
-                            method: 'POST',
+                            url: 'api/bom/${data.id}/edit_order_count/',
+                            method: 'patch',
                             data: {
                                 order_cnt: order_cnt
                             },
@@ -847,8 +848,8 @@
                     node
                 );
                 $.ajax({
-                    url: '/api/bom/delete',
-                    method: 'POST',
+                    url: `/api/bom/${id}/delete_bom/`,
+                    method: 'DELETE',
                     data: {
                         id: node.id
                     },

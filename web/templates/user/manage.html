@@ -51,64 +51,81 @@
   const ONE_MONTHS_AGO = 30;
   const FOUR_MONTHS_AGO = 120;
   const A_LONG_TIME_AGO = 360;
-  let data = []
+  let userData = []
+let elements = [
+      'user_name',
+      'user_name',
+      'password',
+      'confirm_password',
+      'customer_name',
+      'owner_name',
+      'tel',
+      'charge_name',
+        'charge_tel',
+    'charge_pos',
+      'signature',
+      'address',
+      'licensee_no'
+  ]
   async function getUserData() {
-    let data = await fetch("/api/user/list");
+    let data = await fetch("/api/user/");
     return data.json();
   }
   const table = document.querySelector("table tbody");
   const thead = document.querySelector("table thead");
-  async function drawCustomer(data) {
+  async function drawCustomer(userData) {
     table.innerHTML = '';
     $('#collapseExample').on('submit', async function (e) {
       e.preventDefault();
-      let formData = new FormData();
-      let elements = [
-        'email',
-        'password',
-        'confirm_password',
-        'company_name',
-        'owner_name',
-        'tel',
-        'signature',
-        'address',
-        'license_code',
-        'user_name'
-      ]
-      elements.forEach((el) => {
-        formData.append(el, document.getElementById(el).value);
-      });
-      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-      $
-        .ajax({url: "/api/user/add", type: "POST", data: formData, processData: false, contentType: false})
-        .then(async function () {
-          let data = await getUserData();
-          data = await data.json();
-          console.log(data);
+     let formData = new FormData()
+        elements.forEach((element) => {
+            formData.append(element, document.querySelector(`#${element}`).value)
         });
-    });
+     formData['signature'] = document.querySelector('#signature').files[0]
+      await fetch('/api/user/', {
+        method: 'POST',
+        body : formData,
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+    })
 
-    data.forEach(({
+    userData.forEach(({
       id,
-      email,
       user_name,
       tel,
-      company_name,
-      owner_name,
       address,
-      license_code,
-      charge_name,
-      charge_tel,
-      charge_pos,
+      ent,
       created_at: regDate,
       updated_at: lastLogin
     }, idx) => {
       regDate = regDate.split("T")[0];
       lastLogin = lastLogin.split("T")[0];
+
       let afterRegDate = ((new Date() - new Date(regDate)) / 1000 / 60 / 60 / 24).toFixed(0);
       lastLogin = ((new Date() - new Date(lastLogin)) / 1000 / 60 / 60 / 24).toFixed(0);
+
       afterRegDate = parseInt(afterRegDate);
       lastLogin = parseInt(lastLogin);
+      if(ent == null) {
+        ent = {
+          customer_name: '',
+          owner_name: '',
+          licensee_no: '',
+          charge_name: '',
+          charge_tel: '',
+          charge_pos: ''
+        }
+      }
+      const {
+        customer_name,
+        owner_name,
+        licensee_no,
+        charge_name,
+        charge_tel,
+        charge_pos
+      } = ent;
       let regTable = {
         [TODAY]: '<span class="badge bg-danger">오늘</span>',
         [YESTERDAY]: '<span class="badge bg-warning">어제</span>',
@@ -144,16 +161,17 @@
         .classList
         .add("btn-outline-light");
       tr.innerHTML = `
-          <td>${email}</td>
+          <td>${user_name}</td>
           <td>
             <div class="d-flex align-items-center">
-              <span>${company_name}</span>
+              <span>${customer_name}</span>
             </div>
           </td>
           <td>${owner_name}</td>
           <td>${tel || '010-****-****'}</td>
           <td>
             ${regBadge}
+          </td>
           </td>
           <td>
             ${lastLoginBadge}
@@ -177,9 +195,9 @@
                   <div class="col-md-3 col-sm-12 p-2">
                       <div class="input-group input-group-merge">
                           <span class="input-group-text fs-tiny">
-                              ID(email)
+                              ID(user_name)
                           </span>
-                          <input type="text" id="email" name="email" class="form-control"  value="${email}">
+                          <input type="text" id="user_name" name="user_name" class="form-control"  value="${user_name}">
                       </div>
                     </div>
                   <div class="col-md-3 col-sm-12 p-2">
@@ -187,7 +205,7 @@
                         <span class="input-group-text fs-tiny">
                           법인명
                         </span>
-                        <input type="text" id="company_name" name="company_name" class="form-control" value="${ (company_name || '')}">
+                        <input type="text" id="customer_name" name="customer_name" class="form-control" value="${ (customer_name || '')}">
                     </div>
                   </div>
                     <div class="col-md-3 col-sm-12 p-2">
@@ -211,7 +229,7 @@
                         <span class="input-group-text fs-tiny">
                           회사 이름
                         </span>
-                        <input type="text" id="owner_name" name="owner_name" class="form-control" value="${company_name}">
+                        <input type="text" id="owner_name" name="owner_name" class="form-control" value="${customer_name}">
                     </div>
                   </div>
                 <div class="col-md-3 col-sm-12 p-2">
@@ -235,7 +253,7 @@
                       <span class="input-group-text fs-tiny">
                         라이센스 코드
                       </span>
-                      <input type="text" id="license_code" name="license_code" class="form-control" value="${license_code}">
+                      <input type="text" id="licensee_no" name="licensee_no" class="form-control" value="${licensee_no}">
                   </div>
                 </div>
                     <div class="col-md-3 col-sm-12 p-2">
@@ -283,45 +301,42 @@
       table.appendChild(tr);
       $(`#collapseExample${idx}`).on('submit', async function (e) {
         e.preventDefault();
-        let formData = new FormData();
         let doc = document.getElementById(`collapseExample${idx}`);
-        let elements = [
-          'email',
-          'password',
-          'confirm_password',
-          'company_name',
-          'owner_name',
-          'tel',
-          'charge_name',
-            'charge_tel',
-        'charge_pos',
-          'signature',
-          'address',
-          'license_code'
-        ]
-        elements.forEach((el) => {
-          formData.append(el, doc.querySelector(`#${el}`).value);
+        let formData = new FormData()
+        let editElements = [
+      'user_name',
+      'customer_name',
+      'owner_name',
+      'tel',
+      'charge_name',
+        'charge_tel',
+    'charge_pos',
+      'signature',
+      'address',
+      'licensee_no']
+        editElements.forEach((element) => {
+            formData.append(element, doc.querySelector(`#${element}`).value)
         });
-        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-        console.log(formData);
-        $
-          .ajax({url: `/api/user/edit/${id}`, type: "POST", data: formData, processData: false, contentType: false})
-          .then(async function () {
-            let data = await getUserData();
-            data = await data.json();
-            console.log(data);
-          });
-      });
+        formData.append('user_name', user_name)
+        formData['signature'] = document.querySelector('#signature').files[0]
+        await fetch(`/api/user/${id}/`, {
+          method: 'PATCH',
+          body: formData,
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        });
+        });
       $(`#delete${idx}`).on('click', async function (e) {
         let formData = new FormData();
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-        $
-          .ajax({url: `/api/user/delete/${id}`, type: "POST", data: formData, processData: false, contentType: false})
-          .then(async function () {
-            let data = await getUserData();
-            data = await data.json();
-            console.log(data);
-          });
+        fetch(`/api/user/${id}`, {
+          method: 'DELETE',
+          body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
       });
     });
   }
@@ -347,13 +362,13 @@
                     유저 추가
                 </h3>
                   <form class="row flex-wrap d-flex" action='' href="javascript:void(0)">
-   
+
                       <div class="col-md-3 col-sm-12 p-2">
                           <div class="input-group input-group-merge">
                               <span class="input-group-text fs-tiny">
-                                  ID(email)
+                                  ID(user_name)
                               </span>
-                              <input type="text" id="email" name="email" class="form-control">
+                              <input type="text" id="user_name" name="user_name" class="form-control">
                           </div>
                         </div>
                       <div class="col-md-3 col-sm-12 p-2">
@@ -377,7 +392,7 @@
                             <span class="input-group-text fs-tiny">
                               법인명
                             </span>
-                            <input type="text" id="company_name" name="company_name" class="form-control">
+                            <input type="text" id="customer_name" name="customer_name" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-3 col-sm-12 p-2">
@@ -425,7 +440,7 @@
                           <span class="input-group-text fs-tiny">
                             라이센스 코드
                           </span>
-                          <input type="text" id="license_code" name="license_code" class="form-control">
+                          <input type="text" id="licensee_no" name="licensee_no" class="form-control">
                       </div>
                     </div>
                     <div class="col-md-3 col-sm-12 p-2">
