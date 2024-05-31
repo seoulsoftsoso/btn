@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets
+from rest_framework.decorators import permission_classes, api_view, action
+
 from api.models import UserMaster, EnterpriseMaster
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
@@ -7,6 +9,8 @@ from rest_framework import serializers
 from django.db import transaction
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 
 
 def format_data(data):
@@ -90,13 +94,20 @@ class UserViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
     read_only_fields = ['id']
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
-    @login_required
     def get_queryset(self):
         return UserMaster.objects.filter(delete_flag='N')
 
-    def create(self, request, *atrgs, **kwargs):
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = [AllowAny]
+        else:
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
+
+
+    def create(self, request, *args, **kwargs):
         rawData = request.data
         formattedData = format_data(rawData)
         if rawData['password'] != rawData['confirm_password']:
@@ -119,7 +130,6 @@ class UserViewSet(viewsets.ModelViewSet):
         )
         return Response({'status': 'success'})
 
-    @login_required
     def update(self, request, *args, **kwargs):
         rawData = format_data(request.data)
         with transaction.atomic():
@@ -131,7 +141,6 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
         return Response({'status': 'success'})
 
-    @login_required
     def delete (self, request, *args, **kwargs):
         user = UserMaster.objects.get(id=kwargs['pk'])
         user.delete_flag = 'Y'
