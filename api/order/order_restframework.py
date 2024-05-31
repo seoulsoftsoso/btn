@@ -12,6 +12,8 @@ from api.user.user_restframework import ClientSerializer
 
 class OrderMasterSerializer(serializers.ModelSerializer):
     client = ClientSerializer()
+    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
+    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
     class Meta:
         model = OrderMaster
         fields = '__all__'
@@ -23,7 +25,19 @@ class OrderMasterSerializer(serializers.ModelSerializer):
         }
         read_only_fields = ['id']
 
+    def get_by_username(self):
+        return UserMaster.objects.get(user =self.context['request'].user)
 
+    def create(self, instance):
+        instance['created_by'] = self.get_by_username()
+        instance['updated_by'] = self.get_by_username()
+
+        return super().create(instance)
+
+    def update(self, instance, validated_data):
+        validated_data['updated_by'] = self.get_by_username()
+
+        return super().update(instance, validated_data)
 
 
 class OrderViewSet(viewsets.ModelViewSet):
