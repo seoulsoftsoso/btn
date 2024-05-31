@@ -11,6 +11,21 @@
               content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <title>서울소프트 관리자페이지</title>
         <meta name="description" content="">
+
+        <!-- Calendar Core CSS -->
+    <link rel="stylesheet" href=href="{% static 'assets/vendor/css/rtl/core.css' %}" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="{% static 'assets/vendor/css/rtl/theme-default.css' %}" class="template-customizer-theme-css" />
+    <!-- Calendar Vendors CSS -->
+    <link rel="stylesheet" href="{% static 'assets/vendor/libs/typeahead-js/typeahead.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/vendor/libs/flatpickr/flatpickr.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/libs/select2/select2.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/libs/quill/editor.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/libs/@form-validation/umd/styles/index.min.css' %}">
+    <!-- Calendar Page CSS -->
+    <link rel="stylesheet" href="{% static 'assets/vendor/css/pages/app-calendar.css' %}">
+    
+
+
         <!-- Favicon -->
         <link rel="icon" type="image/x-icon" href="{% static '/img/logo.png' %}">
         <!-- Fonts -->
@@ -66,8 +81,6 @@
         <link rel="stylesheet"
               href="{% static 'assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css' %}" />
         <link rel="stylesheet"
-              href="{% static 'assets/vendor/libs/flatpickr/flatpickr.css' %}">
-        <link rel="stylesheet"
               href="{% static 'assets/vendor/libs/sweetalert2/sweetalert2.css' %}">
         <link rel="stylesheet"
               href="{% static 'assets/vendor/libs/bootstrap-select/bootstrap-select.css' %}">
@@ -78,7 +91,6 @@
         <link rel="stylesheet" href="{% static '/assets/app.css' %}">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!-- Helpers -->
-        <script src="{% static 'assets/vendor/js/helpers.js' %}"></script>
         <style type="text/css">
       .layout-menu-fixed .layout-navbar-full .layout-menu,
       .layout-menu-fixed-offcanvas .layout-navbar-full .layout-menu {
@@ -95,7 +107,6 @@
         </style>
         <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
         <!--? Config: Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file. -->
-        <script src="{% static 'assets/js/config.js' %}"></script>
         <style>
       @font-face {
         font-family: 'Pretendard';
@@ -104,8 +115,36 @@
         </style>
         <link rel="stylesheet"
               href="{% static 'assets/vendor/libs/fullcalendar/fullcalendar.css' %}">
-        <link rel="stylesheet"
-              href="{% static 'assets/vendor/libs/flatpickr/flatpickr.css' %}">
+
+        <style>
+        /* Basic styles for the button and hidden datepicker */
+         .datepicker-container {
+            position: relative;
+            display: inline-block;
+        }
+        .datepicker-box {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .datepicker-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 10px;
+        }
+    </style>
+<!-- Calendar Helpers -->
+    <script src="{% static 'assets/vendor/js/helpers.js' %}"></script>
+    <!--? Calendar Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{% static 'assets/js/config.js' %}"></script>
+
     </head>
     <body>
         <!-- Layout wrapper -->

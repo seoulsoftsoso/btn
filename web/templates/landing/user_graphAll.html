@@ -9,16 +9,88 @@
             margin-top: 1.625rem;
             padding-left:9.625rem">
     <!--    row1-->
+
+          <!-- inline calendar (flatpicker) -->
     <div style="--bs-gutter-x: 2.625rem;">
         <div class="row" style="display: flex">
-            <select id="myDropdown" style="border-radius: 6px;background: var(--0-b, #FFF);width: 10%" onchange="logSelectedOption(false)" onload="logSelectedOption(true)">
+            <select id="myDropdown" style="display: inline-flex;padding: 16px 17px;align-items: center;gap: 66px; border-radius: 6px;background: var(--0-b, #FFF);width: 13%" onchange="logSelectedOption(false)" onload="logSelectedOption(true)">
             </select>
+            <div class="col app-calendar-sidebar" id="app-calendar-sidebar">
+                <div class="datepicker-container">
+                    <input type="text" id="datepickerToggle"  style="display: inline-flex;height: 56px;padding: 16px 22px;align-items: flex-end;gap: 17px;flex-shrink: 0;border-radius: 6px;background: var(--0-b, #FFF);" placeholder="Select a date range" readonly>
+                    <div class="datepicker-box " id="datepickerBox">
+                        <div class="event-sidebar" id="addEventSidebar"></div>
+                        <div class="datepicker-footer" >
+                            <button id="applyButton">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let selectedRange = [];
+
+            // Ensure the element is available before initializing
+            const addEventSidebar = document.getElementById("addEventSidebar");
+            if (addEventSidebar) {
+                // Initialize the flatpickr datepicker with range mode
+                const datepicker = flatpickr(addEventSidebar, {
+                    inline: true,
+                    showMonths: 1, // Show two monshowMonths: 2, // Show two mon
+                    mode: "range",
+                    onChange: function(selectedDates, dateStr, instance) {
+                        selectedRange = selectedDates;
+                    }
+                });
+            } else {
+                console.error("Element with ID 'addEventSidebar' not found.");
+            }
+
+            // Get the elements
+            const datepickerToggle = document.getElementById('datepickerToggle');
+            const datepickerBox = document.getElementById('datepickerBox');
+            const applyButton = document.getElementById('applyButton');
+
+            // Function to toggle the datepicker visibility
+            function toggleDatepicker() {
+                if (datepickerBox.style.display === "none" || datepickerBox.style.display === "") {
+                    datepickerBox.style.display = "block";
+                } else {
+                    datepickerBox.style.display = "none";
+                }
+            }
+
+            // Add click event listener to the toggle input box
+            datepickerToggle.addEventListener('click', toggleDatepicker);
+
+            // Hide the datepicker if clicked outside of it
+            document.addEventListener('click', function(event) {
+                if (!datepickerBox.contains(event.target) && event.target !== datepickerToggle) {
+                    datepickerBox.style.display = "none";
+                }
+            });
+
+            // Apply button event listener
+            applyButton.addEventListener('click', function() {
+                if (selectedRange.length === 2) {
+                    const startDate = selectedRange[0].toLocaleDateString();
+                    const endDate = selectedRange[1].toLocaleDateString();
+                    datepickerToggle.value = `${startDate} - ${endDate}`;
+                } else {
+                    alert("Please select a date range.");
+                }
+                toggleDatepicker(); // Hide the datepicker after applying the date range
+            });
+        });
+    </script>
         <div id="selectedOptionDisplay" style="margin-top: 10px;">
             <!-- 선택된 옵션이 여기에 표시됩니다 -->
         </div>
         <script>
-
             let conIdSenidMap = {};
             let uniqueGtrSenName = [];
             function logSelectedOption(init) {
@@ -74,11 +146,12 @@
                     .then(response => response.json())
                     .then(data => {
                         const dropdown = document.getElementById('myDropdown');
-
-
                         conIdSenidMap = data.con_id_senid_map;
                         uniqueGtrSenName = data.unique_gtr_sen_name;
-                        Object.entries(conIdSenidMap).forEach(([conId, conInf]) =>{
+
+                        const sortedEntries = Object.entries(conIdSenidMap).sort(([conId1], [conId2]) => conId1 - conId2);
+
+                        sortedEntries.forEach(([conId, conInf]) =>{
                             const option = document.createElement('option');
                             option.value = conId; // Adjust based on your actual data structure
                             option.textContent = conInf.con_name; // Adjust based on your actual data structure
@@ -93,9 +166,15 @@
         </script>
         <!-- 재배동 실시간 현황 -->
     </div>
-    <!--    row2-->
-</div>
-<!--/ Content -->
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+    const data = [1,2,5,4,2,6];
+    const svg = d3.select('svg');
+    data.forEach((d,i) => {
+        svg.append('rect').attr('height',data[i]).attr('width',40).attr('x',50*i).attr('y',100-data[i])
+
+    })
+</script>
 <!-- Footer -->
 <footer class="content-footer footer bg-footer-theme">
     <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
