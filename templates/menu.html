@@ -225,6 +225,16 @@
                                             </div>
                                         </div>
                                     </a>
+                                                <li>
+                                    <form action="/auth/logout/"  method="post">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item" type="submit">
+                                            <i class="bx bx-power-off me-2"></i>
+                                            <span class="align-middle">Log Out</span>
+                                        </button>
+                                    </form>
+
+                                </li>
                                 </li>
                             </ul>
                         </li>
