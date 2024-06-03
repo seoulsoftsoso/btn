@@ -42,16 +42,6 @@
 <script src="{% static 'assets/js/dashboards-analytics.js' %}"></script>
 {#<script src="{% static 'assets/js/forms-pickers.js' %}"></script>#}
 <script src="{% static 'assets/js/extended-ui-treeview.js' %}"></script>
-{#<script src="{% static 'assets/app.js' %}"></script>#}
-<script>
-        let pageName = {
-            'dashboard':  "관리자용 대쉬보드",
-            'breakDown': '고장식별 기준관리'
-        }
-        let url_name = '{{ request.resolver_match.url_name }}'
-        console.log(url_name)
-        document.getElementById("menuTitle").innerHTML = pageName[url_name] || url_name
-</script>
 
 <script src="{% static 'assets/vendor/libs/fullcalendar/fullcalendar.js' %}"></script>
 <script src="{% static 'assets/js/app-calendar-events.js' %}"></script>
