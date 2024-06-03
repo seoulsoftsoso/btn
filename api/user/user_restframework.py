@@ -16,7 +16,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 def format_data(data):
     return {
         'user':  {
-            'user_code': data['licensee_no'],
+            'user_code': data['user_code'] if 'user_code' in data else '',
             'user_name': data['user_name'],
             'tel': data['tel'],
             'address': data['address'],
@@ -24,9 +24,9 @@ def format_data(data):
         },
         'ent': {
             'licensee_no': data['licensee_no'],
-            'owner_name': data['user_name'],
+            'owner_name': data['owner_name'],
             'charge_name': data['charge_name'] if 'charge_name' in data else '',
-            'customer_name': data['customer_name'] if 'customer_name' in data else '',
+            'company_name': data['company_name'] if 'company_name' in data else '',
             'charge_pos': data['charge_pos'] if 'charge_pos' in data else '',
             'charge_tel': data['charge_tel'] if 'charge_tel' in data else '',
         }
@@ -100,6 +100,11 @@ class UserSerializer(serializers.ModelSerializer):
         }
         read_only_fields = ['id']
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['email'] = instance.user.email
+        return ret
+
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserMaster
@@ -170,7 +175,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
         return Response({'status': 'success'})
 
-    def delete (self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         user = UserMaster.objects.get(id=kwargs['pk'])
         user.delete_flag = 'Y'
         user.ent.delete_flag = 'Y'
