@@ -11,18 +11,34 @@ from api.user.user_restframework import ClientSerializer
 
 
 class OrderMasterSerializer(serializers.ModelSerializer):
-    client = ClientSerializer()
+    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
+    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
+    delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
     class Meta:
         model = OrderMaster
         fields = '__all__'
         extra_kwargs = {
-            'delete_flag': {'required': False},
             'created_by': {'required': False},
             'updated_by': {'required': False},
             'comment': {'required': False},
         }
         read_only_fields = ['id']
 
+    def create(self, validated_data):
+        User = UserMaster.objects.get(user_id=self.context['request'].user.id)
+        validated_data['created_by'] = User
+        validated_data['updated_by'] = User
+        validated_data['delete_flag'] = 'N'
+        return super().create(validated_data)
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['client'] = ClientSerializer(instance.client).data
+        return ret
+
+    def delete (self, instance):
+        instance['delete_flag'] = 'Y'
+        return super().update(instance)
 
 
 

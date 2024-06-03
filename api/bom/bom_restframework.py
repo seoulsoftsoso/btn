@@ -7,6 +7,7 @@ from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from datetime import datetime
+from api.item.item_rest_framework import ItemSerializer
 import uuid
 import json
 
@@ -16,16 +17,55 @@ class BomMasterSerializer(serializers.ModelSerializer):
     product_info = serializers.CharField(source='item.item_name', read_only=True)
     image = serializers.CharField(source='item.brand', read_only=True)
     product_name = serializers.CharField(source='item.item_name', read_only=True)
+    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
+    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
+    delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
 
     class Meta:
         model = BomMaster
-        fields = ['id', 'product_name', 'order_cnt', 'item_price', 'product_info', 'image', 'level', 'item_id', 'parent', 'part_code']
+        fields = ['id', 'part_code', 'item_id', 'order_cnt', 'total', 'tax', 'order_id', 'parent_id', 'level', 'created_by', 'updated_by', 'delete_flag', 'item_price', 'product_info', 'image', 'product_name', 'parent', 'op']
+
+
+    def create(self, instance):
+        instance['created_by'] = self.get_by_username()
+        instance['updated_by'] = self.get_by_username()
+        instance['delete_flag'] = 'N'
+
+        return super().create(instance)
+
+    def update(self, instance, validated_data):
+        validated_data['updated_by'] = self.get_by_username()
+
+        return super().update(instance, validated_data)
+
+    def delete (self, instance):
+        instance['delete_flag'] = 'Y'
+        return super().update(instance)
 
 
 class BomCreateSerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField(read_only=True)
+    updated_by = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = BomMaster
-        fields = ['item_id', 'order_cnt', 'parent']
+        fields = '__all__'
+
+    def get_by_username(self):
+        User = UserMaster.objects.get(user_id=self.context['request'].user.id)
+        return User.id
+
+    def create(self, instance):
+        instance['created_by_id'] = self.get_by_username()
+
+        instance['updated_by_id'] = self.get_by_username()
+
+
+        return super().create(instance)
+
+    def update(self, instance, validated_data):
+        validated_data['updated_by'] = self.get_by_username()
+
+        return super().update(instance, validated_data)
 
 
 class BomViewSet(viewsets.ModelViewSet):
@@ -46,11 +86,6 @@ class BomViewSet(viewsets.ModelViewSet):
                 qs = qs.filter(order_id = order)
 
         return qs
-
-    def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update', 'delete_bom']:
-            return BomCreateSerializer
-        return BomMasterSerializer
 
     def create(self, request, *args, **kwargs):
         rawData = request.data
@@ -88,8 +123,9 @@ class BomViewSet(viewsets.ModelViewSet):
                 bom = BomMaster.objects.create(
                     part_code=rawData.get('text', ''),
                     item_id=rawData['item_id'],
-                    order_cnt=order_cnt,
-                    **bomPriceData,
+                    order_cnt=1,
+                    total = item.standard_price,
+                    tax = item.standard_price * 0.1,
                     order_id=rawData['order_id'],
                     parent_id=parent,
                     level=level,
