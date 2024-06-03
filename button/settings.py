@@ -42,8 +42,7 @@ INSTALLED_APPS = [
     'api',
     'web',
     'manage',
-    'channels',
-    'rest_framework'
+    'channels'
 ]
 
 CHANNEL_LAYERS = {
@@ -52,13 +51,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
-}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -101,14 +93,22 @@ ASGI_APPLICATION = 'button.asgi.application'
 #    }
 #}
 DATABASES = {
+    # 'default': {
+    #         'ENGINE': 'django.db.backends.mysql',
+    #         'NAME': 'button',
+    #         'USER': 'root',
+    #         'PASSWORD': 'dbstmdwo1!',
+    #         'HOST': 'localhost',
+    #         'PORT': '3306',
+    #     }
     'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'button',
-            'USER': 'root',
-            'PASSWORD': '1105',
-            'HOST': 'localhost',
-            'PORT': '3306',
-        }
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'button',
+        'USER': 'button_dev3',
+        'PASSWORD': 'qing1105!',
+        'HOST': '118.44.218.236',
+        'PORT': '6000',
+    }
 }
 # DATABASES = {}
 
