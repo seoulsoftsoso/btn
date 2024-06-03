@@ -33,6 +33,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let selectedRange = [];
+            const today = new Date();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(today.getDate() - 6);
 
             // Ensure the element is available before initializing
             const addEventSidebar = document.getElementById("addEventSidebar");
@@ -42,10 +45,12 @@
                     inline: true,
                     showMonths: 1, // Show two monshowMonths: 2, // Show two mon
                     mode: "range",
+                    defaultDate: [sevenDaysAgo, today],
                     onChange: function(selectedDates, dateStr, instance) {
                         selectedRange = selectedDates;
                     }
                 });
+                selectedRange = [sevenDaysAgo, today];
             } else {
                 console.error("Element with ID 'addEventSidebar' not found.");
             }
@@ -54,6 +59,7 @@
             const datepickerToggle = document.getElementById('datepickerToggle');
             const datepickerBox = document.getElementById('datepickerBox');
             const applyButton = document.getElementById('applyButton');
+            datepickerToggle.value = `${sevenDaysAgo.toLocaleDateString()} - ${today.toLocaleDateString()}`;
 
             // Function to toggle the datepicker visibility
             function toggleDatepicker() {
@@ -87,9 +93,11 @@
             });
         });
     </script>
-        <div id="selectedOptionDisplay" style="margin-top: 10px;">
+
+    <div id="selectedOptionDisplay" style="margin-top: 10px;">
             <!-- 선택된 옵션이 여기에 표시됩니다 -->
         </div>
+
         <script>
             let conIdSenidMap = {};
             let uniqueGtrSenName = [];
@@ -106,6 +114,7 @@
                         let sum = 0;
                         let count = 0;
                         let value;
+
                         Object.entries(conInf.gtr || {}).forEach(([senid, senInf]) => {
                             if (senInf.sen_name === uniqueSenName) {
                                 sum += senInf.value;
@@ -125,22 +134,18 @@
                                         </div>
                                         <div class="text-nowrap" style="padding-bottom: 2rem; padding-left: 2.0rem; padding-right: 1.625rem;">
                                             <!-- Additional content can be added here -->
+
                                         </div>
                                     </div>
                                 </div>`;
-
                                 displayDiv.innerHTML += card;
-                        }
 
+                        }
                     })
                     }
-
-
-
                 });
-
             }
-            document.addEventListener('DOMContentLoaded', function() {
+           document.addEventListener('DOMContentLoaded', function() {
                 // Fetch data from the server endpoint
                 fetch('/api/util/user-table-data/') // replace with your actual endpoint URL
                     .then(response => response.json())
@@ -165,16 +170,85 @@
             });
         </script>
         <!-- 재배동 실시간 현황 -->
-    </div>
-<script src="http://d3js.org/d3.v3.js"></script>
-<script>
-    const data = [1,2,5,4,2,6];
-    const svg = d3.select('svg');
-    data.forEach((d,i) => {
-        svg.append('rect').attr('height',data[i]).attr('width',40).attr('x',50*i).attr('y',100-data[i])
+<div id="chart-container"></div>
 
-    })
-</script>
+          <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            const margin = { top: 70, right: 30, bottom: 40, left: 80 };
+            const width = 1200 - margin.left - margin.right;
+            const height = 500 - margin.top - margin.bottom;
+
+            // Set up the x and y scales
+
+            const x = d3.scaleTime()
+              .range([0, width]);
+
+            const y = d3.scaleLinear()
+              .range([height, 0]);
+
+            // Create the SVG element and append it to the chart container
+
+            const svg = d3.select("#chart-container")
+              .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Create a fake dataset
+
+            const dataset = [
+              { date: new Date("2022-01-01"), value: 200 },
+              { date: new Date("2022-02-01"), value: 250 },
+              { date: new Date("2022-03-01"), value: 180 },
+              { date: new Date("2022-04-01"), value: 300 },
+              { date: new Date("2022-05-01"), value: 280 },
+              { date: new Date("2022-06-01"), value: 220 },
+              { date: new Date("2022-07-01"), value: 300 },
+              { date: new Date("2022-08-01"), value: 450 },
+              { date: new Date("2022-09-01"), value: 280 },
+              { date: new Date("2022-10-01"), value: 600 },
+              { date: new Date("2022-11-01"), value: 780 },
+              { date: new Date("2022-12-01"), value: 320 }
+            ];
+
+            // Define the x and y domains
+
+            x.domain(d3.extent(dataset, d => d.date));
+            y.domain([0, d3.max(dataset, d => d.value)]);
+
+            // Add the x-axis
+
+            svg.append("g")
+              .attr("transform", `translate(0,${height})`)
+              .call(d3.axisBottom(x)
+                .ticks(d3.timeMonth.every(1))
+                .tickFormat(d3.timeFormat("%b %Y")));
+
+
+            // Add the y-axis
+
+            svg.append("g")
+              .call(d3.axisLeft(y))
+
+            // Create the line generator
+
+            const line = d3.line()
+              .x(d => x(d.date))
+              .y(d => y(d.value));
+
+            // Add the line path to the SVG element
+
+            svg.append("path")
+              .datum(dataset)
+              .attr("fill", "none")
+              .attr("stroke", "steelblue")
+              .attr("stroke-width", 1)
+              .attr("d", line);
+
+        </script>
+    </div>
 <!-- Footer -->
 <footer class="content-footer footer bg-footer-theme">
     <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
