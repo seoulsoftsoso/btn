@@ -53,6 +53,13 @@ def landing_user_graph_single(request):
 def landing_admin(request):
     return render(request, 'landing/dashboard.html')
 
+def user_division(request):
+    if not request.user.is_authenticated:
+        return render(request, 'registration/login.html')
+    if request.user.is_superuser:
+        return render(request, 'landing/dashboard.html')
+    else:
+        return render(request, 'landing/dashboard2.html')
 # 자동 재배 관리
 
 def manage_auto(request):

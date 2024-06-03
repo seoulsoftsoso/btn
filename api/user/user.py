@@ -30,7 +30,7 @@ def format_ent_data(entData):
         'licensee_no': entData['license_code'],
         'owner_name': entData['user_name'],
         'charge_name': entData['charge_name'],
-        'customer_name': entData['company_name'],
+        'company_name': entData['company_name'],
         'charge_pos': entData['charge_pos'],
         'charge_tel': entData['charge_tel'],
     }
@@ -76,7 +76,7 @@ def user_list(request):
         email = F('user__email'),
         license_code = F('ent__licensee_no'),
         owner_name = F('ent__owner_name'),
-        company_name = F('ent__customer_name'),
+        company_name = F('ent__company_name'),
         charge_name = F('ent__charge_name'),
         charge_pos = F('ent__charge_pos'),
         charge_tel= F('ent__charge_tel')

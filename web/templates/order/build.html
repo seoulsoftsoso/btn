@@ -27,7 +27,7 @@
                                 <div class="ml-auto align-content-center">제품 설계도</div>
                                 <div class="d-flex align-content-center gap-2">
                                     <button class="btn btn-outline-success add-container">
-                                        <i class="bx bx-cog"></i>&nbsp; 컨테이너 추가
+                                        <i class="bx bx-cog"></i>&nbsp 컨테이너 추가
                                     </button>
                                 </div>
                             </div>
@@ -65,10 +65,10 @@
                 <div class="card-footer">
                     <div class='ml-auto d-flex justify-content-end gap-2'>
                         <button class="btn btn-outline-success add-item" id="add-item">
-                            <i class="bx bx-cog"></i>&nbsp; 제품 추가
+                            <i class="bx bx-cog"></i>&nbsp 제품 추가
                         </button>
                         <button class="btn btn-outline-info " id="edit-item">
-                            <i class="bx bx-edit"></i>&nbsp; 제품 수정
+                            <i class="bx bx-edit"></i>&nbsp 제품 수정
                         </button>
                     </div>
                 </div>
@@ -161,7 +161,7 @@
                 <div class="card-footer">
                     <div class="ml-auto d-flex justify-content-end">
                         <button class="btn btn-outline-success" id="submit-order">
-                            <i class="bx bx-upload"></i>&nbsp; 의뢰
+                            <i class="bx bx-upload"></i>&nbsp 의뢰
                         </button>
                     </div>
                 </div>
@@ -256,7 +256,7 @@
 <script>
     let tree = []
     let items = []
-    let checkboxTree = $('#jstree');
+    let checkboxTree = $('#jstree')
     let order_id = window.location.href.split('/').pop().split('=').pop()
     $(document).ready(async function () {
         async function getBomTree() {
@@ -287,7 +287,7 @@
         await getBomTree()
         await getItemList()
 
-        let checkboxTree = $('#jstree');
+        let checkboxTree = $('#jstree')
         items.forEach(item => {
             $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
         })
@@ -330,8 +330,8 @@
                                     label: '컨테이너 변경',
                                     action: function (data) {
                                         var inst = $.jstree.reference(data.reference),
-                                        obj = inst.get_node(data.reference);
-                                        inst.edit(obj);
+                                        obj = inst.get_node(data.reference)
+                                        inst.edit(obj)
                                         $('#jstree').on('rename_node.jstree', function (e, data) {
                                             console.log(data)
                                             $.ajax({
@@ -351,19 +351,19 @@
                                 컨테이너_삭제: {
                                     label: '컨테이너 삭제',
                                     action: function (node) {
-                                        let data = $("#jstree").jstree(true).get_node(node.reference);
-                                        let offCanvasElement = document.querySelector('#add-new-record');
-                                        offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
-                                        offCanvasEl.show();
-                                        let formRecord = document.getElementById('form-add-new-record');
-                                        let formButton = document.getElementById('formButton');
-                                        $("#plus-item").addClass('d-none');
-                                        let deleteButton = document.createElement('button');
-                                        deleteButton.textContent = '삭제';
-                                        deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item');
-                                        formButton.appendChild(deleteButton);
+                                        let data = $("#jstree").jstree(true).get_node(node.reference)
+                                        let offCanvasElement = document.querySelector('#add-new-record')
+                                        offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
+                                        offCanvasEl.show()
+                                        let formRecord = document.getElementById('form-add-new-record')
+                                        let formButton = document.getElementById('formButton')
+                                        $("#plus-item").addClass('d-none')
+                                        let deleteButton = document.createElement('button')
+                                        deleteButton.textContent = '삭제'
+                                        deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item')
+                                        formButton.appendChild(deleteButton)
                                         let rawItem = data.original 
-                                        formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price;
+                                        formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price
                                         $("#item").val(rawItem.item_id).trigger('change')
                                         $("#order_cnt").val(rawItem.order_cnt).trigger('change')
                                         deleteButton.addEventListener('click', function (e) {
@@ -374,9 +374,9 @@
                                                     'X-CSRFToken': '{{ csrf_token }}'
                                                 }
                                             }).done(function (res) {
-                                                inst = $('#jstree').jstree(true);
-                                                inst.delete_node(data);
-                                                offCanvasEl.hide();
+                                                inst = $('#jstree').jstree(true)
+                                                inst.delete_node(data)
+                                                offCanvasEl.hide()
                                             })
                                         })
                                     }
@@ -387,19 +387,19 @@
                                 bom_삭제: {
                                     label: 'bom 삭제',
                                     action:  function (node) {
-                                        let data = $("#jstree").jstree(true).get_node(node.reference);
-                                        let offCanvasElement = document.querySelector('#add-new-record');
-                                        offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
-                                        offCanvasEl.show();
-                                        let formRecord = document.getElementById('form-add-new-record');
-                                        let formButton = document.getElementById('formButton');
-                                        $("#plus-item").addClass('d-none');
-                                        let deleteButton = document.createElement('button');
-                                        deleteButton.textContent = '삭제';
-                                        deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item');
-                                        formButton.appendChild(deleteButton);
+                                        let data = $("#jstree").jstree(true).get_node(node.reference)
+                                        let offCanvasElement = document.querySelector('#add-new-record')
+                                        offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
+                                        offCanvasEl.show()
+                                        let formRecord = document.getElementById('form-add-new-record')
+                                        let formButton = document.getElementById('formButton')
+                                        $("#plus-item").addClass('d-none')
+                                        let deleteButton = document.createElement('button')
+                                        deleteButton.textContent = '삭제'
+                                        deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item')
+                                        formButton.appendChild(deleteButton)
                                         let rawItem = data.original 
-                                        formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price;
+                                        formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price
                                         $("#item").val(rawItem.item_id).trigger('change')
                                         $("#order_cnt").val(rawItem.order_cnt).trigger('change')
                                         deleteButton.addEventListener('click', function (e) {
@@ -410,9 +410,9 @@
                                                     'X-CSRFToken': '{{ csrf_token }}'
                                                 }
                                             }).done(function (res) {
-                                                inst = $('#jstree').jstree(true);
-                                                inst.delete_node(data);
-                                                offCanvasEl.hide();
+                                                inst = $('#jstree').jstree(true)
+                                                inst.delete_node(data)
+                                                offCanvasEl.hide()
                                             })
                                         })
                                     }
@@ -422,8 +422,8 @@
                                     action: function (data) {
                                         console.log(data)
                                         var inst = $.jstree.reference(data.reference),
-                                        obj = inst.get_node(data.reference);
-                                        inst.edit(obj);
+                                        obj = inst.get_node(data.reference)
+                                        inst.edit(obj)
                                         $('#jstree').on('rename_node.jstree', function (e, data) {
                                             console.log(data)
                                             $.ajax({
@@ -448,8 +448,8 @@
                                     action: function (data) {
                                         console.log(data)
                                         var inst = $.jstree.reference(data.reference),
-                                            obj = inst.get_node(data.reference);
-                                        inst.edit(obj);
+                                            obj = inst.get_node(data.reference)
+                                        inst.edit(obj)
                                         $('#jstree').on('rename_node.jstree', function (e, data) {
                                             console.log(data)
                                             $.ajax({
@@ -488,15 +488,15 @@
                     icon: 'bx bxl-nodejs text-warning'
                 }
             }
-        });
+        })
         checkboxTree.on('select_node.jstree', function (e, data) {
             let filterdTree = $('#jstree').jstree(true).get_json('#', {
                 flat: true,
                 no_state: true
-            });
+            })
             let selected = data.selected
-            let inst = $('#jstree').jstree(true);
-            let node = inst.get_node(selected);
+            let inst = $('#jstree').jstree(true)
+            let node = inst.get_node(selected)
             let parent_level = node.parents.length 
             console.log(selected)
             let child = tree.filter(item => item.parent === parseInt(selected[0]))
@@ -508,25 +508,25 @@
                             product_info: 'level 2'
                         }
                     })).draw()
-                    break;
+                    break
                 case 2:
                     dt_products.data().clear().rows.add(child.map((item, index) => {
                         return {
                             ...item,
                             product_info: 'level 3'
                         }
-                    })).draw();
-                    break;
+                    })).draw()
+                    break
                 case 2:
-                    let inst = $('#jstree').jstree(true);
-                    inst.deselect_all();
-                    break;
+                    let inst = $('#jstree').jstree(true)
+                    inst.deselect_all()
+                    break
                 default:
-                    break;
+                    break
             }
 
-        });
-        var dt_details_table = $('.datatables-order-details');
+        })
+        var dt_details_table = $('.datatables-order-details')
         if (dt_details_table.length) {
             var dt_products = dt_details_table.DataTable({
                 data: tree,
@@ -551,7 +551,7 @@
                         responsivePriority: 2,
                         targets: 0,
                         render: function (data, type, full, meta) {
-                            return '';
+                            return ''
                         }
                     }, {
                         targets: 1,
@@ -560,7 +560,7 @@
                         orderable: false,
                         render: function (data, type, full, meta) {
                             $product_brand = full['product_name']
-                            var stateNum = Math.floor(Math.random() * 6);
+                            var stateNum = Math.floor(Math.random() * 6)
                             var states = [
                                 'success',
                                 'danger',
@@ -569,41 +569,41 @@
                                 'dark',
                                 'primary',
                                 'secondary'
-                            ];
+                            ]
                             var $state = states[stateNum],
                                 $name = full['part_code'] || full['product_name'],
-                                $initials = $name.match(/\b\w/g) || [];
-                            $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
-                            $output = '<span class="avatar-initial rounded-2 bg-label-' + $state + '">' + $initials + '</span>';
-                            var $row_output = '<div class="d-flex justify-content-start align-items-center text-nowrap">' + '<div class="avatar-wrapper">' + '<div class="avatar me-2">' + $output + '</div>' + '</div>' + '<div class="d-flex flex-column">' + '<h6 class="text-body mb-0">' + $name + '</h6>' + '<small class="text-muted">' + $product_brand + '</small>' + '</div>' + '</div>';
-                            return $row_output;
+                                $initials = $name.match(/\b\w/g) || []
+                            $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase()
+                            $output = '<span class="avatar-initial rounded-2 bg-label-' + $state + '">' + $initials + '</span>'
+                            var $row_output = '<div class="d-flex justify-content-start align-items-center text-nowrap">' + '<div class="avatar-wrapper">' + '<div class="avatar me-2">' + $output + '</div>' + '</div>' + '<div class="d-flex flex-column">' + '<h6 class="text-body mb-0">' + $name + '</h6>' + '<small class="text-muted">' + $product_brand + '</small>' + '</div>' + '</div>'
+                            return $row_output
                         }
                     }, {
                         targets: 2,
                         searchable: false,
                         orderable: false,
                         render: function (data, type, full, meta) {
-                            var $item_price = full['item_price'];
-                            var $output = '<span>' + $item_price + '</span>';
-                            return $output;
+                            var $item_price = full['item_price']
+                            var $output = '<span>' + $item_price + '</span>'
+                            return $output
                         }
                     }, {
                         targets: 3,
                         searchable: false,
                         orderable: false,
                         render: function (data, type, full, meta) {
-                            var $order_cnt = full['order_cnt'];
-                            var $output = '<span class="text-body">' + $order_cnt + '</span>';
-                            return $output;
+                            var $order_cnt = full['order_cnt']
+                            var $output = '<span class="text-body">' + $order_cnt + '</span>'
+                            return $output
                         }
                     }, {
                         targets: 4,
                         searchable: false,
                         orderable: false,
                         render: function (data, type, full, meta) {
-                            var $total = parseInt(full['order_cnt']) * full['item_price'];
-                            var $output = $total ? '<h6 class="mb-0">' + $total + '</h6>' : data;
-                            return $output;
+                            var $total = parseInt(full['order_cnt']) * full['item_price']
+                            var $output = $total ? '<h6 class="mb-0">' + $total + '</h6>' : data
+                            return $output
                         }
                     }
                 ],
@@ -620,8 +620,8 @@
                             .display
                             .modal({
                                 header: function (row) {
-                                    var data = row.data();
-                                    return 'Details of ' + data['full_name'];
+                                    var data = row.data()
+                                    return 'Details of ' + data['full_name']
                                 }
                             }),
                         type: 'column',
@@ -630,36 +630,36 @@
                                 .map(columns, function (col, i) {
                                     return col.title !== ''
                                         ? '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' + '<td>' + col.title + ':' + '</td> ' + '<td>' + col.data + '</td>' + '</tr>'
-                                        : '';
+                                        : ''
                                 })
-                                .join('');
+                                .join('')
 
                             return data
                                 ? $('<table class="table" /><tbody />').append(data)
-                                : false;
+                                : false
                         }
                     }
                 }
-            });
+            })
         }
         setTimeout(() => {
-            let offCanvasElement = document.querySelector('#add-new-record');
+            let offCanvasElement = document.querySelector('#add-new-record')
             $(".add-item").on('click', function () {
-                $("#plus-item").removeClass('d-none');
-                $('.delete-item').remove();
-                offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
-                offCanvasEl.show();
-            });
+                $("#plus-item").removeClass('d-none')
+                $('.delete-item').remove()
+                offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
+                offCanvasEl.show()
+            })
             $('.add-container').on('click', function () {
-                $("#plus-item").removeClass('d-none');
-                $('.delete-item').remove();
-                offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
-                offCanvasEl.show();
-                let inst = $('#jstree').jstree(true);
-                inst.deselect_all();
-            });
-        }, 200);
-        let formAddNewRecord = document.getElementById('form-add-new-record');
+                $("#plus-item").removeClass('d-none')
+                $('.delete-item').remove()
+                offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
+                offCanvasEl.show()
+                let inst = $('#jstree').jstree(true)
+                inst.deselect_all()
+            })
+        }, 200)
+        let formAddNewRecord = document.getElementById('form-add-new-record')
         fv = FormValidation.formValidation(formAddNewRecord, {
             fields: {
                 order_cnt: {
@@ -690,38 +690,38 @@
                         e
                             .element
                             .parentElement
-                            .insertAdjacentElement('afterend', e.messageElement);
+                            .insertAdjacentElement('afterend', e.messageElement)
                     }
-                });
+                })
             }
-        });
+        })
         $("#item").on('change', (e) => {
             if (!e.target.value) {
-                $('#order_cnt').attr('disabled', 'disabled');
-                $('#item_price').val('');
-                $('#tax').val('');
-                $('#order_total').val('');
+                $('#order_cnt').attr('disabled', 'disabled')
+                $('#item_price').val('')
+                $('#tax').val('')
+                $('#order_total').val('')
             } else {
-                $('#order_cnt').removeAttr('disabled');
+                $('#order_cnt').removeAttr('disabled')
                 $('#order_cnt').on('change', (e) => {
-                    $('#order_total').val(e.target.value * $('#item_price').val());
-                    let tax = $('#order_total').val() * 0.1;
-                    tax = tax.toFixed(2);
-                    $('#tax').val(tax);
+                    $('#order_total').val(e.target.value * $('#item_price').val())
+                    let tax = $('#order_total').val() * 0.1
+                    tax = tax.toFixed(2)
+                    $('#tax').val(tax)
                 })
             }
         })
         $("#plus-item").on('click', function (e) {
-            let offCanvasElement = document.querySelector('#add-new-record');
-            let offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
-            let formAddNewRecord = $('#form-add-new-record');
+            let offCanvasElement = document.querySelector('#add-new-record')
+            let offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
+            let formAddNewRecord = $('#form-add-new-record')
             fv.validate().then(function (status) {
                 if (status === 'Valid') {
-                    let data = formAddNewRecord.serializeArray();
+                    let data = formAddNewRecord.serializeArray()
                     let formData = data.reduce((acc, item) => {
-                        acc[item.name] = item.value;
-                        return acc;
-                    }, {});
+                        acc[item.name] = item.value
+                        return acc
+                    }, {})
                     console.log(formData)
                     let item_product_name = items.find(
                         item => item.id == formData.bom_id
@@ -738,10 +738,10 @@
                     dt_products.row.add({
                         "id": dt_products.data().length + 1,
                         ...formInput
-                    }).draw();
-                    let jstreeEl = $('#jstree').jstree(true);
-                    selectedTree = jstreeEl.get_selected();
-                    parent = selectedTree[0] ? selectedTree[0] : '#';
+                    }).draw()
+                    let jstreeEl = $('#jstree').jstree(true)
+                    selectedTree = jstreeEl.get_selected()
+                    parent = selectedTree[0] ? selectedTree[0] : '#'
                     let objNode = {
                         order_id: order_id,
                         id: tree.length + 1,
@@ -759,8 +759,8 @@
                         dataType: 'json'
                     }).done(function (data) {
                         let addedBom = data.boms
-                        for(let i = 0; i < addedBom.length; i++){
-                            let addedBomElement = addedBom[i];
+                        for(let i = 0 ;i < addedBom.length; i++){
+                            let addedBomElement = addedBom[i]
                             let objNode = {
                                 id: addedBomElement,
                                 parent,
@@ -769,15 +769,15 @@
                             }
                             jstreeEl.create_node(parent, objNode, 'last', function (new_node) {
                                 setTimeout(function () {
-                                    jstreeEl.edit(new_node);
-                                }, 0);
-                            });
-                            tree.push(objNode);
+                                    jstreeEl.edit(new_node)
+                                }, 0)
+                            })
+                            tree.push(objNode)
                         }
                     })
                 }
-            });
-            offCanvasEl.hide();
+            })
+            offCanvasEl.hide()
         })
         $("#edit-item").on('click', function (e) {
             dt_products
@@ -785,20 +785,20 @@
                 .every(function (rowIdx, tableLoop, rowLoop) {
                     let order_cnt = dt_products
                         .cell(rowIdx, 3)
-                        .data();
+                        .data()
                     dt_products
                         .cell(rowIdx, 3)
-                        .data('<input type="number" class="form-control" value="' + order_cnt + '">');
+                        .data('<input type="number" class="form-control" value="' + order_cnt + '">')
                     dt_products
                         .cell(rowIdx, 4)
-                        .data('<button class="btn btn-outline-danger delete-item"><i class="bx bx-trash"></i></button>');
-                });
-            $(e.target).addClass('d-none');
-            let edit_button = document.createElement('button');
+                        .data('<button class="btn btn-outline-danger delete-item"><i class="bx bx-trash"></i></button>')
+                })
+            $(e.target).addClass('d-none')
+            let edit_button = document.createElement('button')
             edit_button
                 .classList
-                .add('btn', 'btn-outline-success', 'save-item');
-            edit_button.innerHTML = '<i class="bx bx-save"></i>&nbsp; 변경 저장';
+                .add('btn', 'btn-outline-success', 'save-item')
+            edit_button.innerHTML = '<i class="bx bx-save"></i>&nbsp 변경 저장'
             edit_button.addEventListener('click', function (e2) {
                 dt_products
                     .rows()
@@ -806,14 +806,14 @@
                         let order_cnt = dt_products
                             .cell(rowIdx, 3)
                             .node()
-                            .querySelector('input');
-                        order_cnt = $(order_cnt).val();
+                            .querySelector('input')
+                        order_cnt = $(order_cnt).val()
                         dt_products
                             .cell(rowIdx, 3)
-                            .data(order_cnt);
+                            .data(order_cnt)
                         dt_products
                             .cell(rowIdx, 4)
-                            .data(order_cnt * dt_products.cell(rowIdx, 2).data());
+                            .data(order_cnt * dt_products.cell(rowIdx, 2).data())
                         $.ajax({
                             url: 'api/bom/${data.id}/edit_order_count/',
                             method: 'patch',
@@ -825,31 +825,31 @@
                             }
                         }).done(function (data) {
                         })
-                    });
-                $(e.target).removeClass('d-none');
+                    })
+                $(e.target).removeClass('d-none')
                 e2
                     .target
-                    .remove();
+                    .remove()
 
             })
             e
                 .target
                 .parentElement
-                .appendChild(edit_button);
-            let deleteButton = $(document).find('.delete-item');
+                .appendChild(edit_button)
+            let deleteButton = $(document).find('.delete-item')
             deleteButton.on('click', function (e2) {
-                let id = dt_products.row(e2.target.closest('tr')).data().id;
-                let inst = $('#jstree').jstree(true);
-                let selected = tree.find(item => item.id == id);
-                let node = inst.get_node(selected);
+                let id = dt_products.row(e2.target.closest('tr')).data().id
+                let inst = $('#jstree').jstree(true)
+                let selected = tree.find(item => item.id == id)
+                let node = inst.get_node(selected)
                 dt_products
                     .row($(this).parents('tr'))
                     .remove()
-                    .draw();
-                let checkboxTree = $('#jstree');
+                    .draw()
+                let checkboxTree = $('#jstree')
                 checkboxTree.jstree(true).delete_node(
                     node
-                );
+                )
                 $.ajax({
                     url: `/api/bom/${id}/delete_bom/`,
                     method: 'DELETE',
@@ -865,10 +865,10 @@
             })
         })
         $("#item").on('change', function (e) {
-            let item = e.target.value;
-            let product = items.find(item => item.id == e.target.value);
-            $('#item_price').val(product.standard_price);
-        });
+            let item = e.target.value
+            let product = items.find(item => item.id == e.target.value)
+            $('#item_price').val(product.standard_price)
+        })
     })
 </script>
 {% include 'footer.html' %}

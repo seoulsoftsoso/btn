@@ -37,10 +37,7 @@
         </div>
         <div class="offcanvas-body flex-grow-1">
             <form class="add-new-record pt-0 row g-2 "
-                  id="form-add-new-record"
-                  action="/api/order/"
-                  method="POST"
-                  href="/api/order/add">
+                  id="form-add-new-record">
                 {% csrf_token %}
                 <div class="col-sm-12">
                     <label class="form-label" for="order_date">주문일자</label>
@@ -223,7 +220,6 @@
                         var $user_img = full['avatar'],
                             $name = full.client.user_name
                             $post = full.client.address
-                        console.log($name)
                         if ($user_img) {
                             // For Avatar image
                             var $output = '<img src="' + assetsPath + 'img/avatars/' + $user_img + '" alt="Avatar" class="rounded-circle">';
@@ -504,7 +500,6 @@
         });
 
         function tagTemplate(tagData) {
-            console.log(tagData)
             return `
             <tag title="${tagData.title || tagData.email}"
               contenteditable='false'
@@ -614,7 +609,6 @@
                     offCanvasEl.show();
                     const closetColumn = $(e.target).closest('tr');
                     let data = dt_basic.row(closetColumn).data()
-                    console.log(data)
                     orderInputs.forEach((item) => {
                         formAddNewRecord
                             .querySelector(`[name="${item}"]`)

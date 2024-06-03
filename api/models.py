@@ -20,7 +20,7 @@ class UserMaster(models.Model):
 
 
 class EnterpriseMaster(models.Model):
-    customer_name = models.CharField(max_length=255)
+    company_name = models.CharField(max_length=255)
     licensee_no = models.CharField(max_length=255, null=True)
     owner_name = models.CharField(max_length=255)
     bus_con = models.CharField(max_length=255, null=True)
