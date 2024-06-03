@@ -14,22 +14,21 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 def format_data(data):
+    userFields = [
+        'user_code', 'user_name', 'tel', 'address', 'signature'
+    ]
+
+    EntFields = [
+        'company_name', 'owner_name', 'charge_name', 'charge_tel', 'charge_pos',
+        'licensee_no', 'bus_con', 'bus_event', 'postal_code', 'addr',
+        'office_tel', 'office_fax', 'office_email', 'etc', 'cus_type'
+    ]
+    user_dict = {field: data.get(field, '') for field in userFields}
+
+    ent_dict = {field: data.get(field, '') for field in EntFields}
     return {
-        'user':  {
-            'user_code': data['user_code'] if 'user_code' in data else '',
-            'user_name': data['user_name'],
-            'tel': data['tel'],
-            'address': data['address'],
-            'signature': data['signature'] if 'signature' in data else '',
-        },
-        'ent': {
-            'licensee_no': data['licensee_no'],
-            'owner_name': data['owner_name'],
-            'charge_name': data['charge_name'] if 'charge_name' in data else '',
-            'company_name': data['company_name'] if 'company_name' in data else '',
-            'charge_pos': data['charge_pos'] if 'charge_pos' in data else '',
-            'charge_tel': data['charge_tel'] if 'charge_tel' in data else '',
-        }
+        'user':  user_dict,
+        'ent': ent_dict
     }
 
 

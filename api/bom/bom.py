@@ -10,11 +10,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 def format_bom_data(bomData):
-    return {
-        'part_code': bomData['product_name'],
-        'item_id': bomData['item_id'],
-        'order_cnt': bomData['order_cnt'],
-    }
+    bomFields = [
+        'part_code', 'item_id', 'order_cnt'
+    ]
+
+    return {field: bomData.get(field, '') for field in bomFields}
 
 def bom_list(request):
     order = request.GET.get('order')

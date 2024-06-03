@@ -6,16 +6,10 @@ from django.views.decorators.http import require_POST
 @csrf_exempt
 @require_POST
 def format_item_data(itemData):
-    return {
-        'item_code': itemData['item_code'],
-        'item_name': itemData['item_name'],
-        'item_type': itemData['item_type'],
-        'specification': itemData['specification'],
-        'model': itemData['model'],
-        'brand': itemData['brand'],
-        'level': itemData['level'],
-        'standard_price': itemData['standard_price'],
-    }
+    itemFields = [
+        'item_code', 'item_name', 'item_type', 'specification', 'model', 'brand', 'level', 'standard_price'
+    ]
+    return {field: itemData.get(field, '') for field in itemFields}
 
 def item_list(request):
     if request.user.id is None:
