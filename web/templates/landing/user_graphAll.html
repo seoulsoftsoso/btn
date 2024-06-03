@@ -93,162 +93,130 @@
             });
         });
     </script>
-
     <div id="selectedOptionDisplay" style="margin-top: 10px;">
             <!-- 선택된 옵션이 여기에 표시됩니다 -->
-        </div>
+    </div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        let conIdSenidMap = {};
+        let uniqueGtrSenName = [];
+        function logSelectedOption() {
+            const dropdown = document.getElementById('myDropdown');
 
-        <script>
-            let conIdSenidMap = {};
-            let uniqueGtrSenName = [];
-            function logSelectedOption(init) {
-                const dropdown = document.getElementById('myDropdown');
+            const selectedIndex = dropdown.selectedIndex;
+            const selectedOption = dropdown.options[selectedIndex].value;
+            const displayDiv = document.getElementById('selectedOptionDisplay');
+            displayDiv.innerHTML = "";
+            Object.entries(conIdSenidMap).forEach(([conId, conInf]) => {
+                if(conId === selectedOption){
+                    uniqueGtrSenName.forEach(uniqueSenName => {
+                    let sum = 0;
+                    let count = 0;
+                    let value;
+                    let dataset = []; // Array to hold chart data
 
-                const selectedIndex = dropdown.selectedIndex;
-                const selectedOption = dropdown.options[selectedIndex].value;
-                const displayDiv = document.getElementById('selectedOptionDisplay');
-                displayDiv.innerHTML = "";
-                Object.entries(conIdSenidMap).forEach(([conId, conInf]) => {
-                    if(conId === selectedOption){
-                        uniqueGtrSenName.forEach(uniqueSenName => {
-                        let sum = 0;
-                        let count = 0;
-                        let value;
-
-                        Object.entries(conInf.gtr || {}).forEach(([senid, senInf]) => {
-                            if (senInf.sen_name === uniqueSenName) {
-                                sum += senInf.value;
-                                count++;
-                                value = count > 0 ? sum / count : "-";
-                            }
-                        });
-                        if(count !== 0){
-                            let card = `${uniqueSenName}
-                                <div class="col-lg-8 order-lg-2 mb-4" style="border-radius: 15px; width: 100%; min-width: 1359px !important; background: var(--Gray-0, #FFF)">
-                                    <div class="card" style="box-shadow: 0 0px red; --bs-card-cap-padding-x: 1.0rem">
-                                        <div class="card-header" style="justify-content: space-between; display: flex; flex-direction: row; padding-bottom:0.3rem">
-                                            <div style="justify-content:flex-start; display: flex;">
-                                                <div class="m-0 me-2 pb-3" style="color: var(--80-w, #595757);font-family: Pretendard;font-size: 24px;font-style: normal;font-weight: 500;line-height: normal;padding-right:1.2rem">조회한 기간의 평균 수치</div>
-                                                <h5 class="m-0 me-2 pb-3" style="color: var(--40-w, #B5B6B6); font-family: Pretendard; font-size: 22px; width:201; font-style: normal; font-weight: 600; line-height: normal">${value}</h5>
-                                            </div>
-                                        </div>
-                                        <div class="text-nowrap" style="padding-bottom: 2rem; padding-left: 2.0rem; padding-right: 1.625rem;">
-                                            <!-- Additional content can be added here -->
-
+                    Object.entries(conInf.gtr || {}).forEach(([senid, senInf]) => {
+                        if (senInf.sen_name === uniqueSenName) {
+                            sum += senInf.value;
+                            count++;
+                            value = count > 0 ? sum / count : "-";
+                        }
+                    });
+                    if(count !== 0){
+                            const uniqueId = `chart-container-${uniqueSenName.replace(/\s+/g, '-')}-${conId}`;
+                        let card = `${uniqueSenName}
+                            <div class="col-lg-8 order-lg-2 mb-4" style="border-radius: 15px; width: 100%; min-width: 1359px !important; background: var(--Gray-0, #FFF)">
+                                <div class="card" style="box-shadow: 0 0px red; --bs-card-cap-padding-x: 1.0rem">
+                                    <div class="card-header" style="justify-content: space-between; display: flex; flex-direction: row; padding-bottom:0.3rem">
+                                        <div style="justify-content:flex-start; display: flex;">
+                                            <div class="m-0 me-2 pb-3" style="color: var(--80-w, #595757);font-family: Pretendard;font-size: 24px;font-style: normal;font-weight: 500;line-height: normal;padding-right:1.2rem">조회한 기간의 평균 수치</div>
+                                            <h5 class="m-0 me-2 pb-3" style="color: var(--40-w, #B5B6B6); font-family: Pretendard; font-size: 22px; width:201; font-style: normal; font-weight: 600; line-height: normal">${value}</h5>
                                         </div>
                                     </div>
-                                </div>`;
-                                displayDiv.innerHTML += card;
+                                    <div class="text-nowrap" style="padding-bottom: 2rem; padding-left: 2.0rem; padding-right: 1.625rem;">
+                                        <!-- Additional content can be added here -->
+                                        <div id="${uniqueId}">${uniqueId}</div>
+                                    </div>
+                                </div>
+                            </div>`;
+                            displayDiv.innerHTML += card;
+                            drawChart(dataset, uniqueId);
 
-                        }
-                    })
                     }
-                });
-            }
-           document.addEventListener('DOMContentLoaded', function() {
-                // Fetch data from the server endpoint
-                fetch('/api/util/user-table-data/') // replace with your actual endpoint URL
-                    .then(response => response.json())
-                    .then(data => {
-                        const dropdown = document.getElementById('myDropdown');
-                        conIdSenidMap = data.con_id_senid_map;
-                        uniqueGtrSenName = data.unique_gtr_sen_name;
-
-                        const sortedEntries = Object.entries(conIdSenidMap).sort(([conId1], [conId2]) => conId1 - conId2);
-
-                        sortedEntries.forEach(([conId, conInf]) =>{
-                            const option = document.createElement('option');
-                            option.value = conId; // Adjust based on your actual data structure
-                            option.textContent = conInf.con_name; // Adjust based on your actual data structure
-                            dropdown.appendChild(option);
-                        });
-                        const initialSelectedIndex = 0; // Set to the desired index
-                        dropdown.selectedIndex = initialSelectedIndex;
-                        logSelectedOption(true);
-                    })
-                    .catch(error => console.error('Error fetching data:', error));
+                })
+                }
             });
-        </script>
-        <!-- 재배동 실시간 현황 -->
-<div id="chart-container"></div>
+        }
+        function drawChart(dataset, chartId) {
+        const margin = { top: 70, right: 30, bottom: 40, left: 80 };
+        const width = 1200 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
 
-          <script src="https://d3js.org/d3.v7.min.js"></script>
+        // Clear previous chart
+        d3.select(`#${chartId}`).selectAll("*").remove();
 
-        <script>
-            const margin = { top: 70, right: 30, bottom: 40, left: 80 };
-            const width = 1200 - margin.left - margin.right;
-            const height = 500 - margin.top - margin.bottom;
+        // Set up the x and y scales
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);
 
-            // Set up the x and y scales
+        // Create the SVG element and append it to the chart container
+        const svg = d3.select(`#${chartId}`)
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
 
-            const x = d3.scaleTime()
-              .range([0, width]);
+        // Define the x and y domains
+        x.domain(d3.extent(dataset, d => d.date));
+        y.domain([0, d3.max(dataset, d => d.value)]);
 
-            const y = d3.scaleLinear()
-              .range([height, 0]);
+        // Add the x-axis
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat("%b %Y")));
 
-            // Create the SVG element and append it to the chart container
+        // Add the y-axis
+        svg.append("g").call(d3.axisLeft(y));
 
-            const svg = d3.select("#chart-container")
-              .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-              .append("g")
-                .attr("transform", `translate(${margin.left},${margin.top})`);
+        // Create the line generator
+        const line = d3.line()
+            .x(d => x(d.date))
+            .y(d => y(d.value));
 
-            // Create a fake dataset
+        // Add the line path to the SVG element
+        svg.append("path")
+            .datum(dataset)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 1)
+            .attr("d", line);
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+            // Fetch data from the server endpoint
+        fetch('/api/util/user-table-data/') // replace with your actual endpoint URL
+            .then(response => response.json())
+            .then(data => {
+                const dropdown = document.getElementById('myDropdown');
+                conIdSenidMap = data.con_id_senid_map;
+                uniqueGtrSenName = data.unique_gtr_sen_name;
 
-            const dataset = [
-              { date: new Date("2022-01-01"), value: 200 },
-              { date: new Date("2022-02-01"), value: 250 },
-              { date: new Date("2022-03-01"), value: 180 },
-              { date: new Date("2022-04-01"), value: 300 },
-              { date: new Date("2022-05-01"), value: 280 },
-              { date: new Date("2022-06-01"), value: 220 },
-              { date: new Date("2022-07-01"), value: 300 },
-              { date: new Date("2022-08-01"), value: 450 },
-              { date: new Date("2022-09-01"), value: 280 },
-              { date: new Date("2022-10-01"), value: 600 },
-              { date: new Date("2022-11-01"), value: 780 },
-              { date: new Date("2022-12-01"), value: 320 }
-            ];
+                const sortedEntries = Object.entries(conIdSenidMap).sort(([conId1], [conId2]) => conId1 - conId2);
 
-            // Define the x and y domains
-
-            x.domain(d3.extent(dataset, d => d.date));
-            y.domain([0, d3.max(dataset, d => d.value)]);
-
-            // Add the x-axis
-
-            svg.append("g")
-              .attr("transform", `translate(0,${height})`)
-              .call(d3.axisBottom(x)
-                .ticks(d3.timeMonth.every(1))
-                .tickFormat(d3.timeFormat("%b %Y")));
-
-
-            // Add the y-axis
-
-            svg.append("g")
-              .call(d3.axisLeft(y))
-
-            // Create the line generator
-
-            const line = d3.line()
-              .x(d => x(d.date))
-              .y(d => y(d.value));
-
-            // Add the line path to the SVG element
-
-            svg.append("path")
-              .datum(dataset)
-              .attr("fill", "none")
-              .attr("stroke", "steelblue")
-              .attr("stroke-width", 1)
-              .attr("d", line);
-
-        </script>
-    </div>
+                sortedEntries.forEach(([conId, conInf]) =>{
+                    const option = document.createElement('option');
+                    option.value = conId; // Adjust based on your actual data structure
+                    option.textContent = conInf.con_name; // Adjust based on your actual data structure
+                    dropdown.appendChild(option);
+                });
+                const initialSelectedIndex = 0; // Set to the desired index
+                dropdown.selectedIndex = initialSelectedIndex;
+                logSelectedOption();
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+    </script>
+</div>
 <!-- Footer -->
 <footer class="content-footer footer bg-footer-theme">
     <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
