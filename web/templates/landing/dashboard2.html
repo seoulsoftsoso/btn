@@ -96,9 +96,6 @@
                                             socket.addEventListener("close", () => {
                                               console.log("WebSocket is closed");
                                             });
-                                            $(window).unload(function () {
-                                               socket.close();
-                                            });
                                         }
                                         websocket()
 
