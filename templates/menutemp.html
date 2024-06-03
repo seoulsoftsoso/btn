@@ -3,7 +3,7 @@
 
 <div class="layout-page">
     <!-- Navbar -->
-    <nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme"
+    <nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme "
          id="layout-navbar" style="background-color:#F6F6F6 !important; box-shadow: 0 1px #B5B6B6;height:94; padding-right:1.625rem; padding-left:1.625rem;">
         <!--    <div class="container-xxl">-->
         <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
@@ -56,29 +56,29 @@
         font-style: normal;
         font-weight: 500">환경그래프조회</a>
 
-     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fetch data from the server endpoint
-            fetch('/your-endpoint-url/') // replace with your actual endpoint URL
-                .then(response => response.json())
-                .then(data => {
-                    // Extract the necessary data from the JSON response
-                    const items = data.unique_gtr_sen_name; // Adjust based on your actual data structure
-
-                    // Get the dropdown element
-                    const dropdown = document.getElementById('myDropdown');
-
-                    // Populate the dropdown with options
-                    items.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.value; // Adjust based on your actual data structure
-                        option.textContent = item.text; // Adjust based on your actual data structure
-                        dropdown.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        });
-    </script>
+{#     <script>#}
+{#        document.addEventListener('DOMContentLoaded', function() {#}
+{#            // Fetch data from the server endpoint#}
+{#            fetch('/api/util/user-table-data/') // replace with your actual endpoint URL#}
+{#                .then(response => response.json())#}
+{#                .then(data => {#}
+{#                    // Extract the necessary data from the JSON response#}
+{#                    const items = data.unique_gtr_sen_name; // Adjust based on your actual data structure#}
+{##}
+{#                    // Get the dropdown element#}
+{#                    const dropdown = document.getElementById('myDropdown');#}
+{##}
+{#                    // Populate the dropdown with options#}
+{#                    items.forEach(item => {#}
+{#                        const option = document.createElement('option');#}
+{#                        option.value = item.value; // Adjust based on your actual data structure#}
+{#                        option.textContent = item.text; // Adjust based on your actual data structure#}
+{#                        dropdown.appendChild(option);#}
+{#                    });#}
+{#                })#}
+{#                .catch(error => console.error('Error fetching data:', error));#}
+{#        });#}
+{#    </script>#}
             <span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
             <a style="flex-shrink: 0;
                       text-align:center;
@@ -90,102 +90,100 @@
                       font-style: normal;
                       font-weight: 500">문의현황</a>
         </div>
-        <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-            <div class="navbar-nav-right d-flex align-items-center"
-                 id="navbar-collapse">
-                <ul class="navbar-nav flex-row align-items-center ms-auto">
-                    <!-- User -->
-                    <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                        <a class="nav-link dropdown-toggle hide-arrow"
-                           href="javascript:void(0);"
-                           data-bs-toggle="dropdown"
-                           style="color: var(--original-brown, #3D170F);
-                                  text-align: center;
-                                  font-family: Pretendard;
-                                  font-size: 20px;
-                                  font-style: normal;
-                                  font-weight: 400;
-                                  line-height: normal">camoonh님</a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="pages-account-settings-account.html">
-                                    <div class="d-flex">
-                                        <div class="flex-shrink-0 me-3">
-                                            <div class="avatar avatar-online">
-                                                <img src="{% static '/assets/img/avatars/1.png' %}"
-                                                     alt
-                                                     class="w-px-40 h-auto rounded-circle" />
-                                            </div>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <span class="fw-medium d-block">John Doe</span>
-                                            <small class="text-muted">Admin</small>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <div class="dropdown-divider"></div>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="pages-profile-user.html">
-                                    <i class="bx bx-user me-2"></i>
-                                    <span class="align-middle">My Profile</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="pages-account-settings-account.html">
-                                    <i class="bx bx-cog me-2"></i>
-                                    <span class="align-middle">Settings</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="pages-account-settings-billing.html">
-                                    <span class="d-flex align-items-center align-middle">
-                                        <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
-                                        <span class="flex-grow-1 align-middle">Billing</span>
-                                        <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <div class="dropdown-divider"></div>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="pages-faq.html">
-                                    <i class="bx bx-help-circle me-2"></i>
-                                    <span class="align-middle">FAQ</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="pages-pricing.html">
-                                    <i class="bx bx-dollar me-2"></i>
-                                    <span class="align-middle">Pricing</span>
-                                </a>
-                            </li>
-                            <li>
-                                <div class="dropdown-divider"></div>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
-                                    <i class="bx bx-power-off me-2"></i>
-                                    <span class="align-middle">Log Out</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <span>&nbsp&nbsp&nbsp&nbsp</span>
-                    <!--/ User -->
-                    <a class="" style="color: var(--original-brown, #3D170F);
+        <div class="navbar-nav-right d-flex align-items-center"
+             id="navbar-collapse">
+            <ul class="navbar-nav flex-row align-items-center ms-auto">
+                <!-- User -->
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                    <a class="nav-link dropdown-toggle hide-arrow"
+                       href="javascript:void(0);"
+                       data-bs-toggle="dropdown"
+                       style="color: var(--original-brown, #3D170F);
                               text-align: center;
                               font-family: Pretendard;
                               font-size: 20px;
                               font-style: normal;
                               font-weight: 400;
-                              line-height: normal;
-                              text-decoration-line: underline">로그아웃</a>
-                </ul>
-            </div>
+                              line-height: normal">camoonh님</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="pages-account-settings-account.html">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="avatar avatar-online">
+                                            <img src="{% static '/assets/img/avatars/1.png' %}"
+                                                 alt
+                                                 class="w-px-40 h-auto rounded-circle" />
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <span class="fw-medium d-block">John Doe</span>
+                                        <small class="text-muted">Admin</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="pages-profile-user.html">
+                                <i class="bx bx-user me-2"></i>
+                                <span class="align-middle">My Profile</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="pages-account-settings-account.html">
+                                <i class="bx bx-cog me-2"></i>
+                                <span class="align-middle">Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="pages-account-settings-billing.html">
+                                <span class="d-flex align-items-center align-middle">
+                                    <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
+                                    <span class="flex-grow-1 align-middle">Billing</span>
+                                    <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="pages-faq.html">
+                                <i class="bx bx-help-circle me-2"></i>
+                                <span class="align-middle">FAQ</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="pages-pricing.html">
+                                <i class="bx bx-dollar me-2"></i>
+                                <span class="align-middle">Pricing</span>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
+                                <i class="bx bx-power-off me-2"></i>
+                                <span class="align-middle">Log Out</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <span>&nbsp&nbsp&nbsp&nbsp</span>
+                <!--/ User -->
+                <a class="" style="color: var(--original-brown, #3D170F);
+                          text-align: center;
+                          font-family: Pretendard;
+                          font-size: 20px;
+                          font-style: normal;
+                          font-weight: 400;
+                          line-height: normal;
+                          text-decoration-line: underline">로그아웃</a>
+            </ul>
         </div>
         <!--    </div>-->
     </nav>
