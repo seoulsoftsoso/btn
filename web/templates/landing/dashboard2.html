@@ -76,7 +76,6 @@
                                                 .then(response => response.json())
                                                 .then(data => {
                                                     updateTable(data);
-                                                    console.log(data);
                                                 })
                                                 .catch(error => console.error('Error fetching initial data:', error));
                                         }
@@ -98,7 +97,7 @@
                                               console.log("WebSocket is closed");
                                             });
                                         }
-                                        {#websocket()#}
+                                        websocket()
 
                                         function updateTable(data) {
                                             let uniqueGtrSenName = data.unique_gtr_sen_name;
