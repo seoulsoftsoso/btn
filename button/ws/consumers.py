@@ -21,5 +21,4 @@ class MyConsumer(AsyncWebsocketConsumer):
 
     async def send_update(self, event):
         data = event['data']
-        print(data)
         await self.send(text_data=json.dumps(data))
