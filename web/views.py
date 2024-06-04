@@ -44,7 +44,6 @@ def harvest_manual(request):
 # 초기 화면
 
 def landing_user(request):
-    start_listening_to_changes(request)
     return render(request, 'landing/dashboard2.html')
 def landing_user_graph_all(request):
     return render(request, 'landing/user_graphAll.html')
@@ -59,6 +58,7 @@ def user_division(request):
     if request.user.is_superuser:
         return render(request, 'landing/dashboard.html')
     else:
+        start_listening_to_changes(request)
         return render(request, 'landing/dashboard2.html')
 # 자동 재배 관리
 
