@@ -204,6 +204,7 @@
                 eleValidClass: '',
                 rowSelector: '.col-sm-12'
               }),
+              
               defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
               autoFocus: new FormValidation.plugins.AutoFocus()
             },
@@ -219,16 +220,20 @@
             e2.preventDefault();
             const form = e2.target;
             const formData = new FormData(form);
-            fetch(serverUrl, {
-              method: reqeustMethod,
-              body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            }).then(response => {
-              if (response.ok) {
-                dt_basic.ajax.reload();
-                $('#item').modal('hide');
+            fv.validate().then(function (status) {
+              if (status === 'Valid') {
+                fetch(serverUrl, {
+                  method: reqeustMethod,
+                  body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }).then(response => {
+                  if (response.ok) {
+                    dt_basic.ajax.reload();
+                    $('#item').modal('hide');
+                  }
+                });
               }
             });
           });

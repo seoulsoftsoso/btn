@@ -38,7 +38,7 @@ class BomMasterSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-    def delete (self, instance):
+    def delete(self, instance):
         instance['delete_flag'] = 'Y'
         return super().update(instance)
 
@@ -73,18 +73,13 @@ class BomViewSet(viewsets.ModelViewSet):
     serializer_class = BomMasterSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['order']
     read_only_fields = ['id']
     permission_classes = [IsAuthenticated]
 
 
     def get_queryset(self):
         qs = BomMaster.objects.filter(delete_flag='N')
-
-        if 'order' in self.request.query_params:
-            order = self.request.query_params['order']
-            if order != '':
-                qs = qs.filter(order_id = order)
-
         return qs
 
     def create(self, request, *args, **kwargs):
