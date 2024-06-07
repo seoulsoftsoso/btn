@@ -17,7 +17,7 @@
                         <th>규격</th>
                         <th>모델</th>
                         <th>제조사</th>
-                        <th>레벨</th>
+                        <th>유형</th>
                         <th>표준단가</th>
                         <th></th>
                     </tr>
@@ -62,12 +62,12 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="item_type">유형</label>
                             <select class="form-select select2" id="item_type" name="item_type">
-                                <optgroup label="level1">
+                                <optgroup label="level0">
                                 <option value="P">
                                     P<span>(제품)</span>
                                 </option>
                                 </optgroup>
-                                <optgroup label="level2">
+                                <optgroup label="level1">
                                 <option value="AC">
                                     AC<span>(컨트롤러)</span>
                                 </option>
@@ -75,7 +75,7 @@
                                     AM<span>(모니터링)</span>
                                 </option>
                                 </optgroup>
-                                <optgroup label="level3">
+                                <optgroup label="level2">
                                 <option value="C">
                                     C<span>(제어)</span>
                                 </option>
@@ -116,20 +116,6 @@
                                    aria-label="Enter brand" />
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="level">레벨</label>
-                            <select class="form-select select2" id="level" name="level">
-                                <option value="0">
-                                    컨테이너<span>(level1)</span>
-                                </option>
-                                <option value="1">
-                                    컨트롤러<span>(level2)</span>
-                                </option>
-                                <option value="2    ">
-                                    제품<span>(level3)</span>
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="standardPrice">표준단가</label>
                             <div class="input-group input-group-merge">
                                 <span class="input-group-text"><i class="bx bx-dollar"></i></span>
@@ -152,7 +138,7 @@
         </div>
     </div>
     <script>
-       let serverUrl = '/api/item/';
+       let serverUrl = '/api/item';
        let reqeustMethod = 'POST'
       document.addEventListener('DOMContentLoaded', function (e) {
         (function () {
@@ -204,7 +190,6 @@
                 eleValidClass: '',
                 rowSelector: '.col-sm-12'
               }),
-              defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
               autoFocus: new FormValidation.plugins.AutoFocus()
             },
             init: instance => {
@@ -219,16 +204,31 @@
             e2.preventDefault();
             const form = e2.target;
             const formData = new FormData(form);
-            fetch(serverUrl, {
-              method: reqeustMethod,
-              body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            }).then(response => {
-              if (response.ok) {
-                dt_basic.ajax.reload();
-                $('#item').modal('hide');
+            const level = document.getElementById('item_type').value;
+            const levelFromModel = {
+              P: 0,
+              AC: 1,
+              AM: 1,
+              C: 2,
+              L: 2,
+              E: 2
+            }
+            console.log("submit", levelFromModel[level]);
+            fv.validate().then(function (status) {
+              if (status === 'Valid') {
+              formData.append('level', levelFromModel[level]);
+                fetch(serverUrl, {
+                  method: reqeustMethod,
+                  body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }).then(response => {
+                  if (response.ok) {
+                    dt_basic.ajax.reload();
+                    $('#item').modal('hide');
+                  }
+                });
               }
             });
           });
@@ -238,7 +238,7 @@
       var dt_basic_table = $('.datatables-basic')
       dt_basic = dt_basic_table.DataTable({
         ajax: {
-          url: '/api/item',
+          url: '/api/item/',
           dataSrc: function (json) {
             return json;
           },          
@@ -291,26 +291,18 @@
             render: function (data, type, full, meta) {
               var $status_number = full['level'];
               var $status = {
-                1: {
-                  title: 'level 1',
+                0: {
+                  title: '컨테이너',
                   class: 'bg-label-primary'
                 },
-                2: {
-                  title: 'level 2',
+                1: {
+                  title: '컨트롤러',
                   class: ' bg-label-success'
                 },
-                3: {
-                  title: 'level 3',
+                2: {
+                  title: '센서',
                   class: ' bg-label-danger'
                 },
-                4: {
-                  title: 'level 4',
-                  class: ' bg-label-warning'
-                },
-                5: {
-                  title: 'level 5',
-                  class: ' bg-label-info'
-                }
               };
               if (typeof $status[$status_number] === 'undefined') {
                 return data;

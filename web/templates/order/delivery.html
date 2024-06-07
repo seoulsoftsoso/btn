@@ -622,7 +622,7 @@
                 })
             })
         }, 200)
-
+        
         // Form validation for Add ne  record
         fv = FormValidation.formValidation(formAddNewRecord, {
             fields: {
@@ -640,10 +640,17 @@
                         }
                     }
                 },
-                price: {
+                order_price: {
                     validators: {
                         notEmpty: {
                             message: '공급가는 필수입니다.'
+                        }
+                    }
+                },
+                order_place: {
+                    validators: {
+                        notEmpty: {
+                            message: '납품처는 필수입니다.'
                         }
                     }
                 }
@@ -691,19 +698,23 @@
         });
         formAddNewRecord.addEventListener('submit', function (e2) {
             e2.preventDefault();
-            const form = e2.target
-            const formData = new FormData(form)
-            formData.set('client', JSON.parse($("#TagifyUserList").val())[0].value)
-            fetch(requestUrl, {
-                method: requestMethod,
-                body: formData,
-                headers:{
-                    'X-CSRFToken': '{{ csrf_token }}'
+            fv.validate().then(function (status) {
+                if (status === 'Valid') {
+                    const form = e2.target
+                    const formData = new FormData(form)
+                    formData.set('client', JSON.parse($("#TagifyUserList").val())[0].value)
+                    fetch(requestUrl, {
+                        method: requestMethod,
+                        body: formData,
+                        headers:{
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    }).then(response => response.json()).then(data => {
+                        $('#add-new-record').offcanvas('hide');
+                        dt_basic.ajax.reload();
+                        form.reset();
+                    });
                 }
-            }).then(response => response.json()).then(data => {
-                $('#add-new-record').offcanvas('hide');
-                dt_basic.ajax.reload();
-                form.reset();
             });
         });
     });
