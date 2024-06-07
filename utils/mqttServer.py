@@ -2,9 +2,14 @@ from pymongo import MongoClient
 import paho.mqtt.client as mqtt
 import certifi
 
-def on_message(userdata, msg):
-    print(msg.topic + " " + str(msg.payload))
+def on_message(client, userdata, msg):
+    print(str(msg.payload.decode("utf-8")))
 
+def on_connect(client, userdata, flags, rc):
+        try:
+            print(f"Connected with result code {rc}")
+        except Exception as e:
+            print(f"Error connecting to MQTT: {e}")
 class MqttServer:
     def __init__(self, mqtt_host='127.0.0.1', mqtt_port=1883, topic='test'):
         self.mongo_client = None
@@ -21,17 +26,9 @@ class MqttServer:
         }
 
     def mqtt_config(self):
-        self.mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        self.mqtt_client = self.mqtt_client.d
         self.mqtt_client.on_connect = self.on_connect
         self.mqtt_client.on_message = on_message
-
-    def on_connect(self, client, userdata, flags, rc, properties):
-        try:
-            print(f"Connected with result code {rc}")
-            self.mqtt_client.subscribe(self.server_config['topic'])
-            print(self.message)
-        except Exception as e:
-            print(f"Error connecting to MQTT: {e}")
 
     def insert(self, data):
         try:
@@ -47,14 +44,14 @@ class MqttServer:
     def on_mqtt_message(self, data):
         try:
             print(f"Received message: {data}")
-            self.insert(data)
+            # self.insert(data)
             self.message = data
         except Exception as e:
             print(f"Error handling message: {e}")
 
     def init_mqtt(self):
         try:
-            self.mqtt_client.on_connect = self.on_connect
+            self.mqtt_client.on_connect = on_connect
             self.mqtt_client.on_message = on_message
             self.mqtt_client.connect(self.server_config['host'], self.server_config['port'])
             self.mqtt_client.loop_start()
@@ -70,8 +67,26 @@ class MqttServer:
         except Exception as e:
             print(f"Error closing connections: {e}")
 
+
+def on_disconnect(self, client, userdata, rc):
+    print(rc)
+
+def on_subscribe(client, userdata, mid, granted_pos):
+    print(f'subscribed:{str(mid)}{str(granted_pos)}')
+
+
 if __name__ == "__main__":
     mqtt_server = MqttServer('127.0.0.1', 1883, 'test')
+    mqtt_subscribe = mqtt.Client()
+    mqtt_subscribe.connect('127.0.0.1', 1883)
+    mqtt_subscribe.on_message = on_message
+    mqtt_subscribe.on_connect = on_connect
+    mqtt_subscribe.on_disconnect = on_disconnect
+    mqtt_subscribe.on_subscribe = on_subscribe
+    mqtt_subscribe.subscribe('test', 1)
+
+    mqtt_subscribe.loop_forever()
+
     mqtt_server.mqtt_config()
     mqtt_server.init_mqtt()
 

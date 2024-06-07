@@ -256,7 +256,6 @@
 <script>
     let tree = []
     let items = []
-    let checkboxTree = $('#jstree')
     let order_id = window.location.href.split('/').pop().split('=').pop()
     $(document).ready(async function () {
         async function getBomTree() {
@@ -291,7 +290,7 @@
         items.forEach(item => {
             $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
         })
-        
+
         function drawOrderCalculation(){
             let items_price = tree.reduce((acc, item) => {
                 return acc + item.standard_price * item.order_cnt
@@ -312,6 +311,62 @@
                     `)
         }
         drawOrderCalculation()
+
+
+        function appendDeleteBtn(nodeData) {
+            let formButton = document.getElementById('formButton')
+            let deleteButton = document.createElement('button')
+            deleteButton.textContent = '삭제'
+            deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item')
+            formButton.appendChild(deleteButton)
+            deleteButton.addEventListener('click', function (e) {
+                $.ajax({
+                    url: `/api/bom/${nodeData.id}/delete_bom/`,
+                    method: 'delete',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }).done(function (res) {
+                    inst = $('#jstree').jstree(true)
+                    inst.delete_node(nodeData)
+                    offCanvasEl.hide()
+                })
+            })
+        }
+
+        function editNode(data) {
+            var inst = $.jstree.reference(data.reference),
+                obj = inst.get_node(data.reference)
+            inst.edit(obj)
+            $('#jstree').on('rename_node.jstree', function (e, data) {
+                console.log(data)
+                $.ajax({
+                    url: `/api/bom/${data.node.id}/edit_part_code/`,
+                    method: 'patch',
+                    data: {
+                        part_code: data.text
+                    },
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }).done(function (res) {
+                    console.log(res)
+                })
+            })
+        }
+
+        function deleteNode(node) {
+            let data = $("#jstree").jstree(true).get_node(node.reference)
+            let offCanvasElement = document.querySelector('#add-new-record')
+            offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
+            offCanvasEl.show()
+            let formRecord = document.getElementById('form-add-new-record')
+            appendDeleteBtn(data)
+            let rawItem = data.original
+            formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price
+            $("#item").val(rawItem.item_id).trigger('change')
+            $("#order_cnt").val(rawItem.order_cnt).trigger('change')
+        }
         $('#jstree').jstree({
             core: {
                 check_callback: true,
@@ -322,149 +377,41 @@
             ],
             contextmenu: {
                 items: function (node) {
-                    console.log(node)
                     switch (node.parents.length) {
                         case 1:
                             return {
-                                컨테이너_변경: {
+                                edit_part_code_by_conatiner: {
                                     label: '컨테이너 변경',
                                     action: function (data) {
-                                        var inst = $.jstree.reference(data.reference),
-                                        obj = inst.get_node(data.reference)
-                                        inst.edit(obj)
-                                        $('#jstree').on('rename_node.jstree', function (e, data) {
-                                            console.log(data)
-                                            $.ajax({
-                                                url: `/api/bom/${data.node.id}/edit_part_code/`,
-                                                method: 'patch',
-                                                data: {
-                                                    part_code: data.text
-                                                },
-                                                headers: {
-                                                    'X-CSRFToken': '{{ csrf_token }}'
-                                                }
-                                            }).done(function (res) {
-                                                console.log(res)
-                                            })
-                                        })
+                                        editNode(data)
                                 }},
-                                컨테이너_삭제: {
+                                delete_container: {
                                     label: '컨테이너 삭제',
                                     action: function (node) {
-                                        let data = $("#jstree").jstree(true).get_node(node.reference)
-                                        let offCanvasElement = document.querySelector('#add-new-record')
-                                        offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
-                                        offCanvasEl.show()
-                                        let formRecord = document.getElementById('form-add-new-record')
-                                        let formButton = document.getElementById('formButton')
-                                        $("#plus-item").addClass('d-none')
-                                        let deleteButton = document.createElement('button')
-                                        deleteButton.textContent = '삭제'
-                                        deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item')
-                                        formButton.appendChild(deleteButton)
-                                        let rawItem = data.original 
-                                        formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price
-                                        $("#item").val(rawItem.item_id).trigger('change')
-                                        $("#order_cnt").val(rawItem.order_cnt).trigger('change')
-                                        deleteButton.addEventListener('click', function (e) {
-                                            $.ajax({
-                                                url: `/api/bom/${data.id}/delete_bom/`,
-                                                method: 'delete',
-                                                headers: {
-                                                    'X-CSRFToken': '{{ csrf_token }}'
-                                                }
-                                            }).done(function (res) {
-                                                inst = $('#jstree').jstree(true)
-                                                inst.delete_node(data)
-                                                offCanvasEl.hide()
-                                            })
-                                        })
+                                        deleteNode(node)
                                     }
                                 }
                             }
                         case 2:
                             return {
-                                bom_삭제: {
-                                    label: 'bom 삭제',
+                                delete_controller: {
+                                    label: '컨트롤러 삭제',
                                     action:  function (node) {
-                                        let data = $("#jstree").jstree(true).get_node(node.reference)
-                                        let offCanvasElement = document.querySelector('#add-new-record')
-                                        offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
-                                        offCanvasEl.show()
-                                        let formRecord = document.getElementById('form-add-new-record')
-                                        let formButton = document.getElementById('formButton')
-                                        $("#plus-item").addClass('d-none')
-                                        let deleteButton = document.createElement('button')
-                                        deleteButton.textContent = '삭제'
-                                        deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item')
-                                        formButton.appendChild(deleteButton)
-                                        let rawItem = data.original 
-                                        formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price
-                                        $("#item").val(rawItem.item_id).trigger('change')
-                                        $("#order_cnt").val(rawItem.order_cnt).trigger('change')
-                                        deleteButton.addEventListener('click', function (e) {
-                                            $.ajax({
-                                                url: `/api/bom/${data.id}/delete_bom/`,
-                                                method: 'delete',
-                                                headers: {
-                                                    'X-CSRFToken': '{{ csrf_token }}'
-                                                }
-                                            }).done(function (res) {
-                                                inst = $('#jstree').jstree(true)
-                                                inst.delete_node(data)
-                                                offCanvasEl.hide()
-                                            })
-                                        })
+                                        deleteNode(node)
                                     }
                                 },
-                               bom_변경: {
-                                    label: 'bom 변경',
+                               edit_part_code_by_controller: {
+                                    label: '컨트롤러 변경',
                                     action: function (data) {
-                                        console.log(data)
-                                        var inst = $.jstree.reference(data.reference),
-                                        obj = inst.get_node(data.reference)
-                                        inst.edit(obj)
-                                        $('#jstree').on('rename_node.jstree', function (e, data) {
-                                            console.log(data)
-                                            $.ajax({
-                                                url: `/api/bom/${data.node.id}/edit_part_code/`,
-                                                method: 'patch',
-                                                data: {
-                                                    part_code: data.text
-                                                },
-                                                headers: {
-                                                    'X-CSRFToken': '{{ csrf_token }}'
-                                                }
-                                            }).done(function (res) {
-                                                console.log(res)
-                                            })
-                                        })
+                                        editNode(data)
                                 }},
                             }
                         case 3:
                             return {
-                                아이템_변경: {
-                                    label: '아이템 변경',
+                                edit_part_code_by_sensor: {
+                                    label: '센서 변경',
                                     action: function (data) {
-                                        console.log(data)
-                                        var inst = $.jstree.reference(data.reference),
-                                            obj = inst.get_node(data.reference)
-                                        inst.edit(obj)
-                                        $('#jstree').on('rename_node.jstree', function (e, data) {
-                                            console.log(data)
-                                            $.ajax({
-                                                url: `/api/bom/${data.node.id}/edit_part_code/`,
-                                                method: 'patch',
-                                                data: {
-                                                    part_code: data.text
-                                                },
-                                                headers: {
-                                                    'X-CSRFToken': '{{ csrf_token }}'
-                                                }
-                                            }).done(function (res) {
-                                                console.log(res)
-                                            })
-                                        })
+                                        editNode(data)
                                     }
                                 }
                             }
@@ -490,41 +437,28 @@
             }
         })
         checkboxTree.on('select_node.jstree', function (e, data) {
-            let filterdTree = $('#jstree').jstree(true).get_json('#', {
-                flat: true,
-                no_state: true
+            const treeInstance = $('#jstree').jstree(true)
+            const optionsForItem = $('#item')
+            const selected_id = data.selected[0]
+            const selected_node = treeInstance.get_node(selected_id)
+            // level1 = 0 level2 = 1 level3 = 2
+            const selected_level = selected_node.parents.length - 1
+            const child_level = selected_level + 1
+            const ItemsByLevel = items.filter(item => item.level == child_level)
+            optionsForItem.empty()
+            optionsForItem.append(`<option value="">Select item</option>`)
+            ItemsByLevel.forEach(item => {
+                optionsForItem.append(`<option value="${item.id}">${item.item_name}</option>`)
             })
-            let selected = data.selected
-            let inst = $('#jstree').jstree(true)
-            let node = inst.get_node(selected)
-            let parent_level = node.parents.length 
-            console.log(selected)
-            let child = tree.filter(item => item.parent === parseInt(selected[0]))
-            switch (parent_level) {
-                case 1:
-                    dt_products.data().clear().rows.add(child.map((item, index) => {
-                        return {
-                            ...item,
-                            product_info: 'level 2'
-                        }
-                    })).draw()
-                    break
-                case 2:
-                    dt_products.data().clear().rows.add(child.map((item, index) => {
-                        return {
-                            ...item,
-                            product_info: 'level 3'
-                        }
-                    })).draw()
-                    break
-                case 2:
-                    let inst = $('#jstree').jstree(true)
-                    inst.deselect_all()
-                    break
-                default:
-                    break
-            }
-
+            let child = tree.filter(item => item.parent == selected_id)
+            dt_products.data().clear().rows.add(child.map((item, index) => {
+                return {
+                    ...item,
+                    product_info: `level ${selected_level + 1}`
+                }
+            })).draw()
+            const inst = $('#jstree').jstree(true)
+            if(selected_level == 2) inst.deselect_all()
         })
         var dt_details_table = $('.datatables-order-details')
         if (dt_details_table.length) {
@@ -652,6 +586,11 @@
             })
             $('.add-container').on('click', function () {
                 $("#plus-item").removeClass('d-none')
+                let tempItems = items.filter(item => item.level == 0)
+                $('#item').empty()
+                tempItems.forEach(item => {
+                    $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
+                })
                 $('.delete-item').remove()
                 offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
                 offCanvasEl.show()
@@ -846,7 +785,6 @@
                     .row($(this).parents('tr'))
                     .remove()
                     .draw()
-                let checkboxTree = $('#jstree')
                 checkboxTree.jstree(true).delete_node(
                     node
                 )
