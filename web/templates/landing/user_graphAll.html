@@ -31,11 +31,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        let selectedRange = [];
         document.addEventListener('DOMContentLoaded', function() {
-            let selectedRange = [];
             const today = new Date();
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(today.getDate() - 6);
+            sevenDaysAgo.setHours(0, 0, 0, 0); // Set time to 00:00:00
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999); // Set time to 23:59:59.999
 
             // Ensure the element is available before initializing
             const addEventSidebar = document.getElementById("addEventSidebar");
@@ -45,12 +48,12 @@
                     inline: true,
                     showMonths: 1, // Show two monshowMonths: 2, // Show two mon
                     mode: "range",
-                    defaultDate: [sevenDaysAgo, today],
+                    defaultDate: [sevenDaysAgo, endOfDay],
                     onChange: function(selectedDates, dateStr, instance) {
                         selectedRange = selectedDates;
                     }
                 });
-                selectedRange = [sevenDaysAgo, today];
+                selectedRange = [sevenDaysAgo, endOfDay];
             } else {
                 console.error("Element with ID 'addEventSidebar' not found.");
             }
@@ -59,7 +62,7 @@
             const datepickerToggle = document.getElementById('datepickerToggle');
             const datepickerBox = document.getElementById('datepickerBox');
             const applyButton = document.getElementById('applyButton');
-            datepickerToggle.value = `${sevenDaysAgo.toLocaleDateString()} - ${today.toLocaleDateString()}`;
+            datepickerToggle.value = `${sevenDaysAgo.toLocaleDateString()} - ${endOfDay.toLocaleDateString()}`;
 
             // Function to toggle the datepicker visibility
             function toggleDatepicker() {
@@ -83,13 +86,17 @@
             // Apply button event listener
             applyButton.addEventListener('click', function() {
                 if (selectedRange.length === 2) {
-                    const startDate = selectedRange[0].toLocaleDateString();
-                    const endDate = selectedRange[1].toLocaleDateString();
-                    datepickerToggle.value = `${startDate} - ${endDate}`;
+                    const startDate = new Date(selectedRange[0]);
+                    startDate.setHours(0, 0, 0, 0); // Set time to 00:00:00
+                    const endDate = new Date(selectedRange[1]);
+                    endDate.setHours(23, 59, 59, 999); // Set time to 23:59:59.999
+
+                    datepickerToggle.value = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
                 } else {
                     alert("Please select a date range.");
                 }
                 toggleDatepicker(); // Hide the datepicker after applying the date range
+                logSelectedOption();
             });
         });
     </script>
@@ -98,102 +105,25 @@
     </div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
+         async function fetchData(startDate, endDate, conId, senIds) {
+            const response = await fetch('/api/util/fetch-data/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ startDate, endDate, conId, senIds })
+            });
+
+            const data = await response.json();
+            return data.map(d => ({
+                date: new Date(d.date),
+                value: d.value
+            }));
+        }
         let conIdSenidMap = {};
         let uniqueGtrSenName = [];
-        function logSelectedOption() {
-            const dropdown = document.getElementById('myDropdown');
-
-            const selectedIndex = dropdown.selectedIndex;
-            const selectedOption = dropdown.options[selectedIndex].value;
-            const displayDiv = document.getElementById('selectedOptionDisplay');
-            displayDiv.innerHTML = "";
-            Object.entries(conIdSenidMap).forEach(([conId, conInf]) => {
-                if(conId === selectedOption){
-                    uniqueGtrSenName.forEach(uniqueSenName => {
-                    let sum = 0;
-                    let count = 0;
-                    let value;
-                    let dataset = []; // Array to hold chart data
-
-                    Object.entries(conInf.gtr || {}).forEach(([senid, senInf]) => {
-                        if (senInf.sen_name === uniqueSenName) {
-                            sum += senInf.value;
-                            count++;
-                            value = count > 0 ? sum / count : "-";
-                        }
-                    });
-                    if(count !== 0){
-                            const uniqueId = `chart-container-${uniqueSenName.replace(/\s+/g, '-')}-${conId}`;
-                        let card = `${uniqueSenName}
-                            <div class="col-lg-8 order-lg-2 mb-4" style="border-radius: 15px; width: 100%; min-width: 1359px !important; background: var(--Gray-0, #FFF)">
-                                <div class="card" style="box-shadow: 0 0px red; --bs-card-cap-padding-x: 1.0rem">
-                                    <div class="card-header" style="justify-content: space-between; display: flex; flex-direction: row; padding-bottom:0.3rem">
-                                        <div style="justify-content:flex-start; display: flex;">
-                                            <div class="m-0 me-2 pb-3" style="color: var(--80-w, #595757);font-family: Pretendard;font-size: 24px;font-style: normal;font-weight: 500;line-height: normal;padding-right:1.2rem">조회한 기간의 평균 수치</div>
-                                            <h5 class="m-0 me-2 pb-3" style="color: var(--40-w, #B5B6B6); font-family: Pretendard; font-size: 22px; width:201; font-style: normal; font-weight: 600; line-height: normal">${value}</h5>
-                                        </div>
-                                    </div>
-                                    <div class="text-nowrap" style="padding-bottom: 2rem; padding-left: 2.0rem; padding-right: 1.625rem;">
-                                        <!-- Additional content can be added here -->
-                                        <div id="${uniqueId}">${uniqueId}</div>
-                                    </div>
-                                </div>
-                            </div>`;
-                            displayDiv.innerHTML += card;
-                            drawChart(dataset, uniqueId);
-
-                    }
-                })
-                }
-            });
-        }
-        function drawChart(dataset, chartId) {
-        const margin = { top: 70, right: 30, bottom: 40, left: 80 };
-        const width = 1200 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
-
-        // Clear previous chart
-        d3.select(`#${chartId}`).selectAll("*").remove();
-
-        // Set up the x and y scales
-        const x = d3.scaleTime().range([0, width]);
-        const y = d3.scaleLinear().range([height, 0]);
-
-        // Create the SVG element and append it to the chart container
-        const svg = d3.select(`#${chartId}`)
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
-
-        // Define the x and y domains
-        x.domain(d3.extent(dataset, d => d.date));
-        y.domain([0, d3.max(dataset, d => d.value)]);
-
-        // Add the x-axis
-        svg.append("g")
-            .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat("%b %Y")));
-
-        // Add the y-axis
-        svg.append("g").call(d3.axisLeft(y));
-
-        // Create the line generator
-        const line = d3.line()
-            .x(d => x(d.date))
-            .y(d => y(d.value));
-
-        // Add the line path to the SVG element
-        svg.append("path")
-            .datum(dataset)
-            .attr("fill", "none")
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 1)
-            .attr("d", line);
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-            // Fetch data from the server endpoint
+                // Fetch data from the server endpoint
         fetch('/api/util/user-table-data/') // replace with your actual endpoint URL
             .then(response => response.json())
             .then(data => {
@@ -214,7 +144,194 @@
                 logSelectedOption();
             })
             .catch(error => console.error('Error fetching data:', error));
-    });
+
+        async function logSelectedOption() {
+            const dropdown = document.getElementById('myDropdown');
+            const selectedIndex = dropdown.selectedIndex;
+            const selectedOption = dropdown.options[selectedIndex].value;
+            const isoStartDate = new Date(selectedRange[0]);
+            isoStartDate.setHours(0, 0, 0, 0); // Set time to 00:00:00
+            const isoEndDate = new Date(selectedRange[1]);
+            isoEndDate.setHours(23, 59, 59, 999); // Set time to 23:59:59.999
+            const startDate = isoStartDate.toISOString();
+            const endDate = isoEndDate.toISOString();
+            const displayDiv = document.getElementById('selectedOptionDisplay');
+            console.log(startDate);
+            {#const startDate = isoStartDate.toISOString().split('T')[0] + 'T00:00:00.000';#}
+            {#const endDate = isoEndDate.toISOString().split('T')[0] + 'T00:00:00.000';#}
+            displayDiv.innerHTML = "";
+            Object.entries(conIdSenidMap).forEach(async ([conId, conInf]) => {
+                if(conId === selectedOption){
+                    for (let uniqueSenName of uniqueGtrSenName) {
+                        const senIds = Object.keys(conInf.gtr).filter(senid => conInf.gtr[senid].sen_name === uniqueSenName);
+                        const data = await fetchData(startDate, endDate, conId, senIds);
+                        const uniqueId = `chart-container-${uniqueSenName.replace(/\s+/g, '-')}-${conId}`;
+                        var chartId =`chartContainer${uniqueId}`;
+                        let card = `${uniqueSenName}
+                            <div class="col-lg-8 order-lg-2 mb-4" style="border-radius: 15px; width: 100%; min-width: 1359px !important; background: var(--Gray-0, #FFF)">
+                                <div class="card" style="box-shadow: 0 0px red; --bs-card-cap-padding-x: 1.0rem">
+                                    <div class="card-header" style="justify-content: space-between; display: flex; flex-direction: row; padding-bottom:0.3rem">
+                                        <div style="justify-content:flex-start; display: flex;">
+                                            <div class="m-0 me-2 pb-3" style="color: var(--80-w, #595757);font-family: Pretendard;font-size: 24px;font-style: normal;font-weight: 500;line-height: normal;padding-right:1.2rem">조회한 기간의 평균 수치</div>
+                                            <h5 class="m-0 me-2 pb-3" style="color: var(--40-w, #B5B6B6); font-family: Pretendard; font-size: 22px; width:201; font-style: normal; font-weight: 600; line-height: normal">d111111111</h5>
+                                        </div>
+                                    </div>
+                                    <div class="text-nowrap" style="padding-bottom: 2rem; padding-left: 4.0rem; padding-right: 1.625rem;justify-content:flex-start;align-items: center;display: flex;">
+                                        <!-- Additional content can be added here -->
+<button class="prev-button" style="position: absolute;top: 50%;transform: translateY(-50%);padding: 10px;background-color: #007BFF;color: white;border: none;cursor: pointer;z-index: 10;left: 0px;">Prev</button>
+    <div id="${chartId}" class="chart-container" style = "position: relative;width: 95%;overflow: hidden;"></div>
+<button class="next-button" style="position: absolute;top: 50%;transform: translateY(-50%);padding: 10px;background-color: #007BFF;color: white;border: none;cursor: pointer;z-index: 10;right: 0px;">Next</button>
+                                    </div>
+                                </div>
+                            </div>`;
+                            displayDiv.innerHTML += card;
+                            drawChart(data, chartId,selectedRange);
+                }
+                }
+
+            });
+        }
+        function drawChart(dataset, chartId, selectedRange) {
+            const margin = { top: 70, right: 30, bottom: 40, left: 25 };
+            const width = 1200 - margin.left - margin.right;
+            const height = 500 - margin.top - margin.bottom;
+            const viewWidth = 1200;
+            const tickInterval = (100 / 7) * 6;
+            const totalWidth = 2400;
+
+            let startDate = new Date(selectedRange[0]);
+            startDate.setHours(0, 0, 0, 0);
+            let endDate = new Date(selectedRange[1]);
+            endDate.setDate(endDate.getDate() + 1);
+            endDate.setHours(0, 0, 0, 0);
+
+            d3.select(`#${chartId}`).selectAll("*").remove();
+
+            const x = d3.scaleTime().range([0, totalWidth]);
+            const y = d3.scaleLinear().range([height, 0]);
+
+            const svg = d3.select(`#${chartId}`)
+                .append("svg")
+                .attr("width", totalWidth + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            svg.append("defs").append("clipPath")
+                .attr("id", `clip-${chartId}`)
+                .append("rect")
+                .attr("width", viewWidth)
+                .attr("height", height);
+
+            x.domain([startDate, endDate]);
+            y.domain([0, d3.max(dataset, d => d.value)]);
+
+            const xAxis = d3.axisBottom(x)
+                .ticks(d3.timeDay.every(1))
+                .tickFormat(d3.timeFormat("%Y.%m.%d"));
+
+            const yAxis = d3.axisLeft(y);
+
+            const xAxisG = svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(xAxis);
+
+            svg.append("g").call(yAxis);
+
+            const hourlyTicks = d3.timeHour.every(1).range(d3.extent([startDate, endDate])[0], d3.extent([startDate, endDate])[1]);
+            svg.selectAll(".hourly-grid")
+                .data(hourlyTicks)
+                .enter()
+                .append("line")
+                .attr("class", "hourly-grid")
+                .attr("x1", d => x(d))
+                .attr("x2", d => x(d))
+                .attr("y1", 0)
+                .attr("y2", height)
+                .attr("stroke", d => d.getHours() % 6 === 0 ? "#aaa" : "#ddd")
+                .attr("stroke-width", d => d.getHours() % 6 === 0 ? 0.8 : 0.5);
+
+            svg.selectAll(".y-grid")
+                .data(y.ticks())
+                .enter()
+                .append("line")
+                .attr("class", "y-grid")
+                .attr("x1", 0)
+                .attr("x2", totalWidth)
+                .attr("y1", d => y(d))
+                .attr("y2", d => y(d))
+                .attr("stroke", "#ddd")
+                .attr("stroke-width", 0.5);
+
+            const line = d3.line()
+                .x(d => x(new Date(d.date)))
+                .y(d => y(d.value));
+
+            const path = svg.append("path")
+                .datum(dataset)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-width", 1)
+                .attr("d", line)
+                .attr("clip-path", `url(#clip-${chartId})`);
+
+            const zoom = d3.zoom()
+                .scaleExtent([1, 1])
+                .translateExtent([[0, 0], [totalWidth, height]])
+                .extent([[0, 0], [viewWidth, height]])
+                .on("zoom", zoomed);
+
+            svg.call(zoom);
+            const minTranslateX = 0;
+            const maxTranslateX = -1 * (totalWidth - viewWidth);
+            d3.select(".next-button")
+                .on("click", function () {
+                    const currentTransform = d3.zoomTransform(svg.node());
+                    let newTransform = currentTransform.translate(-tickInterval, 0);
+                    if (newTransform.x < maxTranslateX) newTransform.x = maxTranslateX;
+                    svg.transition()
+                        .duration(500)
+                        .call(zoom.transform, newTransform);
+                });
+
+            d3.select(".prev-button")
+                .on("click", function () {
+                    const currentTransform = d3.zoomTransform(svg.node());
+                    let newTransform = currentTransform.translate(tickInterval, 0);
+                    if (newTransform.x > minTranslateX) newTransform.x = minTranslateX;
+                    svg.transition()
+                        .duration(500)
+                        .call(zoom.transform, newTransform);
+                });
+
+            function zoomed(event) {
+                const transform = event.transform;
+                if (transform.x > minTranslateX) transform.x = minTranslateX;
+                if (transform.x < maxTranslateX) transform.x = maxTranslateX;
+
+
+                const zx = transform.rescaleX(x);
+                xAxisG.call(xAxis.scale(zx));
+                path.attr("d", line.x(d => zx(new Date(d.date))));
+                svg.selectAll(".hourly-grid")
+                    .attr("x1", d => zx(d))
+                    .attr("x2", d => zx(d));
+            }
+        }
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
     </script>
 </div>
 <!-- Footer -->
