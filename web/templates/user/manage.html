@@ -25,11 +25,11 @@
     <div class="tab-content pt-0">
       <div class="tab-pane fade show active">
         <div class="table-responsive text-start">
-          <table class="table table-borderless -nowrap">
-            <thead>
+          <table class="table border">
+            <thead class="">
               <tr>
                 <td colspan="7" class="">
-            <div class="collapse p-2" id="collapseExample-1" style="">
+                  <div class="collapse p-2" id="collapseExample-1" style="">
                 <h3>
                     유저 추가
                 </h3>
@@ -241,9 +241,6 @@
                 ? regTable[FOUR_MONTHS_AGO]
                 : regTable[A_LONG_TIME_AGO]
       let tr = document.createElement("tr")
-      tr
-        .classList
-        .add("btn-outline-light")
         tr.onclick = () => {
           toggleCollapse(idx)
         }
@@ -275,7 +272,7 @@
           table.appendChild(tr)
           tr = document.createElement("tr")
           tr.innerHTML = `<td colspan="7" class="">
-        <div class="collapse p-2" id="collapseExample${idx}">
+        <div class="collapse" id="collapseExample${idx}">
             <h3>
                 ${data.user_name} 정보
             </h3>
@@ -357,7 +354,6 @@
     console.log(collapses)
     const targetCollapse = document.querySelector('#collapseExample' + idx);
     $(targetCollapse).collapse('show')
-    let closetTr = targetCollapse.closest('tr')
   }
   document
     .getElementById("register")
