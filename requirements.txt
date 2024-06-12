@@ -28,12 +28,14 @@ pyasn1_modules==0.4.0
 pycparser==2.22
 pymongo==4.7.1
 pyOpenSSL==24.1.0
+python-dateutil==2.9.0.post0
 python-snappy==0.7.1
 pytz==2024.1
 service-identity==24.1.0
 six==1.16.0
 sqlparse==0.5.0
 Twisted==24.3.0
+twisted-iocpsupport==1.0.4
 txaio==23.1.1
 typing_extensions==4.11.0
 tzdata==2024.1
