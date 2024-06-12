@@ -17,5 +17,6 @@ urlpatterns = [
     path('', include(router.urls)),
 
     path('util/user-table-data/', user_table_data),
+    path('util/fetch-data/', fetch_data),
 
 ]
