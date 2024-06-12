@@ -4,13 +4,19 @@
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
         <div class="d-flex flex-column justify-content-center">
-            <h5 class="mb-1 mt-3">
+            <h5 class="mb-1 mt-3 mb-3">
                 주문 상세/설계
             </h5>
-            <p class="text-body" id="orderDate">
-                Aug 17,
-                <span id="orderYear"></span>, 5:48 (ET)
-            </p>
+            <div class="text-body">
+                <label for="orderIdList">
+                    <span>
+                        <i class="bx bx-list-check"></i>&nbsp 주문 ID
+                    </span>
+                </label>
+                <select id="orderIdList" class="select2 form-select">
+                    <option value="">Select Order</option>
+                </select>
+            </div>
         </div>
         <div class="d-flex align-content-center flex-wrap gap-2">
             <button class="btn btn-label-danger delete-order">Delete Order</button>
@@ -226,9 +232,9 @@
             <div class="col-sm-12 col-md-6">
                 <label class="form-label" for="order_total">합계</label>
                 <div class="input-group input-group-merge">
-                                        <span id="order_total2" class="input-group-text">
-                                            <i class="bx bx-dollar"></i>
-                                        </span>
+                <span id="order_total2" class="input-group-text">
+                    <i class="bx bx-dollar"></i>
+                </span>
                     <input type="number"
                            id="order_total"
                            name="order_total"
@@ -257,31 +263,58 @@
     let tree = []
     let items = []
     let order_id = window.location.href.split('/').pop().split('=').pop()
-    $(document).ready(async function () {
-        async function getBomTree() {
-            let res = fetch(`/api/bom/?order=${order_id}`)
-            let data = await res.then(res => res.json())
-            tree = data.map(data => {
-                return {
-                    id: data.id,
-                    parent: data.parent || '#',
-                    product_name: data.product_name,
-                    part_code: data.part_code,
-                    item_price: data.item_price,
-                    order_cnt: data.order_cnt,
-                    text: data.part_code,
-                    product_info: data.product_info,
-                    image: data.image,
-                    item_id: data.item_id
-                }
-            })
-        }
 
-        async function getItemList() {
-            let res = fetch('/api/item')
-            let data = await res.then(res => res.json())
-            items = data
-        }
+    async function getBomTree() {
+        if (order_id === 'build') return
+        $("#orderIdList").val(order_id)
+        let res = fetch(`/api/bom/?order=${order_id}`)
+        let data = await res.then(res => res.json())
+        tree = data.map(data => {
+            return {
+                id: data.id,
+                parent: data.parent || '#', // '#' for root nodes or id of parent node
+                product_name: data.product_name,
+                part_code: data.part_code,
+                item_price: data.item_price,
+                order_cnt: data.order_cnt,
+                text: data.part_code,
+                product_info: data.product_info,
+                image: data.image,
+                item_id: data.item_id
+            }
+        })
+    }
+
+    async function getItemList() {
+        let res = fetch('/api/item')
+        let data = await res.then(res => res.json())
+        items = data
+    }
+
+    function drawOrderCalculation() {
+        $("#orderIdList").val(order_id)
+        let items_price = tree.reduce((acc, item) => {
+            return acc + item.item_price * item.order_cnt
+        }, 0)
+        $(".order-calculations").html(`
+            <div class="d-flex justify-content-between mb-2">
+                <span class="w-px-100">총 금앧</span>
+                <span class="text-heading">${items_price}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="w-px-100">부가세(10%)</span>
+                <span class="text-heading">${items_price * 0.1}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <h6 class="w-px-100 mb-0">Total:</h6>
+                <h6 class="mb-0">${items_price * 1 + items_price * 0.1}</h6>
+            </div>
+            `)// 1.1로 곱하면 소수점 20짜리 까지 나옴
+    }
+
+    $(document).ready(async function () {
+
+        $("#orderIdList").select2()
 
         await getBomTree()
         await getItemList()
@@ -290,28 +323,10 @@
         items.forEach(item => {
             $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
         })
+        $("#orderIdList").append(`<option value="24">24</option>`)
+        $("#orderIdList").append(`<option value="23">23</option>`)
 
-        function drawOrderCalculation(){
-            let items_price = tree.reduce((acc, item) => {
-                return acc + item.standard_price * item.order_cnt
-            }, 0)
-            $(".order-caculations").html(`
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="w-px-100">총 금앧</span>
-                        <span class="text-heading">${items_price}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="w-px-100">부가세(10%)</span>
-                        <span class="text-heading">${items_price* 0.1}</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <h6 class="w-px-100 mb-0">Total:</h6>
-                        <h6 class="mb-0">${items_price * 1.1}</h6>
-                    </div>
-                    `)
-        }
         drawOrderCalculation()
-
 
         function appendDeleteBtn(nodeData) {
             let formButton = document.getElementById('formButton')
@@ -394,17 +409,18 @@
                             }
                         case 2:
                             return {
+                                edit_part_code_by_controller: {
+                                    label: '컨트롤러 변경',
+                                    action: function (data) {
+                                        editNode(data)
+                                    }
+                                },
                                 delete_controller: {
                                     label: '컨트롤러 삭제',
                                     action:  function (node) {
                                         deleteNode(node)
                                     }
                                 },
-                               edit_part_code_by_controller: {
-                                    label: '컨트롤러 변경',
-                                    action: function (data) {
-                                        editNode(data)
-                                }},
                             }
                         case 3:
                             return {
@@ -807,6 +823,17 @@
             let product = items.find(item => item.id == e.target.value)
             $('#item_price').val(product.standard_price)
         })
+        $("#orderIdList").on('change', async function (e) {
+            order_id = e.target.value
+            console.log(order_id)
+            await getBomTree()
+            await getItemList()
+            $('.datatables-order-details').DataTable().clear().rows.add(tree).draw()
+            $('#jstree').jstree(true).settings.core.data = tree
+            $('#jstree').jstree(true).refresh()
+            drawOrderCalculation()
+        })
     })
+
 </script>
 {% include 'footer.html' %}
