@@ -2,9 +2,15 @@ from django.http import JsonResponse
 from api.models import BomMaster, ItemMaster, OrderProduct, OrderMaster
 import json
 from pymongo import MongoClient, ASCENDING, DESCENDING
+from dateutil.parser import isoparse
+import pytz
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Subquery
+import json
+from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime, timedelta
+
 
 def user_table_data(request):
     uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -67,3 +73,81 @@ def user_table_data(request):
         'con_id_senid_map': cont
     }
     return JsonResponse(initial_data, encoder=DjangoJSONEncoder)
+
+def fetch_data(request):
+    seoul_timezone = pytz.timezone('Asia/Seoul')
+    utc_timezone = pytz.utc
+
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        start_date = isoparse(data['startDate'])
+        end_date = isoparse(data['endDate'])
+        start_date_utc = start_date.astimezone(utc_timezone)
+        end_date_utc = end_date.astimezone(utc_timezone)
+        con_id = int(data['conId'])
+        sen_Ids = [int(sen_id) for sen_id in data['senIds']]
+        print(start_date)
+        print(end_date)
+        print(con_id)
+        print(sen_Ids)
+
+        client = MongoClient('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+        db = client['djangoConnectTest']
+        collection = db['sen_gather']
+
+        pipeline = [
+            {
+                '$match': {
+                    'c_date': {'$gte': start_date, '$lt': end_date},
+                    'con_id': con_id,
+                    'senid': {'$in': sen_Ids}
+                }
+            },
+            {
+                '$group': {
+                    '_id': {
+                        'year': {'$year': '$c_date'},
+                        'month': {'$month': '$c_date'},
+                        'day': {'$dayOfMonth': '$c_date'},
+                        'hour': {'$hour': '$c_date'}
+                    },
+                    'avgValue': {'$avg': '$value'}
+                }
+            },
+            {
+                '$sort': {
+                    '_id.year': 1, '_id.month': 1, '_id.day': 1, '_id.hour': 1
+                }
+            }
+        ]
+        results = list(collection.aggregate(pipeline))
+        formatted_results = []
+        for res in results:
+            utc_datetime = datetime(
+                res['_id']['year'],
+                res['_id']['month'],
+                res['_id']['day'],
+                res['_id']['hour']
+            ).replace(tzinfo=utc_timezone)
+
+            # Convert UTC datetime to Seoul local time
+            seoul_datetime = utc_datetime.astimezone(seoul_timezone)
+
+            # If the hour is past 15:00, increment the date to the next day at 00:00
+            # if seoul_datetime.hour >= 15:
+            #     seoul_datetime = seoul_datetime - timedelta(hours=15)
+            #     seoul_datetime = seoul_datetime + timedelta(days=1)
+            #     seoul_datetime = seoul_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+            # else:
+            #     seoul_datetime = seoul_datetime + timedelta(hours=9)
+
+            formatted_results.append({
+                'date': seoul_datetime.strftime('%Y-%m-%dT%H:%M:%S%z'),
+                'value': res['avgValue']
+            })
+
+        print(formatted_results)
+        client.close()
+        return JsonResponse(formatted_results, safe=False)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)

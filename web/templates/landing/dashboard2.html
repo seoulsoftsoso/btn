@@ -69,8 +69,7 @@
                             <tr>
                                 <td style="border: 1px solid var(--30-b, #C9CACA);color: #FFF;text-align: center;leading-trim: both;text-edge: cap;font-family: Inter;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;background: var(--original-brown, #3D170F);width:180;">재배동 이름</td>
                                 <script>
-                                    document.addEventListener("DOMContentLoaded", function() {
-
+                                    {#document.addEventListener("DOMContentLoaded", function() {#}
                                         function fetchInitialData() {
                                             fetch('/api/util/user-table-data/')
                                                 .then(response => response.json())
@@ -145,7 +144,6 @@
                                                 tableBody.innerHTML += row;
                                             });
                                         }
-                                    })
                                 </script>
                             </tr>
                         </thead>
