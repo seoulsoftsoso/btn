@@ -166,7 +166,16 @@
                 </div>
                 <div class="card-footer">
                     <div class="ml-auto d-flex justify-content-end">
-                        <button class="btn btn-outline-success" id="submit-order">
+                        <button class="btn btn-outline-success" id="submit-order" onclick="
+                            fetch(`/api/order/${order_id}/reg_container/`, {
+                                method: 'POST',
+                                headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                                }
+                            }).then(res => res.json()).then(data => {
+                                console.log(data)
+                            })
+                        ">
                             <i class="bx bx-upload"></i>&nbsp 의뢰
                         </button>
                     </div>
