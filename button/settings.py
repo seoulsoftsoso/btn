@@ -119,7 +119,7 @@ DATABASES = {
     }
 }
 # DATABASES = {}
-
+CSRF_TRUSTED_ORIGINS=['http://118.44.218.236:7000']
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
