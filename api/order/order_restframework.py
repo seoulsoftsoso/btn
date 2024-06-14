@@ -1,5 +1,7 @@
 from rest_framework import viewsets
-from api.models import OrderMaster, ItemMaster, UserMaster, OrderProduct, BomMaster
+from rest_framework.decorators import action
+
+from api.models import OrderMaster, ItemMaster, UserMaster, OrderProduct, BomMaster, Plantation, PlanPart
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
@@ -14,6 +16,7 @@ class OrderMasterSerializer(serializers.ModelSerializer):
     created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
     updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
     delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
+
     class Meta:
         model = OrderMaster
         fields = '__all__'
@@ -36,14 +39,12 @@ class OrderMasterSerializer(serializers.ModelSerializer):
         ret['client'] = ClientSerializer(instance.client).data
         return ret
 
-    def delete (self, instance):
+    def delete(self, instance):
         instance['delete_flag'] = 'Y'
         return super().update(instance)
 
 
-
 class OrderViewSet(viewsets.ModelViewSet):
-
     queryset = OrderMaster.objects.all()
     serializer_class = OrderMasterSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -93,6 +94,37 @@ class OrderViewSet(viewsets.ModelViewSet):
             )
             op.bom = bom
             op.save()
+        return Response({'message': 'success'})
+
+    @action(methods=['post'], detail=True)
+    def reg_container(self, request, *args, **kwargs):
+        order = self.get_object()
+        sensor_by_order = BomMaster.objects.filter(order=order, level=2, delete_flag='N')
+        container_by_order = BomMaster.objects.filter(order=order, level=0, delete_flag='N')
+        user = UserMaster.objects.get(user_id=request.user.id)
+        for container in container_by_order:
+            item_by_container = container.item
+            Plantation.objects.create(
+                c_code=container.part_code,
+                c_name=item_by_container.item_name,
+                owner=order.client,
+                bom=container,
+                reg_flag='Y',
+                created_by=user,
+                updated_by=user,
+            )
+        for sensor in sensor_by_order:
+            PlanPart.objects.create(
+                p_name = sensor.part_code,
+                part = sensor,
+                delete_flag = 'N',
+                reg_flag = 'Y',
+                created_by = user,
+                updated_by = user
+            )
+        order.comment = "주문완료"
+        order.save()
+
         return Response({'message': 'success'})
 
     def delete(self, request, *args, **kwargs):
