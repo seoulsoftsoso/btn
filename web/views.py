@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from button.ws.mongo_updates import start_listening_to_changes
 # 알람
 
@@ -53,13 +53,13 @@ def landing_admin(request):
     return render(request, 'landing/dashboard.html')
 
 def user_division(request):
-    if not request.user.is_authenticated:
-        return render(request, 'registration/login.html')
     if request.user.is_superuser:
         return render(request, 'landing/dashboard.html')
-    else:
+    elif request.user.is_authenticated:
         start_listening_to_changes(request)
         return render(request, 'landing/dashboard2.html')
+    else:
+        return redirect('login')
 # 자동 재배 관리
 
 def manage_auto(request):
