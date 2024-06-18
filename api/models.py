@@ -33,7 +33,7 @@ class EnterpriseMaster(models.Model):
     charge_name = models.CharField(max_length=255, null=True)
     charge_tel = models.CharField(max_length=255, null=True)
     charge_pos = models.CharField(max_length=255, null=True)
-    etc = models.TextField(null=True)
+    etc = models.CharField(max_length=255, null=True)
     cus_type = models.CharField(max_length=255, null=True)
     delete_flag = models.CharField(max_length=1, choices=(('Y', 'Yes'), ('N', 'No')))
     class Meta:
@@ -44,8 +44,8 @@ class ItemMaster(models.Model):
     item_code = models.CharField(max_length=255, unique=True)
     item_name = models.CharField(max_length=255)
     item_type = models.CharField(max_length=255)
-    specification = models.TextField(blank=True, null=True)
-    model = models.TextField(blank=True, null=True)
+    specification = models.CharField(max_length=255, null=True)
+    model = models.CharField(max_length=255, null=True)
     brand = models.CharField(max_length=255, blank=True, null=True)
     level = models.CharField(max_length=255)  # root = container / 1 = controller / 2 = part(item)
     standard_price = models.IntegerField(blank=True, default=999)
@@ -150,7 +150,7 @@ class PlanPart(models.Model):
 class Plantation(models.Model):
     c_code = models.CharField(max_length=50, unique=True)
     c_name = models.CharField(max_length=100)
-    owner = models.CharField(max_length=100)
+    owner = models.ForeignKey(UserMaster, on_delete=models.SET_NULL, null=True)
     bom = models.ForeignKey(BomMaster, on_delete=models.SET_NULL, null=True)
     delete_flag = models.CharField(max_length=1, default='N')
     reg_flag = models.CharField(max_length=1, default='N')

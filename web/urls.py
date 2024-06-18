@@ -8,8 +8,8 @@ urlpatterns = [
     path('alram/plan', alram_plan),
 
     # 유저 등록
-    path('register/register', register_register),
-    path('register/select', register_select),
+    path('register/register', register_register, name='register'),
+    path('register/select', register_select, name='register_select'),
 
     # 고장 관리
     path('breakdown/control', breakdown_control),
@@ -24,7 +24,7 @@ urlpatterns = [
     path('landing/user', landing_user),
     path('landing/user/graph/all', landing_user_graph_all),
     path('landing/user/graph/single', landing_user_graph_all),
-    path('', user_division),
+    path('', user_division, name='user_division'),
 
     # 자동 재배 관리
     path('manage/auto', manage_auto),

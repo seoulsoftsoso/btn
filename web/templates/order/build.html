@@ -332,9 +332,12 @@
         items.forEach(item => {
             $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
         })
-        $("#orderIdList").append(`<option value="24">24</option>`)
-        $("#orderIdList").append(`<option value="23">23</option>`)
-
+        
+        let orderIdList = await fetch("/api/order/get_order_list/")
+        orderIdList = await orderIdList.json()
+        orderIdList.forEach(order => {
+            $("#orderIdList").append(`<option value="${order.id}">${order.id}</option>`)
+        })
         drawOrderCalculation()
 
         function appendDeleteBtn(nodeData) {

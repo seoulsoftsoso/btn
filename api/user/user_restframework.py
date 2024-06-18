@@ -143,7 +143,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'error': '비밀번호가 일치하지 않습니다.'}, status=400)
         user = {
             'username' : rawData['user_name'], # 'username' : 'user_name' -> 'username' : 'user_name
-            'email' :rawData['email'],
+            'email' :rawData['user_name'] + "@seoulsoft.kr",
             'password' :rawData['password'],
         }
         auth_user = User.objects.create_user(

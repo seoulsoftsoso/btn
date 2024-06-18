@@ -54,6 +54,11 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return OrderMaster.objects.filter(delete_flag='N')
+    
+    @action(methods=['get'], detail=False)
+    def get_order_list(self, request, *args, **kwargs):
+        qs = OrderMaster.objects.filter(delete_flag='N').values('id')
+        return Response(qs)
 
     def create(self, request, *args, **kwargs):
         User = UserMaster.objects.get(user_id=request.user.id)
@@ -107,7 +112,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             Plantation.objects.create(
                 c_code=container.part_code,
                 c_name=item_by_container.item_name,
-                owner=order.client,
+                owner_id=order.client.id,
                 bom=container,
                 reg_flag='Y',
                 created_by=user,
