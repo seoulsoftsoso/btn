@@ -5,7 +5,7 @@ from .user.user_restframework import UserViewSet
 from .order.order_restframework import OrderViewSet
 from .util.utils import *
 from rest_framework.routers import DefaultRouter
-
+from .flutter.flutter import *
 router = DefaultRouter()
 router.register(r'bom', BomViewSet)
 router.register(r'item', ItemViewSet)
@@ -18,5 +18,8 @@ urlpatterns = [
 
     path('util/user-table-data/', user_table_data),
     path('util/fetch-data/', fetch_data),
+    path('flutter/login/', login),
+    path('flutter/csrf/', csrf),
+    path('flutter/userdata/', csrf),
 
 ]
