@@ -20,5 +20,6 @@ urlpatterns = [
     path('util/fetch-data/', fetch_data),
     path('flutter/login/', login),
     path('flutter/csrf/', csrf),
+    path('flutter/container-map/', container_map),
 
 ]
