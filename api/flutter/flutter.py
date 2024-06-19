@@ -52,6 +52,38 @@ def container_map(request):
         if not user_id:
             return JsonResponse({'error': 'User ID not provided'}, status=400)
 
+
+        order_products = OrderProduct.objects.filter(order__client=user_id)
+        bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
+
+        container_bom_masters = bom_masters.filter(level=0)
+
+        cont = {}
+        for container in container_bom_masters:
+            con_inf = {}
+            con_name = container.part_code
+            con_id = container.id
+            con_inf['con_name'] = con_name
+            cont[con_id] = con_inf
+
+        initial_data = {
+            'con_id_senid_map': cont
+        }
+        return JsonResponse(initial_data, encoder=DjangoJSONEncoder)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+@csrf_exempt  # You can use this if you're not using CSRF tokens
+def container_sen_map(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        conId = data.get('conId')
+
+        if not user_id:
+            return JsonResponse({'error': 'User ID not provided'}, status=400)
+
         uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
         client = MongoClient(uri)
         db = client['djangoConnectTest']
@@ -63,15 +95,12 @@ def container_map(request):
         order_products = OrderProduct.objects.filter(order__client=user_id)
         bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
 
-        container_bom_masters = bom_masters.filter(level=0)
-        controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC')
+        container_bom_masters = bom_masters.filter(level=0, id=conId)
+        controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', parent__in=conId)
         controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
         sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
         gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
         sta_bom_masters = sensor_bom_masters.filter(item__item_type='C')
-
-        unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
-        unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
 
         cont = {}
         for container in container_bom_masters:
@@ -107,8 +136,6 @@ def container_map(request):
             cont[con_id] = con_inf
 
         initial_data = {
-            'unique_gtr_sen_name': unique_gtr_items,
-            'unique_sta_sen_name': unique_sta_items,
             'con_id_senid_map': cont
         }
         return JsonResponse(initial_data, encoder=DjangoJSONEncoder)
