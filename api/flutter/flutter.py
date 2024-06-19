@@ -17,28 +17,18 @@ def login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             # Authentication successful
-            return JsonResponse({'success': True})
+            return JsonResponse({
+                'success': True,
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    # Add other fields as necessary
+                }
+            })
         else:
             # Authentication failed
             return JsonResponse({'success': False, 'error': 'Invalid credentials'}, status=401)
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
-@csrf_exempt  # Exempt this view from CSRF protection for simplicity
-def userdata(request):
-    if request.method == 'GET':
-        # Assuming you have a way to get the authenticated user
-        # (e.g., from the access token provided in the request headers)
-        user = request.user
-
-        # Serialize user data to JSON
-        user_data = {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            # Add any other user data you want to include
-        }
-
-        return JsonResponse(user_data)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
