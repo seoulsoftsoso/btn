@@ -21,5 +21,6 @@ urlpatterns = [
     path('flutter/login/', login),
     path('flutter/csrf/', csrf),
     path('flutter/container-map/', container_map),
+    path('flutter/container-sen-map/', container_sen_map),
 
 ]
