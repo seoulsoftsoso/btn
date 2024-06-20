@@ -84,6 +84,9 @@ def container_sen_map(request):
         if not user_id:
             return JsonResponse({'error': 'User ID not provided'}, status=400)
 
+        if not conId:
+            return JsonResponse({'error': 'conID not provided'}, status=400)
+
         uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
         client = MongoClient(uri)
         db = client['djangoConnectTest']
@@ -96,7 +99,7 @@ def container_sen_map(request):
         bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
 
         container_bom_masters = bom_masters.filter(level=0, id=conId)
-        controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', parent__in=conId)
+        controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', parent=conId)
         controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
         sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
         gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
