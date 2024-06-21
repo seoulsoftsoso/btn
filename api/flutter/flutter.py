@@ -95,8 +95,8 @@ def container_sen_map(request):
         dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
         dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
 
-        order_products = OrderProduct.objects.filter(order__client=user_id)
-        bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True), delete_flag='N')
+        order_products = OrderProduct.objects.filter(order__client=user_id).values_list('bom', flat=True)
+        bom_masters = BomMaster.objects.filter(id__in=order_products, delete_flag='N')
 
         container_bom_masters = bom_masters.filter(level=0, id=conId)
         controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', parent=conId, delete_flag='N')
@@ -104,8 +104,8 @@ def container_sen_map(request):
         sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
         gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
         sta_bom_masters = sensor_bom_masters.filter(item__item_type='C')
-        unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
-        unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
+        unique_gtr_items = list(gtr_bom_masters.values_list('item__item_name', flat=True).distinct())
+        unique_sta_items = list(sta_bom_masters.values_list('part_code', flat=True).distinct())
 
         cont = {}
         for container in container_bom_masters:
@@ -114,8 +114,9 @@ def container_sen_map(request):
             con_id = container.id
 
             controller_ids = controller_bom_masters.values_list('id', flat=True)
-            lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
-            lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
+            lv2_gtr_ids = list(gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True))
+            lv2_sta_ids = list(sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True))
+
             gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
                                                   sort=[('c_date', DESCENDING)]))
             sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
