@@ -87,6 +87,7 @@ def container_sen_map(request):
         if not conId:
             return JsonResponse({'error': 'conID not provided'}, status=400)
 
+        # uri = "mongodb://localhost:27017/"
         uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
         client = MongoClient(uri)
         db = client['djangoConnectTest']
@@ -94,7 +95,7 @@ def container_sen_map(request):
         dbSensorStatus = db['sen_status']
         dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
         dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-
+        #바로 위에서 인덱스 처리 하는데 여기서 시간이 좀 걸림. 하지만 결국 인덱스 처리가 필요함. 몽고디비 설치후 디비 자체에서 하는 방법 모색해보자!.
         order_products = OrderProduct.objects.filter(order__client=user_id).values_list('bom', flat=True)
         bom_masters = BomMaster.objects.filter(id__in=order_products, delete_flag='N')
 
