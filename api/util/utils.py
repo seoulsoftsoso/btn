@@ -22,14 +22,14 @@ def user_table_data(request):
     dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
 
     order_products = OrderProduct.objects.filter(order__client=request.user.id)
-    bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
+    bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True), delete_flag='N')
 
     container_bom_masters = bom_masters.filter(level=0)
-    controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC')
+    controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', delete_flag='N')
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
-    sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
-    gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
-    sta_bom_masters = sensor_bom_masters.filter(item__item_type='C')
+    sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
+    gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L', delete_flag='N')
+    sta_bom_masters = sensor_bom_masters.filter(item__item_type='C', delete_flag='N')
 
     unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
     unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
@@ -82,8 +82,6 @@ def fetch_data(request):
         data = json.loads(request.body)
         start_date = isoparse(data['startDate'])
         end_date = isoparse(data['endDate'])
-        start_date_utc = start_date.astimezone(utc_timezone)
-        end_date_utc = end_date.astimezone(utc_timezone)
         con_id = int(data['conId'])
         sen_Ids = [int(sen_id) for sen_id in data['senIds']]
         print(start_date)
@@ -129,18 +127,7 @@ def fetch_data(request):
                 res['_id']['day'],
                 res['_id']['hour']
             ).replace(tzinfo=utc_timezone)
-
-            # Convert UTC datetime to Seoul local time
             seoul_datetime = utc_datetime.astimezone(seoul_timezone)
-
-            # If the hour is past 15:00, increment the date to the next day at 00:00
-            # if seoul_datetime.hour >= 15:
-            #     seoul_datetime = seoul_datetime - timedelta(hours=15)
-            #     seoul_datetime = seoul_datetime + timedelta(days=1)
-            #     seoul_datetime = seoul_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
-            # else:
-            #     seoul_datetime = seoul_datetime + timedelta(hours=9)
-
             formatted_results.append({
                 'date': seoul_datetime.strftime('%Y-%m-%dT%H:%M:%S%z'),
                 'value': res['avgValue']
