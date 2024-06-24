@@ -1,5 +1,7 @@
 {% include "header.html" %}
 {% include 'menu.html' %}
+<link rel="stylesheet" href="https://www.jeasyui.com/easyui/themes/material-teal/tree.css"/>
+<link rel="stylesheet" href="https://www.jeasyui.com/easyui/themes/material-teal/datagrid.css"/>
 {% load static %}
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
@@ -23,12 +25,15 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-12 col-lg-8">
+        <div class="col-12">
             <div class="card mb-4">
                 <!-- Checkbox -->
                 <div class="col-12">
                     <div class="card mb-md-0 mb-4">
                         <h5 class="card-header">
+                            <a href="javascript:void(0)" class="btn btn-info" onclick="edit()">Edit</a>
+                            <a href="javascript:void(0)" class="btn btn-primary" onclick="save()">Save</a>
+                            <a href="javascript:void(0)" class="btn btn-danger" onclick="cancel()">Cancel</a>
                             <div class="d-flex align-content-center justify-content-between flex-wrap gap-2">
                                 <div class="ml-auto align-content-center">제품 설계도</div>
                                 <div class="d-flex align-content-center gap-2">
@@ -39,46 +44,14 @@
                             </div>
                         </h5>
                         <div class="card-body">
-                            <div id="jstree"></div>
+                            <table id="tg">
+                            </table>
                         </div>
                     </div>
                 </div>
                 <!-- /Checkbox -->
             </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div class="card-title">
-                        <h5>제품</h5>
-                    </div>
-                </div>
-                <div class="card-datatable table-responsive">
-                    <table class="datatables-order-details table">
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th class="w-50">코드</th>
-                            <th class="w-25">가격</th>
-                            <th class="w-25">수량</th>
-                            <th>total</th>
-                        </tr>
-                        </thead>
-                    </table>
-                    <div class="d-flex justify-content-end align-items-center m-3 mb-2 p-1">
-                        <div class="order-calculations">
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <div class='ml-auto d-flex justify-content-end gap-2'>
-                        <button class="btn btn-outline-success add-item" id="add-item">
-                            <i class="bx bx-cog"></i>&nbsp 제품 추가
-                        </button>
-                        <button class="btn btn-outline-info " id="edit-item">
-                            <i class="bx bx-edit"></i>&nbsp 제품 수정
-                        </button>
-                    </div>
-                </div>
-            </div>
+
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="card-title m-0">주문상황</h5>
@@ -151,34 +124,6 @@
                             </div>
                         </li>
                     </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title m-0">배치도</h5>
-                </div>
-                <div class="card-body">
-                    <img src="{% static 'assets/img/front-pages/misc/nav-item-col-img.png' %}"
-                         class="card-img-top p-1"
-                         alt="...">
-                </div>
-                <div class="card-footer">
-                    <div class="ml-auto d-flex justify-content-end">
-                        <button class="btn btn-outline-success" id="submit-order" onclick="
-                            fetch(`/api/order/${order_id}/reg_container/`, {
-                                method: 'POST',
-                                headers: {
-                                'X-CSRFToken': '{{ csrf_token }}'
-                                }
-                            }).then(res => res.json()).then(data => {
-                                console.log(data)
-                            })
-                        ">
-                            <i class="bx bx-upload"></i>&nbsp 의뢰
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -267,7 +212,7 @@
         </form>
     </div>
 </div>
-<div class="content-backdrop fade"></div>
+<div class="content-backdrop fade"></div>a
 <script>
     let tree = []
     let items = []
@@ -277,21 +222,35 @@
         if (order_id === 'build') return
         $("#orderIdList").val(order_id)
         let res = fetch(`/api/bom/?order=${order_id}`)
-        let data = await res.then(res => res.json())
-        tree = data.map(data => {
-            return {
+        let bomData = await res.then(res => res.json())
+        console.log(bomData)
+        bomData = bomData.sort((a, b) => b.level - a.level)
+        let tempData =[] 
+        bomData.forEach(data => {
+            let parent = data.parent || '#'
+            let level = data.level
+            let rawData = {
                 id: data.id,
-                parent: data.parent || '#', // '#' for root nodes or id of parent node
                 product_name: data.product_name,
                 part_code: data.part_code,
                 item_price: data.item_price,
                 order_cnt: data.order_cnt,
-                text: data.part_code,
                 product_info: data.product_info,
-                image: data.image,
-                item_id: data.item_id
+               }
+            if(level !== 2){
+                level = data.level
+                children = tempData[data.id]
+                tempData[data.id] = []
+                tempData[data.id].push(data)
+                tempData[data.id].children = children
+                rawData.children = children
             }
+               if(!tempData[parent]){
+                   tempData[parent] = []
+               }
+               tempData[parent].push(rawData)
         })
+        tree = tempData['#']
     }
 
     async function getItemList() {
@@ -299,6 +258,9 @@
         let data = await res.then(res => res.json())
         items = data
     }
+
+    var editingId;
+
 
     function drawOrderCalculation() {
         $("#orderIdList").val(order_id)
@@ -328,7 +290,22 @@
         await getBomTree()
         await getItemList()
 
-        let checkboxTree = $('#jstree')
+        $("#tg").treegrid({
+            data: tree,
+            idField: 'id',
+            treeField: 'product_name',
+            columns:[[
+                {field:'product_name',title:'제품명', width: '25%'},
+                {field:'part_code',title:'코드', editor: 'text', width: '25%'},
+                {field:'item_price',title:'가격', width: '20%'},
+                {field:'order_cnt',title:'수량', width: '10%'},
+                {field:'product_info',title:'비고', width: '20%'}
+            ]],
+            rownumbers: true,
+            collapsible: true,
+            showFooter: true
+        })
+
         items.forEach(item => {
             $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
         })
@@ -351,36 +328,15 @@
                         'X-CSRFToken': '{{ csrf_token }}'
                     }
                 }).done(function (res) {
-                    inst = $('#jstree').jstree(true)
-                    inst.delete_node(nodeData)
                     offCanvasEl.hide()
                 })
             })
         }
 
         function editNode(data) {
-            var inst = $.jstree.reference(data.reference),
-                obj = inst.get_node(data.reference)
-            inst.edit(obj)
-            $('#jstree').on('rename_node.jstree', function (e, data) {
-                console.log(data)
-                $.ajax({
-                    url: `/api/bom/${data.node.id}/edit_part_code/`,
-                    method: 'patch',
-                    data: {
-                        part_code: data.text
-                    },
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    }
-                }).done(function (res) {
-                    console.log(res)
-                })
-            })
         }
 
         function deleteNode(node) {
-            let data = $("#jstree").jstree(true).get_node(node.reference)
             let offCanvasElement = document.querySelector('#add-new-record')
             offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
             offCanvasEl.show()
@@ -390,216 +346,6 @@
             formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price
             $("#item").val(rawItem.item_id).trigger('change')
             $("#order_cnt").val(rawItem.order_cnt).trigger('change')
-        }
-        $('#jstree').jstree({
-            core: {
-                check_callback: true,
-                data: tree
-            },
-            plugins: [
-                'types', 'state', 'contextmenu'
-            ],
-            contextmenu: {
-                items: function (node) {
-                    switch (node.parents.length) {
-                        case 1:
-                            return {
-                                edit_part_code_by_conatiner: {
-                                    label: '컨테이너 변경',
-                                    action: function (data) {
-                                        editNode(data)
-                                }},
-                                delete_container: {
-                                    label: '컨테이너 삭제',
-                                    action: function (node) {
-                                        deleteNode(node)
-                                    }
-                                }
-                            }
-                        case 2:
-                            return {
-                                edit_part_code_by_controller: {
-                                    label: '컨트롤러 변경',
-                                    action: function (data) {
-                                        editNode(data)
-                                    }
-                                },
-                                delete_controller: {
-                                    label: '컨트롤러 삭제',
-                                    action:  function (node) {
-                                        deleteNode(node)
-                                    }
-                                },
-                            }
-                        case 3:
-                            return {
-                                edit_part_code_by_sensor: {
-                                    label: '센서 변경',
-                                    action: function (data) {
-                                        editNode(data)
-                                    }
-                                }
-                            }
-                    }
-                },
-            },
-            types: {
-                default: {
-                    icon: 'bx bx-folder'
-                },
-                html: {
-                    icon: 'bx bxl-html5 text-danger'
-                },
-                css: {
-                    icon: 'bx bxl-css3 text-info'
-                },
-                img: {
-                    icon: 'bx bx-image text-success'
-                },
-                js: {
-                    icon: 'bx bxl-nodejs text-warning'
-                }
-            }
-        })
-        checkboxTree.on('select_node.jstree', function (e, data) {
-            const treeInstance = $('#jstree').jstree(true)
-            const optionsForItem = $('#item')
-            const selected_id = data.selected[0]
-            const selected_node = treeInstance.get_node(selected_id)
-            // level1 = 0 level2 = 1 level3 = 2
-            const selected_level = selected_node.parents.length - 1
-            const child_level = selected_level + 1
-            const ItemsByLevel = items.filter(item => item.level == child_level)
-            optionsForItem.empty()
-            optionsForItem.append(`<option value="">Select item</option>`)
-            ItemsByLevel.forEach(item => {
-                optionsForItem.append(`<option value="${item.id}">${item.item_name}</option>`)
-            })
-            let child = tree.filter(item => item.parent == selected_id)
-            dt_products.data().clear().rows.add(child.map((item, index) => {
-                return {
-                    ...item,
-                    product_info: `level ${selected_level + 1}`
-                }
-            })).draw()
-            const inst = $('#jstree').jstree(true)
-            if(selected_level == 2) inst.deselect_all()
-        })
-        var dt_details_table = $('.datatables-order-details')
-        if (dt_details_table.length) {
-            var dt_products = dt_details_table.DataTable({
-                data: tree,
-                columns: [
-                    {
-                        data: 'id'
-                    }, {
-                        data: 'product_name'
-                    }, {
-                        data: 'item_price'
-                    }, {
-                        data: 'order_cnt'
-                    }, {
-                        data: ''
-                    }
-                ],
-                columnDefs: [
-                    {
-                        className: 'control',
-                        searchable: false,
-                        orderable: false,
-                        responsivePriority: 2,
-                        targets: 0,
-                        render: function (data, type, full, meta) {
-                            return ''
-                        }
-                    }, {
-                        targets: 1,
-                        responsivePriority: 1,
-                        searchable: false,
-                        orderable: false,
-                        render: function (data, type, full, meta) {
-                            $product_brand = full['product_name']
-                            var stateNum = Math.floor(Math.random() * 6)
-                            var states = [
-                                'success',
-                                'danger',
-                                'warning',
-                                'info',
-                                'dark',
-                                'primary',
-                                'secondary'
-                            ]
-                            var $state = states[stateNum],
-                                $name = full['part_code'] || full['product_name'],
-                                $initials = $name.match(/\b\w/g) || []
-                            $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase()
-                            $output = '<span class="avatar-initial rounded-2 bg-label-' + $state + '">' + $initials + '</span>'
-                            var $row_output = '<div class="d-flex justify-content-start align-items-center text-nowrap">' + '<div class="avatar-wrapper">' + '<div class="avatar me-2">' + $output + '</div>' + '</div>' + '<div class="d-flex flex-column">' + '<h6 class="text-body mb-0">' + $name + '</h6>' + '<small class="text-muted">' + $product_brand + '</small>' + '</div>' + '</div>'
-                            return $row_output
-                        }
-                    }, {
-                        targets: 2,
-                        searchable: false,
-                        orderable: false,
-                        render: function (data, type, full, meta) {
-                            var $item_price = full['item_price']
-                            var $output = '<span>' + $item_price + '</span>'
-                            return $output
-                        }
-                    }, {
-                        targets: 3,
-                        searchable: false,
-                        orderable: false,
-                        render: function (data, type, full, meta) {
-                            var $order_cnt = full['order_cnt']
-                            var $output = '<span class="text-body">' + $order_cnt + '</span>'
-                            return $output
-                        }
-                    }, {
-                        targets: 4,
-                        searchable: false,
-                        orderable: false,
-                        render: function (data, type, full, meta) {
-                            var $total = parseInt(full['order_cnt']) * full['item_price']
-                            var $output = $total ? '<h6 class="mb-0">' + $total + '</h6>' : data
-                            return $output
-                        }
-                    }
-                ],
-                order: [
-                    1, ''
-                ],
-                dom: 't',
-                responsive: {
-                    details: {
-                        display: $
-                            .fn
-                            .dataTable
-                            .Responsive
-                            .display
-                            .modal({
-                                header: function (row) {
-                                    var data = row.data()
-                                    return 'Details of ' + data['full_name']
-                                }
-                            }),
-                        type: 'column',
-                        renderer: function (api, rowIdx, columns) {
-                            var data = $
-                                .map(columns, function (col, i) {
-                                    return col.title !== ''
-                                        ? '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' + '<td>' + col.title + ':' + '</td> ' + '<td>' + col.data + '</td>' + '</tr>'
-                                        : ''
-                                })
-                                .join('')
-
-                            return data
-                                ? $('<table class="table" /><tbody />').append(data)
-                                : false
-                        }
-                    }
-                }
-            })
         }
         setTimeout(() => {
             let offCanvasElement = document.querySelector('#add-new-record')
@@ -619,8 +365,6 @@
                 $('.delete-item').remove()
                 offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
                 offCanvasEl.show()
-                let inst = $('#jstree').jstree(true)
-                inst.deselect_all()
             })
         }, 200)
         let formAddNewRecord = document.getElementById('form-add-new-record')
@@ -690,7 +434,8 @@
                     let item_product_name = items.find(
                         item => item.id == formData.bom_id
                     ).item_name
-                    let formInput = {
+                       parent = $("#tg").treegrid('getSelected').id
+                     let formInput = {
                         'item_id': formData.bom_id,
                         'product_name': item_product_name,
                         'order_cnt': formData.order_cnt,
@@ -699,13 +444,6 @@
                         'product_info': formData.comment,
                         'image': ''
                     }
-                    dt_products.row.add({
-                        "id": dt_products.data().length + 1,
-                        ...formInput
-                    }).draw()
-                    let jstreeEl = $('#jstree').jstree(true)
-                    selectedTree = jstreeEl.get_selected()
-                    parent = selectedTree[0] ? selectedTree[0] : '#'
                     let objNode = {
                         order_id: order_id,
                         id: tree.length + 1,
@@ -731,12 +469,7 @@
                                 text: item_product_name,
                                 data: formInput
                             }
-                            jstreeEl.create_node(parent, objNode, 'last', function (new_node) {
-                                setTimeout(function () {
-                                    jstreeEl.edit(new_node)
-                                }, 0)
-                            })
-                            tree.push(objNode)
+                            $("#tg").treegrid('append', objNode)
                         }
                     })
                 }
@@ -744,19 +477,7 @@
             offCanvasEl.hide()
         })
         $("#edit-item").on('click', function (e) {
-            dt_products
-                .rows()
-                .every(function (rowIdx, tableLoop, rowLoop) {
-                    let order_cnt = dt_products
-                        .cell(rowIdx, 3)
-                        .data()
-                    dt_products
-                        .cell(rowIdx, 3)
-                        .data('<input type="number" class="form-control" value="' + order_cnt + '">')
-                    dt_products
-                        .cell(rowIdx, 4)
-                        .data('<button class="btn btn-outline-danger delete-item"><i class="bx bx-trash"></i></button>')
-                })
+
             $(e.target).addClass('d-none')
             let edit_button = document.createElement('button')
             edit_button
@@ -764,32 +485,7 @@
                 .add('btn', 'btn-outline-success', 'save-item')
             edit_button.innerHTML = '<i class="bx bx-save"></i>&nbsp 변경 저장'
             edit_button.addEventListener('click', function (e2) {
-                dt_products
-                    .rows()
-                    .every(function (rowIdx, tableLoop, rowLoop) {
-                        let order_cnt = dt_products
-                            .cell(rowIdx, 3)
-                            .node()
-                            .querySelector('input')
-                        order_cnt = $(order_cnt).val()
-                        dt_products
-                            .cell(rowIdx, 3)
-                            .data(order_cnt)
-                        dt_products
-                            .cell(rowIdx, 4)
-                            .data(order_cnt * dt_products.cell(rowIdx, 2).data())
-                        $.ajax({
-                            url: 'api/bom/${data.id}/edit_order_count/',
-                            method: 'patch',
-                            data: {
-                                order_cnt: order_cnt
-                            },
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}'
-                            }
-                        }).done(function (data) {
-                        })
-                    })
+             
                 $(e.target).removeClass('d-none')
                 e2
                     .target
@@ -802,17 +498,8 @@
                 .appendChild(edit_button)
             let deleteButton = $(document).find('.delete-item')
             deleteButton.on('click', function (e2) {
-                let id = dt_products.row(e2.target.closest('tr')).data().id
-                let inst = $('#jstree').jstree(true)
                 let selected = tree.find(item => item.id == id)
-                let node = inst.get_node(selected)
-                dt_products
-                    .row($(this).parents('tr'))
-                    .remove()
-                    .draw()
-                checkboxTree.jstree(true).delete_node(
-                    node
-                )
+
                 $.ajax({
                     url: `/api/bom/${id}/delete_bom/`,
                     method: 'DELETE',
@@ -837,12 +524,61 @@
             console.log(order_id)
             await getBomTree()
             await getItemList()
-            $('.datatables-order-details').DataTable().clear().rows.add(tree).draw()
-            $('#jstree').jstree(true).settings.core.data = tree
-            $('#jstree').jstree(true).refresh()
-            drawOrderCalculation()
+            $("#tg").treegrid('loadData', tree)
         })
     })
+
+    var editingId;
+    function edit(){
+        if (editingId != undefined){
+            $('#tg').treegrid('select', editingId);
+            return;
+        }
+        var row = $('#tg').treegrid('getSelected');
+        if (row){
+            editingId = row.id
+            console.log(editingId)
+            $('#tg').treegrid('beginEdit', editingId);
+        }
+    }
+    function save(){
+         if (editingId != undefined){
+            let t = $('#tg');
+            t.treegrid('endEdit', editingId);
+            editingId = undefined;
+            let persons = 0;
+            let rows = t.treegrid('getChildren');
+            let row = t.treegrid('getSelected');
+            for(let i=0; i<rows.length; i++){
+                let p = parseInt(rows[i].persons);
+                if (!isNaN(p)){
+                    persons += p;
+                }
+            }
+            fetch(`/api/bom/${row.id}/edit_bom_data/`, {
+                method: 'Patch',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    'id': row.id,
+                    'part_code': row.part_code,
+                    'order_cnt': row.order_cnt,
+                    'product_info': row.product_info,
+                })
+            }).then(res => res.json())
+            .then(data => {
+                console.log(data)
+            })
+        }
+    }
+    function cancel(){
+        if (editingId != undefined){
+            $('#tg').treegrid('cancelEdit', editingId);
+            editingId = undefined;
+        }
+    }
 
 </script>
 {% include 'footer.html' %}

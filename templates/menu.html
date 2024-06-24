@@ -27,37 +27,37 @@
             <li class="menu-header small text-uppercase fs-4">
                 <span class="menu-header-text">데이터</span>
             </li>
-            <li class="menu-item {% if request.resolver_match.route|slice:":6" == 'users/' %}active open{% endif %}">
+            <li class="menu-item {% if request.resolver_match.route|slice:":5" == 'user/' %}active open{% endif %}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons bx bx-user"></i>
                     <div class="text-truncate" data-i18n="사용자 관리">사용자 관리</div>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {% if request.resolver_match.url_name == 'user_manage' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'user/manage' %}active{% endif %}">
                         <a href='/user/manage' class="menu-link">
                             <div class="text-truncate">사용자 관리</div>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'part' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'user/part' %}active{% endif %}">
                         <a href="/user/part" class="menu-link">
                             <div class="text-truncate">사용자 계정관리</div>
                         </a>
                     </li>
                 </ul>
             </li>
-            <li class="menu-item {% if request.resolver_match.route|slice:":5" == 'data/' %}active open{% endif %}">
+            <li class="menu-item {% if request.resolver_match.route|slice:":7" == 'device/' %}active open{% endif %}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons bx bx-home-circle"></i>
                     <div class="text-truncate">재배동</div>
                     <span class="badge badge-center rounded-pill bg-danger ms-auto">5</span>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {% if request.resolver_match.url_name == 'deviceControl' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'device/control' %}active{% endif %}">
                         <a href="/device/control" class="menu-link">
                             <div class="text-truncate">재배동 관리</div>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'deviceExplain' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'device/explain' %}active{% endif %}">
                         <a href="/device/explain" class="menu-link">
                             <div class="text-truncate">재배동 상세</div>
                         </a>
@@ -70,17 +70,17 @@
                     <div class="text-truncate">주문관리</div>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {% if request.resolver_match.url_name == 'delivery' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'order/delivery' %}active{% endif %}">
                         <a href="/order/delivery" class="menu-link">
                             <div class="text-truncate">주문 조회/등록</div>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'build' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'order/build' %}active{% endif %}">
                         <a href="/order/build" class="menu-link">
                             <div class="text-truncate">주문 상세/설계</div>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'item' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'order/item' %}active{% endif %}">
                         <a href="/order/item" class="menu-link">
                             <div class="text-truncate">품목정보 관리</div>
                         </a>
@@ -94,7 +94,7 @@
                     <div class="text-truncate">재배일자 관리</div>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {% if request.resolver_match.url_name == 'auto' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'manage/auto' %}active{% endif %}">
                         <a href="/manage/auto" class="menu-link">
                             <div class="text-truncate" data-i18n="자동재배 관리">자동재배 관리</div>
                         </a>
@@ -102,18 +102,18 @@
                 </ul>
             </li>
             <!-- Layouts -->
-            <li class="menu-item {% if request.resolver_match.route|slice:":10" == 'breakDown/' %}active open{% endif %}">
+            <li class="menu-item {% if request.resolver_match.route|slice:":10" == 'breakdown/' %}active open{% endif %}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons bx bx-error"></i>
                     <div class="text-truncate" data-i18n="고장식별 기준관리">고장식별 기준관리</div>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {% if request.resolver_match.url_name == 'controlError' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'breakdown/control' %}active{% endif %}">
                         <a href="/breakdown/control" class="menu-link">
                             <div class="text-truncate">제어장비</div>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'collectError' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'breakdown/collect' %}active{% endif %}">
                         <a href="/breakdown/collect" class="menu-link">
                             <div class="text-truncate">수집장비</div>
                         </a>
@@ -127,44 +127,42 @@
                     <div class="text-truncate" data-i18n="재배가이드 관리">재배가이드 관리</div>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {% if request.resolver_match.url_name == 'Manual' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'harvest/manual' %}active{% endif %}">
                         <a href="/harvest/manual" class="menu-link">
                             <div class="text-truncate" data-i18n="메뉴얼 관리">메뉴얼 관리</div>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'FAQ' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'harvest/faq' %}active{% endif %}">
                         <a href="/harvest/faq" class="menu-link">
                             <div class="text-truncate" data-i18n="문의, FAQ 관리">문의, FAQ 관리</div>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'Info' %}active{% endif %}">
+                    <li class="menu-item {% if request.resolver_match.route == 'harvest/info' %}active{% endif %}">
                         <a href="/harvest/info" class="menu-link">
                             <div class="text-truncate" data-i18n="공지사항 관리">공지사항 관리</div>
                         </a>
                     </li>
                 </ul>
             </li>
-            <!-- e-commerce-app menu end -->
-            <!-- Academy menu start -->
             <li class="menu-item {% if request.resolver_match.route|slice:":6" == 'alarm/' %}active open{% endif %}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons bx bx-book-open"></i>
                     <div class="text-truncate" data-i18n="알림 관리">알림 관리</div>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {% if request.resolver_match.url_name == 'control' %}active{% endif %}">
-                        <a href="/alram/control" class="menu-link">
+                    <li class="menu-item {% if request.resolver_match.route == 'alarm/control' %}active{% endif %}">
+                        <a href="/alarm/control" class="menu-link">
                             <div class="text-truncate" data-i18n="제어 알림 관리">제어 알림 관리</div>
                             <span class="badge badge-center rounded-pill bg-danger ms-auto">5</span>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'Contact' %}active{% endif %}">
-                        <a href="/alram/contact" class="menu-link">
+                    <li class="menu-item {% if request.resolver_match.route == 'alarm/contact' %}active{% endif %}">
+                        <a href="/alarm/contact" class="menu-link">
                             <div class="text-truncate" data-i18n="고객센터 알림관리">고객센터 알림관리</div>
                         </a>
                     </li>
-                    <li class="menu-item {% if request.resolver_match.url_name == 'etc' %}active{% endif %}">
-                        <a href="/alram/etc" class="menu-link">
+                    <li class="menu-item {% if request.resolver_match.route == 'alarm/etc' %}active{% endif %}">
+                        <a href="/alarm/etc" class="menu-link">
                             <div class="text-truncate" data-i18n="기타 알림관리">기타 알림관리</div>
                         </a>
                     </li>
