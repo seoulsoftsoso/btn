@@ -1,4 +1,4 @@
-{% include "header.html" %}
+w{% include "header.html" %}
 {% include 'menu.html' %}
 <link rel="stylesheet" href="https://www.jeasyui.com/easyui/themes/material-teal/tree.css"/>
 <link rel="stylesheet" href="https://www.jeasyui.com/easyui/themes/material-teal/datagrid.css"/>
@@ -34,11 +34,13 @@
                             <a href="javascript:void(0)" class="btn btn-info" onclick="edit()">Edit</a>
                             <a href="javascript:void(0)" class="btn btn-primary" onclick="save()">Save</a>
                             <a href="javascript:void(0)" class="btn btn-danger" onclick="cancel()">Cancel</a>
+                            <a href="javascript:void(0)" class="btn btn-danger" onclick="bom_delete()">delete</a>
+
                             <div class="d-flex align-content-center justify-content-between flex-wrap gap-2">
                                 <div class="ml-auto align-content-center">제품 설계도</div>
                                 <div class="d-flex align-content-center gap-2">
-                                    <button class="btn btn-outline-success add-container">
-                                        <i class="bx bx-cog"></i>&nbsp 컨테이너 추가
+                                    <button class="btn btn-outline-success add-item">
+                                        <i class="bx bx-cog"></i>&nbsp 아이템 추가
                                     </button>
                                 </div>
                             </div>
@@ -236,6 +238,7 @@
                 item_price: data.item_price,
                 order_cnt: data.order_cnt,
                 product_info: data.product_info,
+                item_id: data.item
                }
             if(level !== 2){
                 level = data.level
@@ -298,9 +301,21 @@
                 {field:'product_name',title:'제품명', width: '25%'},
                 {field:'part_code',title:'코드', editor: 'text', width: '25%'},
                 {field:'item_price',title:'가격', width: '20%'},
-                {field:'order_cnt',title:'수량', width: '10%'},
+                {field:'order_cnt',title:'수량', width: '10%', editor: 'text'},
                 {field:'product_info',title:'비고', width: '20%'}
             ]],
+            onSelect: function (row) {
+                console.log(row.item_id)
+                console.log(row)
+                item = items.find(item => item.id == row.item_id)
+                let parent_level = parseInt(item.level)
+                let filteredItem = items.filter(item => parseInt(item.level) == parent_level + 1);
+                $('#item').empty();
+                $("#item").append(`<option value="">아이템 선택</option>`)
+                filteredItem.forEach(item => {
+                    $('#item').append(`<option value="${item.id}">${item.item_name}</option>`);
+                });
+            },
             rownumbers: true,
             collapsible: true,
             showFooter: true
@@ -314,54 +329,10 @@
 
         drawOrderCalculation()
 
-        function appendDeleteBtn(nodeData) {
-            let formButton = document.getElementById('formButton')
-            let deleteButton = document.createElement('button')
-            deleteButton.textContent = '삭제'
-            deleteButton.classList.add('btn', 'btn-danger', 'data-submit', 'me-sm-3', 'me-z1', 'delete-item')
-            formButton.appendChild(deleteButton)
-            deleteButton.addEventListener('click', function (e) {
-                $.ajax({
-                    url: `/api/bom/${nodeData.id}/delete_bom/`,
-                    method: 'delete',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    }
-                }).done(function (res) {
-                    offCanvasEl.hide()
-                })
-            })
-        }
-
-        function editNode(data) {
-        }
-
-        function deleteNode(node) {
-            let offCanvasElement = document.querySelector('#add-new-record')
-            offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
-            offCanvasEl.show()
-            let formRecord = document.getElementById('form-add-new-record')
-            appendDeleteBtn(data)
-            let rawItem = data.original
-            formRecord.querySelector(`[name=item_price]`).value = rawItem.item_price
-            $("#item").val(rawItem.item_id).trigger('change')
-            $("#order_cnt").val(rawItem.order_cnt).trigger('change')
-        }
         setTimeout(() => {
             let offCanvasElement = document.querySelector('#add-new-record')
             $(".add-item").on('click', function () {
                 $("#plus-item").removeClass('d-none')
-                $('.delete-item').remove()
-                offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
-                offCanvasEl.show()
-            })
-            $('.add-container').on('click', function () {
-                $("#plus-item").removeClass('d-none')
-                let tempItems = items.filter(item => item.level == 0)
-                $('#item').empty()
-                tempItems.forEach(item => {
-                    $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
-                })
                 $('.delete-item').remove()
                 offCanvasEl = new bootstrap.Offcanvas(offCanvasElement)
                 offCanvasEl.show()
@@ -451,6 +422,7 @@
                         text: item_product_name,
                        ...formInput
                     }
+                    console.log({...formInput, part_code: formInput.product_name}   )
                     $.ajax({
                         url: `/api/bom/`,
                         method: 'POST',
@@ -459,18 +431,13 @@
                             'X-CSRFToken': '{{ csrf_token }}'
                         },
                         dataType: 'json'
-                    }).done(function (data) {
+                    }).done(async function (data) {
                         let addedBom = data.boms
                         for(let i = 0 ;i < addedBom.length; i++){
                             let addedBomElement = addedBom[i]
-                            let objNode = {
-                                id: addedBomElement,
-                                parent,
-                                text: item_product_name,
-                                data: formInput
-                            }
-                            $("#tg").treegrid('append', objNode)
                         }
+                        await getBomTree()   
+                        $("#tg").treegrid('loadData', tree)
                     })
                 }
             })
@@ -571,6 +538,7 @@
             .then(data => {
                 console.log(data)
             })
+            $("#tg").treegrid('reload');
         }
     }
     function cancel(){
@@ -579,6 +547,22 @@
             editingId = undefined;
         }
     }
+    function bom_delete(){
+        let t = $('#tg');
+        let row = t.treegrid('getSelected');
+          fetch(`/api/bom/${row.id}`, {
+                method: 'delete',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            }).then(res => res)
+            .then(data => {
+                $("#tg").treegrid('remove', row.id);
+            })
+        
+    } 
+
 
 </script>
 {% include 'footer.html' %}
