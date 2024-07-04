@@ -3,16 +3,16 @@ from button.ws.mongo_updates import start_listening_to_changes
 # 알람
 
 def alram_contact(request):
-    return render(request, 'alram/contact.html')
+    return render(request, 'alarm/contact.html')
 
 def alram_control(request):
-    return render(request, 'alram/control.html')
+    return render(request, 'alarm/control.html')
 
 def alram_etc(request):
-    return render(request, 'alram/etc.html')
+    return render(request, 'alarm/etc.html')
 
 def alram_plan(request):
-    return render(request, 'alram/plan.html')
+    return render(request, 'alarm/plan.html')
 
 # 유저 관리
 

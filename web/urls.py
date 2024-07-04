@@ -2,10 +2,10 @@ from .views import *
 from django.urls import path
 urlpatterns = [
     # 알람
-    path('alram/contact', alram_contact),
-    path('alram/control', alram_control),
-    path('alram/etc', alram_etc),
-    path('alram/plan', alram_plan),
+    path('alarm/contact', alram_contact),
+    path('alarm/control', alram_control),
+    path('alarm/etc', alram_etc),
+    path('alarm/plan', alram_plan),
 
     # 유저 등록
     path('register/register', register_register),

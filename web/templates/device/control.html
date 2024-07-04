@@ -17,22 +17,74 @@
         </div>
     </div>
     <div class="card">
-        <div class="card-datatable table-responsive">
-            <table class="datatables-basic table border-top">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>아이디(이메일)</th>
-                        <th>법인명</th>
-                        <th>대표자명</th>
-                        <th>재배동 위치</th>
-                        <th>보유 재배동 갯수</th>
-                        <th>최초둥록일자</th>
-                        <th></th>
-                    </tr>
-                </thead>
-            </table>
+        <h5 class="card-header">제배동</h5>
+        <div class="table-responsive text-nowrap">
+          <table class="table">
+            <thead class="table-light">
+              <tr>
+                <th>Project</th>
+                <th>Client</th>
+                <th>Users</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0" id="plantation_tbody">
+            </tbody>
+          </table>
         </div>
-    </div>
+      </div>
 </div>
+<script>
+      $(document).ready(async function() {
+        let plantation = await fetch('/api/plantation/get_container_by_owner')
+        plantation = await plantation.json()
+        plantation.forEach(async (data) => {
+            let userData = await fetch(`/api/user/${data.owner_id}`)
+            userData = await userData.json()
+            console.log(data.containers)
+            $("#plantation_tbody").append(`
+             <tr>
+                <td>
+                  <i class="fab fa-vuejs fa-lg text-success me-3"></i>
+                  <span class="fw-medium">
+                  ${userData['ent']['company_name']}
+                </td>
+                <td>${userData['user_name']}
+                <td>
+                    <ul class="list-unstyled users-list avatar-group d-flex align-items-center">
+                      ${data.containers.map(text =>
+                          `<li
+                          data-bs-toggle="tooltip"
+                          data-popup="tooltip-custom"
+                          data-bs-placement="top"
+                          class="avatar avatar-md pull-up"
+                          title="${text}">
+                          <img src="{% static 'assets/img/avatars/5.png' %}" alt="Avatar" class="rounded-circle" />
+                        </li>` 
+                      )}
+                    </ul>
+                </td>
+                <td><span class="badge bg-label-info me-1">Scheduled</span></td>
+                <td>
+                  <div class="dropdown">
+                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                      <i class="bx bx-dots-vertical-rounded"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" href="javascript:void(0);"
+                        ><i class="bx bx-edit-alt me-1"></i> Edit</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0);"
+                        ><i class="bx bx-trash me-1"></i> Delete</a
+                      >
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            `)
+        })
+
+    })
+</script>
 {% include 'footer.html' %}

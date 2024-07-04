@@ -7,7 +7,6 @@ from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from datetime import datetime
-from api.item.item_rest_framework import ItemSerializer
 import uuid
 import json
 
@@ -23,7 +22,7 @@ class BomMasterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BomMaster
-        fields = ['id', 'part_code', 'item_id', 'order_cnt', 'total', 'tax', 'order_id', 'parent_id', 'level', 'created_by', 'updated_by', 'delete_flag', 'item_price', 'product_info', 'image', 'product_name', 'parent', 'op']
+        fields = "__all__"
 
 
     def create(self, instance):
@@ -131,28 +130,20 @@ class BomViewSet(viewsets.ModelViewSet):
         return Response({'message': 'success', 'boms': boms}, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['patch'])
-    def edit_order_count(self, request, *args, **kwargs):
+    def edit_bom_data(self, request, *args, **kwargs):
         bom_id = kwargs.get('pk')
         bom = get_object_or_404(BomMaster, id=bom_id)
         data = request.data
         order_cnt = int(data['order_cnt'])
         item_totalPrice = bom.item.standard_price * order_cnt
-        orderProduct = OrderProduct.objects.get(id=bom.op_id)
+        part_code = data.get('part_code', '')
         bomEditData = {
             'order_cnt': order_cnt,
             'total': item_totalPrice,
-            'tax': item_totalPrice * 0.1
+            'tax': item_totalPrice * 0.1,
+            'part_code': part_code
         }
         bom.__dict__.update(bomEditData)
-        orderProduct.save()
-        return Response({'message': 'success'}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['patch'])
-    def edit_part_code(self, request, *args, **kwargs):
-        bom_id = kwargs.get('pk')
-        bom = get_object_or_404(BomMaster, id=bom_id)
-        data = request.data
-        bom.part_code = data['part_code']
         bom.save()
         return Response({'message': 'success'}, status=status.HTTP_200_OK)
 
