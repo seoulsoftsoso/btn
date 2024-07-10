@@ -39,6 +39,7 @@
       $(document).ready(async function() {
         let plantation = await fetch('/api/plantation/get_container_by_owner')
         plantation = await plantation.json()
+          console.log(plantation)
         plantation.forEach(async (data) => {
             let userData = await fetch(`/api/user/${data.owner_id}`)
             userData = await userData.json()
@@ -61,7 +62,7 @@
                           class="avatar avatar-md pull-up"
                           title="${text}">
                           <img src="{% static 'assets/img/avatars/5.png' %}" alt="Avatar" class="rounded-circle" />
-                        </li>` 
+                        </li>`
                       )}
                     </ul>
                 </td>
@@ -84,7 +85,6 @@
               </tr>
             `)
         })
-
     })
 </script>
 {% include 'footer.html' %}
