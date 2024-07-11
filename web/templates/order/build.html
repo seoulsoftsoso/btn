@@ -234,7 +234,6 @@
 
     async function getBomTree() {
         if (order_id === 'build') return
-        $("#orderIdList").val(order_id)
         let res = fetch(`/api/bom/?order=${order_id}`)
         let bomData = await res.then(res => res.json())
         console.log(bomData)
@@ -294,8 +293,6 @@
                 {field:'product_info',title:'비고', width: '20%'}
             ]],
             onSelect: function (row) {
-                console.log(row.item_id)
-                console.log(row)
                 item = items.find(item => item.id == row.item_id)
                 let parent_level = parseInt(item.level)
                 let filteredItem = items.filter(item => parseInt(item.level) == parent_level + 1);
@@ -324,6 +321,7 @@
         orderIdList.forEach((orderId) => {
             $("#orderIdList").append(`<option value="${orderId}">${orderId}</option>`);
         });
+        $("#orderIdList").val(order_id).trigger("change")
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
     }
