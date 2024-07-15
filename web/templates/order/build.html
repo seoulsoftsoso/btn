@@ -234,8 +234,8 @@
 
     async function getBomTree() {
         if (order_id === 'build') return
-        let res = fetch(`/api/bom/?order=${order_id}`)
-        let bomData = await res.then(res => res.json())
+        let res = await fetch(`/api/bom/?order=${order_id}`)
+        let bomData = await res => res.json()
         console.log(bomData)
         bomData = bomData.sort((a, b) => b.level - a.level)
         let tempData =[]
@@ -252,7 +252,6 @@
                 item_id: data.item
                }
             if(level !== 2){
-                level = data.level
                 children = tempData[data.id]
                 tempData[data.id] = []
                 tempData[data.id].push(data)
@@ -293,7 +292,7 @@
                 {field:'product_info',title:'비고', width: '20%'}
             ]],
             onSelect: function (row) {
-                item = items.find(item => item.id == row.item_id)
+                let item = items.find(item => item.id == row.item_id)
                 let parent_level = parseInt(item.level)
                 let filteredItem = items.filter(item => parseInt(item.level) == parent_level + 1);
                 $('#item').empty();
@@ -399,7 +398,6 @@
                         acc[item.name] = item.value
                         return acc
                     }, {})
-                    console.log(formData)
                     let item_product_name = items.find(
                         item => item.id == formData.bom_id
                     ).item_name

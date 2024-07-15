@@ -3,9 +3,9 @@
     <!-- Menu -->
     <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
         <div class="app-brand demo">
-            <a href="/landing/user" class="app-brand-link">
+            <a href="/" class="app-brand-link">
                 <span class="app-brand-logo demo">
-                    <svg width="173"
+                    <svg width="173" 
                          height="169"
                          viewBox="0 0 173 169"
                          fill="none"
@@ -201,7 +201,7 @@
                                href="javascript:void(0);"
                                data-bs-toggle="dropdown">
                                 <div class="avatar avatar-online">
-                                    <img src="{% static '/assets/img/avatars/1.png' %}"
+                                    <img src=""
                                          alt=""
                                          class="w-px-40 h-auto rounded-circle">
                                 </div>
@@ -218,8 +218,8 @@
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <span class="fw-medium d-block">John Doe</span>
-                                                <small class="text-muted">Admin</small>
+                                                <span class="fw-medium d-block">{{ request.user.username }}</span>
+                                                <small class="text-muted">{% if request.is_superuser %} admin {% endif %}</small>
                                             </div>
                                         </div>
                                     </a>
