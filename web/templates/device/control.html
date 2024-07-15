@@ -22,11 +22,11 @@
           <table class="table">
             <thead class="table-light">
               <tr>
-                <th>Project</th>
-                <th>Client</th>
-                <th>Users</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>관리자</th>
+                <th>주문자</th>
+                <th>제배동 수</th>
+                <th>상태</th>
+                <th>---</th>
               </tr>
             </thead>
             <tbody class="table-border-bottom-0" id="plantation_tbody">
@@ -39,6 +39,7 @@
       $(document).ready(async function() {
         let plantation = await fetch('/api/plantation/get_container_by_owner')
         plantation = await plantation.json()
+          console.log(plantation)
         plantation.forEach(async (data) => {
             let userData = await fetch(`/api/user/${data.owner_id}`)
             userData = await userData.json()
@@ -61,7 +62,7 @@
                           class="avatar avatar-md pull-up"
                           title="${text}">
                           <img src="{% static 'assets/img/avatars/5.png' %}" alt="Avatar" class="rounded-circle" />
-                        </li>` 
+                        </li>`
                       )}
                     </ul>
                 </td>
@@ -84,7 +85,6 @@
               </tr>
             `)
         })
-
     })
 </script>
 {% include 'footer.html' %}

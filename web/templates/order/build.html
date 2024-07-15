@@ -1,4 +1,4 @@
-w{% include "header.html" %}
+{% include "header.html" %}
 {% include 'menu.html' %}
 <link rel="stylesheet" href="https://www.jeasyui.com/easyui/themes/material-teal/tree.css"/>
 <link rel="stylesheet" href="https://www.jeasyui.com/easyui/themes/material-teal/datagrid.css"/>
@@ -31,24 +31,35 @@ w{% include "header.html" %}
                 <div class="col-12">
                     <div class="card mb-md-0 mb-4">
                         <h5 class="card-header">
-                            <a href="javascript:void(0)" class="btn btn-info" onclick="edit()">Edit</a>
-                            <a href="javascript:void(0)" class="btn btn-primary" onclick="save()">Save</a>
-                            <a href="javascript:void(0)" class="btn btn-danger" onclick="cancel()">Cancel</a>
-                            <a href="javascript:void(0)" class="btn btn-danger" onclick="bom_delete()">delete</a>
-
                             <div class="d-flex align-content-center justify-content-between flex-wrap gap-2">
                                 <div class="ml-auto align-content-center">제품 설계도</div>
-                                <div class="d-flex align-content-center gap-2">
-                                    <button class="btn btn-outline-success add-item">
-                                        <i class="bx bx-cog"></i>&nbsp 아이템 추가
-                                    </button>
-                                </div>
-                            </div>
+                        <button class="btn btn-outline-success" id="submit-order" onclick="
+                            fetch(`/api/order/${order_id}/reg_container/`, {
+                                method: 'POST',
+                                headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                                }
+                            }).then(res => res.json()).then(data => {
+                                console.log(data)
+                            })
+                        ">
+                            <i class="bx bx-upload"></i>&nbsp 의뢰
+                        </button>
+                    </div>
                         </h5>
                         <div class="card-body">
                             <table id="tg">
                             </table>
                         </div>
+                    <div class="card-footer">
+                            <button class="btn btn-outline-success add-item">
+                                <i class="bx bx-cog"></i>&nbsp 아이템 추가
+                            </button>
+                            <a href="javascript:void(0)" class="btn btn-info" onclick="edit()">Edit</a>
+                            <a href="javascript:void(0)" class="btn btn-primary" onclick="save()">Save</a>
+                            <a href="javascript:void(0)" class="btn btn-secondary" onclick="cancel()">Cancel</a>
+                            <a href="javascript:void(0)" class="btn btn-danger" onclick="bom_delete()">delete</a>
+                    </div>
                     </div>
                 </div>
                 <!-- /Checkbox -->
@@ -214,7 +225,8 @@ w{% include "header.html" %}
         </form>
     </div>
 </div>
-<div class="content-backdrop fade"></div>a
+</div>
+<div class="content-backdrop fade"></div>
 <script>
     let tree = []
     let items = []
@@ -222,12 +234,11 @@ w{% include "header.html" %}
 
     async function getBomTree() {
         if (order_id === 'build') return
-        $("#orderIdList").val(order_id)
         let res = fetch(`/api/bom/?order=${order_id}`)
         let bomData = await res.then(res => res.json())
         console.log(bomData)
         bomData = bomData.sort((a, b) => b.level - a.level)
-        let tempData =[] 
+        let tempData =[]
         bomData.forEach(data => {
             let parent = data.parent || '#'
             let level = data.level
@@ -265,30 +276,7 @@ w{% include "header.html" %}
     var editingId;
 
 
-    function drawOrderCalculation() {
-        $("#orderIdList").val(order_id)
-        let items_price = tree.reduce((acc, item) => {
-            return acc + item.item_price * item.order_cnt
-        }, 0)
-        $(".order-calculations").html(`
-            <div class="d-flex justify-content-between mb-2">
-                <span class="w-px-100">총 금앧</span>
-                <span class="text-heading">${items_price}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-                <span class="w-px-100">부가세(10%)</span>
-                <span class="text-heading">${items_price * 0.1}</span>
-            </div>
-            <div class="d-flex justify-content-between">
-                <h6 class="w-px-100 mb-0">Total:</h6>
-                <h6 class="mb-0">${items_price * 1 + items_price * 0.1}</h6>
-            </div>
-            `)// 1.1로 곱하면 소수점 20짜리 까지 나옴
-    }
-
     $(document).ready(async function () {
-
-        $("#orderIdList").select2()
 
         await getBomTree()
         await getItemList()
@@ -305,8 +293,6 @@ w{% include "header.html" %}
                 {field:'product_info',title:'비고', width: '20%'}
             ]],
             onSelect: function (row) {
-                console.log(row.item_id)
-                console.log(row)
                 item = items.find(item => item.id == row.item_id)
                 let parent_level = parseInt(item.level)
                 let filteredItem = items.filter(item => parseInt(item.level) == parent_level + 1);
@@ -324,10 +310,22 @@ w{% include "header.html" %}
         items.forEach(item => {
             $('#item').append(`<option value="${item.id}">${item.item_name}</option>`)
         })
-        $("#orderIdList").append(`<option value="24">24</option>`)
-        $("#orderIdList").append(`<option value="23">23</option>`)
 
-        drawOrderCalculation()
+      try {
+        let orderIdListReq = await fetch('/api/order/');
+        if (!orderIdListReq.ok) {
+            return new Error('Network response was not ok');
+        }
+        let orderIdList = await orderIdListReq.json();
+        orderIdList = orderIdList.map(order => order.id);
+        orderIdList.forEach((orderId) => {
+            $("#orderIdList").append(`<option value="${orderId}">${orderId}</option>`);
+        });
+        $("#orderIdList").val(order_id).trigger("change")
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+    }
+
 
         setTimeout(() => {
             let offCanvasElement = document.querySelector('#add-new-record')
@@ -436,7 +434,7 @@ w{% include "header.html" %}
                         for(let i = 0 ;i < addedBom.length; i++){
                             let addedBomElement = addedBom[i]
                         }
-                        await getBomTree()   
+                        await getBomTree()
                         $("#tg").treegrid('loadData', tree)
                     })
                 }
@@ -452,7 +450,7 @@ w{% include "header.html" %}
                 .add('btn', 'btn-outline-success', 'save-item')
             edit_button.innerHTML = '<i class="bx bx-save"></i>&nbsp 변경 저장'
             edit_button.addEventListener('click', function (e2) {
-             
+
                 $(e.target).removeClass('d-none')
                 e2
                     .target
@@ -560,8 +558,8 @@ w{% include "header.html" %}
             .then(data => {
                 $("#tg").treegrid('remove', row.id);
             })
-        
-    } 
+
+    }
 
 
 </script>

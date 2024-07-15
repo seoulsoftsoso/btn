@@ -29,7 +29,7 @@
             <thead class="">
               <tr>
                 <td colspan="7" class="">
-                  <div class="collapse p-2" id="collapseExample-1" style="">
+                  <div class="collapse p-2" id="collapseExample" style="">
                 <h3>
                     유저 추가
                 </h3>
@@ -38,7 +38,7 @@
                       <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
                         <i class="fas fa-eye"> 닫기</i>
                       </button>
-                      <button class="btn data-submit" type="submit" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
+                      <button class="btn data-submit" type="submit">
                         <i class="fas fa-add"> 추가</i>
                       </button>
                     </div>
@@ -59,7 +59,6 @@
                 <th>마지막 로그인</th>
                 <th></th>
               </tr>
-
             </thead>
             <tbody></tbody>
           </table>
@@ -111,6 +110,18 @@
   let formValidationOption;
     document.addEventListener('DOMContentLoaded', function (e) {
       const formAddNewRecord = document.getElementById('userAddForm')
+
+    $("#userAddForm").prepend(
+        Object.keys(elements).map((el) => {
+            return `<div class="col-md-3 col-sm-12 p-2">
+                <div class="input-group input-group-merge">
+                    <span class="input-group-text fs-tiny">
+                        ${elements[el]}
+                    </span>
+                    <input type="text" name="${el}" class="form-control border p-2">
+                </div>
+            </div>`})
+        .join(''))
       formValidationOption = {
         fields: {
               email: {
@@ -120,6 +131,20 @@
                       },
                       emailAddress: {
                           message: 'The value is not a valid email address'
+                      }
+                  }
+              },
+              password: {
+                    validators: {
+                      notEmpty: {
+                          message: 'The password is required'
+                      }
+                 }
+              },
+              confirm_password: {
+                  validators: {
+                      notEmpty: {
+                          message: 'The password is required'
                       }
                   }
               },
@@ -143,26 +168,13 @@
                       eleValidClass: '',
                       rowSelector: '.col-sm-12'
                   }),
-              defaultSubmit: new FormValidation
-                  .plugins
-                  .DefaultSubmit(),
               autoFocus: new FormValidation
                   .plugins
                   .AutoFocus()
           }
   }
 
-      $("#userAddForm").prepend(
-        Object.keys(elements).map((el) => {
-            return `<div class="col-md-3 col-sm-12 p-2">
-                <div class="input-group input-group-merge">
-                    <span class="input-group-text fs-tiny">
-                        ${elements[el]}
-                    </span>
-                    <input type="text" name="${el}" class="form-control border p-2">
-                </div>
-            </div>`})
-        .join(''))
+
         let fv = FormValidation.formValidation(formAddNewRecord, formValidationOption)
         formAddNewRecord.addEventListener('submit', function (e) {
           e.preventDefault()
@@ -344,6 +356,17 @@
           }
         })
   })
+  $(`#delete${idx}`).on("click", (e)=>{
+    fetch(`/api/user/${user_id}/`, {
+      method: 'delete',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}'
+      }
+    }).then(async (res) => {
+        $(`#collapseExample${idx}`).collapse('hide')
+        drawCustomer(await getUserData())
+    })
+})
   })
 }
   function toggleCollapse(idx) {

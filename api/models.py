@@ -150,7 +150,7 @@ class PlanPart(models.Model):
 class Plantation(models.Model):
     c_code = models.CharField(max_length=50, unique=True)
     c_name = models.CharField(max_length=100)
-    owner = models.CharField(max_length=100)
+    owner = models.ForeignKey(UserMaster, on_delete=models.CASCADE)
     bom = models.ForeignKey(BomMaster, on_delete=models.SET_NULL, null=True)
     delete_flag = models.CharField(max_length=1, default='N')
     reg_flag = models.CharField(max_length=1, default='N')

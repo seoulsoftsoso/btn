@@ -6,11 +6,9 @@ from api.models import OrderMaster, ItemMaster, UserMaster, Plantation
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
-from django.db import transaction
 from rest_framework.response import Response
 import uuid, json
 
-from api.user.user_restframework import ClientSerializer
 
 
 class PlantationSerializer(serializers.ModelSerializer):
@@ -52,8 +50,7 @@ class PlantationViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def get_container_by_owner(self, request, pk=None):
-        ret = Plantation.objects.filter(delete_flag='N').values('c_code', 'owner_id')
-        ret = list(ret)
+        ret = Plantation.objects.values('owner_id', 'c_code')
         group_ret_by_owner = []
         for i in ret:
             if i['owner_id'] not in [x['owner_id'] for x in group_ret_by_owner]:
