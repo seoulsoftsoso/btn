@@ -132,7 +132,7 @@
                                                 });
                                                 {#이 부분은 제어 센서#}
                                                 uniqueStaSenName.forEach(uniqueSenName => {
-                                                    let status = "-";
+                                                    let status = "err";
                                                     Object.entries(conInf.sta || {}).forEach(([senid, senInf]) => {
                                                         if (senInf.sen_name === uniqueSenName) {
                                                                 status = senInf.status;
