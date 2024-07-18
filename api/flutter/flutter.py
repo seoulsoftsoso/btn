@@ -48,7 +48,6 @@ def container_map(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         user_id = data.get('user_id')
-
         if not user_id:
             return JsonResponse({'error': 'User ID not provided'}, status=400)
 
@@ -95,7 +94,7 @@ def container_sen_map(request):
         dbSensorStatus = db['sen_status']
         dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
         dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-        #¹Ù·Î À§¿¡¼­ ÀÎµ¦½º Ã³¸® ÇÏ´Âµ¥ ¿©±â¼­ ½Ã°£ÀÌ Á» °É¸². ÇÏÁö¸¸ °á±¹ ÀÎµ¦½º Ã³¸®°¡ ÇÊ¿äÇÔ. ¸ù°íµðºñ ¼³Ä¡ÈÄ µðºñ ÀÚÃ¼¿¡¼­ ÇÏ´Â ¹æ¹ý ¸ð»öÇØº¸ÀÚ!.
+        #ï¿½Ù·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½â¼­ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½É¸ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½á±¹ ï¿½Îµï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Øºï¿½ï¿½ï¿½!.
         order_products = OrderProduct.objects.filter(order__client=user_id).values_list('bom', flat=True)
         bom_masters = BomMaster.objects.filter(id__in=order_products, delete_flag='N')
 
