@@ -31,7 +31,7 @@
                 <div class="modal-body">
                     <button type="button"
                             class="btn-close"
-                            atda-bs-dismiss="modal"
+                            data-bs-dismiss="modal"
                             aria-label="Close"></button>
                     <div class="text-center mb-4">
                         <h3 class="title">추가</h3>
@@ -538,9 +538,10 @@
         }
         let data = dt_basic.row(tr).data();
         if(data){
-          ['item_code', 'item_name', 'item_type', 'specification', 'model', 'brand','standard_price'].forEach((key) => {
+          ['item_code', 'item_name', 'specification', 'model', 'brand','standard_price'].forEach((key) => {
             formRecord.querySelector(`#${key}`).value = data[key];
           });
+          $("#item_type").val(data['item_type']).trigger("change")
           $("#level").val(data.level).trigger("change");
         }
       });

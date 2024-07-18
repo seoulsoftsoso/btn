@@ -235,7 +235,7 @@
     async function getBomTree() {
         if (order_id === 'build') return
         let res = await fetch(`/api/bom/?order=${order_id}`)
-        let bomData = await res => res.json()
+        let bomData = await res.json()
         console.log(bomData)
         bomData = bomData.sort((a, b) => b.level - a.level)
         let tempData =[]
