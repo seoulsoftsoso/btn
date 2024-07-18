@@ -253,9 +253,6 @@
                 ? regTable[FOUR_MONTHS_AGO]
                 : regTable[A_LONG_TIME_AGO]
       let tr = document.createElement("tr")
-        tr.onclick = () => {
-          toggleCollapse(idx)
-        }
       tr.innerHTML = `
           <td>
             ${data.email}
@@ -322,8 +319,7 @@
                 </div>
             </form>
           <div class="d-flex align-items-center gap-2 justify-content-end align-content-center mt-3">
-            <span class="badge bg-primary">관리자</span>
-            <span class="badge bg-secondary">사용자</span>
+            <span class="badge bg-primary">${data.is_master ? '관리자' : '사용자'}</span>
           </div>
         </div>
       </td>`

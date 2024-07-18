@@ -154,6 +154,16 @@
     let requestUrl = '/api/order/';
     let requestMethod = 'POST';
     $(async function () {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                addEventListeners();
+            }
+        });
+    });
+    const config = { childList: true, subtree: true };
+    observer.observe(document.body, config);
+
         let dt_basic_table = $('.datatables-basic')
         const dt_basic = dt_basic_table.DataTable({
         ajax: {
@@ -240,7 +250,6 @@
                             $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
                             $output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
                         }
-                        // Creates full output for row
                         var $row_output = '<div class="d-flex justify-content-start align-items-center user-name">' + '<div class="avatar-wrapper">' + '<div class="avatar me-2">' + $output + '</div>' + '</div>' + '<div class="d-flex flex-column">' + '<span class="emp_name text-truncate">' + $name + '</span>' + '<small class="emp_post text-truncate text-muted">' + $post + '</small>' + '</div>' + '</div>';
                         return $row_output;
                     }
@@ -254,16 +263,16 @@
                     orderable: false,
                     searchable: false,
                     render: function (data, type, full, meta) {
-                        const htmlCode = `
-                <div class="d-inline-block">
-                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a href="/order/build?id=${full.id}" class="dropdown-item"><i class="bx bxs-edit"></i> 주문서 작성</a></li>
-                        <li><button href="javascript:;" class="dropdown-item edit-order"><i class="bx bxs-edit"></i> 수정</button></li>
-                        <li><button href="javascript:;" class="dropdown-item text-danger delete-order"><i class="bx bxs-trash"></i> 삭제</button></li>
-                    </ul>
-                </div>
-            `;
+                    const htmlCode = `
+                        <div class="d-inline-block">
+                            <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></a>
+                            <ul class="dropdown-menu dropdown-menu-end m-0">
+                                <li><a href="/order/build?id=${full.id}" class="dropdown-item"><i class="bx bxs-edit"></i> 주문서 작성</a></li>
+                                <li><button href="javascript:;" class="dropdown-item edit-order"><i class="bx bxs-edit"></i> 수정</button></li>
+                                <li><button href="javascript:;" class="dropdown-item text-danger delete-order"><i class="bx bxs-trash"></i> 삭제</button></li>
+                            </ul>
+                        </div>
+                        `;
                         return (htmlCode);
                     }
                 }
@@ -568,6 +577,18 @@
         let offCanvasElement = document.querySelector('#add-new-record');
         let offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
 
+
+    function addEventListeners() {
+        let deleteOrderBtnMulti = document.querySelectorAll('.delete-order');
+        deleteOrderBtnMulti.forEach(el => {
+            el.addEventListener('click', handleDeleteClick); // 중복 방지를 위해 기존 이벤트 제거
+        });
+        let EditOrderBtnMulti = document.querySelectorAll('.edit-order')
+        EditOrderBtnMulti.forEach(el =>{
+            el.addEventListener("click", handleEditClick)
+        })
+    }
+
         setTimeout(() => {
             const addOrder = document.querySelector('.add-order')
             if (!addOrder) {
@@ -580,28 +601,39 @@
                 $(".data-submit").text('추가')
             });
         }, 200)
-        setTimeout(() => {
-            let deleteOrderBtnMulti = document.querySelectorAll('.delete-order');
-            deleteOrderBtnMulti.forEach(el => {
-                el.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    offCanvasEl.show();
-                    const closetColumn = $(event.target).closest('tr');
-                    let data = dt_basic
-                        .row(closetColumn)
-                        .data();
-                    $(TagifyUserListEl).val(data.client.user_name).trigger('tagify:updated');
-                    $(".data-submit").text('삭제')
-                    requestUrl = '/api/order/' + data['id'];
-                    requestMethod = 'DELETE';
-                    orderInputs.forEach((item) => {
-                        formAddNewRecord
-                            .querySelector(`[name="${item}"]`)
-                            .value = (data[item] || '')
-                    });
-                });
-            });
-        }, 200)
+        
+    function handleDeleteClick(event) {
+        event.preventDefault();
+        offCanvasEl.show();
+        const closetColumn = $(event.target).closest('tr');
+        let data = dt_basic.row(closetColumn).data();
+        $(TagifyUserListEl).val(data.client.user_name).trigger('tagify:updated');
+        $(".data-submit").text('삭제');
+        requestUrl = '/api/order/' + data['id'];
+        requestMethod = 'DELETE';
+        orderInputs.forEach((item) => {
+            formAddNewRecord.querySelector(`[name="${item}"]`).value = (data[item] || '');
+        });
+    }
+    
+    function handleEditClick(event){
+        event.preventDefault()
+        offCanvasEl.show();
+        const closetColumn = $(event.target).closest('tr');
+        let data = dt_basic.row(closetColumn).data()
+        orderInputs.forEach((item) => {
+            formAddNewRecord
+                .querySelector(`[name="${item}"]`)
+                .value = (data[item] || '')
+        });
+        $(".data-submit").text('수정')
+        $(TagifyUserListEl).val(data.client.user_name).trigger('tagify:updated');
+        requestUrl  = `/api/order/${data['id']}/`;
+        requestMethod = 'patch';
+        
+    }
+
+
         setTimeout(() => {
             let editOrderBtnMulti = document.querySelectorAll('.edit-order');
             editOrderBtnMulti.forEach(el => {
@@ -614,7 +646,6 @@
                             .querySelector(`[name="${item}"]`)
                             .value = (data[item] || '')
                     });
-                    $('')
                     $(TagifyUserListEl).val(data.client.user_name).trigger('tagify:updated');
                     requestUrl  = `/api/order/${data['id']}/`;
                     requestMethod = 'patch';
@@ -622,7 +653,7 @@
                 })
             })
         }, 200)
-        
+
         // Form validation for Add ne  record
         fv = FormValidation.formValidation(formAddNewRecord, {
             fields: {
