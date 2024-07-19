@@ -130,7 +130,7 @@
                 </div>
                 <div class="col-sm-12 mt-3">
                     <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">추가</button>
-                    <button type="reset" class="btn btn-outline-info" data-bs-dismiss="offcanvas">초기화</button>
+                    <button type="reset" class="btn btn-outline-info">초기화</button>
                 </div>
             </form>
         </div>
@@ -167,11 +167,13 @@
         let dt_basic_table = $('.datatables-basic')
         const dt_basic = dt_basic_table.DataTable({
         ajax: {
-          url: '/api/order',
+          url: '/api/order/?format=datatables',
           dataSrc: function (json) {
-            return json;
+            return json.data
           },
         },
+        "processing": true,
+        "serverSide": true,
             columns: [
                 {
                     data: ''
@@ -180,7 +182,7 @@
                 }, {
                     data: 'id'
                 }, {
-                    data: ''
+                    data: 'client'
                 }, {
                     data: 'order_place'
                 }, {
@@ -497,44 +499,26 @@
         }
 
         const usersList = await getUserList().then(data => {
-            return data.map(user => {
+            return data.results.map(user => {
                 return {
                     value: user.id,
                     id: user.user_id,
-                    user_name: user.user_name,
-                    email: user.email,
+                    user_name: user.user_name.trim(),
+                    email: user.email.trim(),
                     avatar: user.signature
                 }
             });
         });
 
-        function tagTemplate(tagData) {
-            return `
-            <tag title="${tagData.title || tagData.email}"
-              contenteditable='false'
-              spellcheck='false'
-              tabIndex="-1"
-              class="${this.settings.classNames.tag} ${tagData.class
-                ? tagData.class
-                : ''}"
-              ${this.getAttributes(tagData)}
-            >
-      <div>
-        <span class='tagify__tag-text'>${tagData.user_name}</span>
-      </div>
-    </tag>
-  `;
-        }
-
         function suggestionItemTemplate(tagData) {
             return `
             <div ${this.getAttributes(tagData)}
               class='tagify__dropdown__item align-items-center ${tagData.class
-                ? tagData.class
-                : ''}'
-              tabindex="0"
-              role="option"
-            >
+                        ? tagData.class
+                        : ''}'
+                    tabindex="0"
+                    role="option"
+                    >
                     ${
                 tagData?.avatar
                     ? `<div class='tagify__dropdown__item__avatar-wrap'>
@@ -547,27 +531,16 @@
       `;
         }
 
-        function dropdownHeaderTemplate(suggestions) {
-            return `
-        <div class="${this.settings.classNames.dropdownItem}">
-            <span>${suggestions.length} members</span>
-        </div>
-    `;
-        }
-
-        new Tagify(TagifyUserListEl, {
+        const tagify = new Tagify(TagifyUserListEl, {
             mode: "select",
             tagTextProp: 'user_name', // very important since a custom template is used with this property as text. allows typing a "value" or a "name" to match input with whitelist
-            enforceWhitelist: true,
             skipInvalid: true, // do not remporarily add invalid tags
             dropdown: {
                 classname: 'users-list',
                 searchKeys: ['user_name'] // very important to set by which keys to search for suggesttions when typing
             },
             templates: {
-                tag: tagTemplate,
                 dropdownItem: suggestionItemTemplate,
-                dropdownHeader: dropdownHeaderTemplate
             },
             whitelist: usersList
         });
@@ -578,16 +551,16 @@
         let offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
 
 
-    function addEventListeners() {
-        let deleteOrderBtnMulti = document.querySelectorAll('.delete-order');
-        deleteOrderBtnMulti.forEach(el => {
-            el.addEventListener('click', handleDeleteClick); // 중복 방지를 위해 기존 이벤트 제거
-        });
-        let EditOrderBtnMulti = document.querySelectorAll('.edit-order')
-        EditOrderBtnMulti.forEach(el =>{
-            el.addEventListener("click", handleEditClick)
-        })
-    }
+        function addEventListeners() {
+            let deleteOrderBtnMulti = document.querySelectorAll('.delete-order');
+            deleteOrderBtnMulti.forEach(el => {
+                el.addEventListener('click', handleDeleteClick); // 중복 방지를 위해 기존 이벤트 제거
+            });
+            let EditOrderBtnMulti = document.querySelectorAll('.edit-order')
+            EditOrderBtnMulti.forEach(el =>{
+                el.addEventListener("click", handleEditClick)
+            })
+        }
 
         setTimeout(() => {
             const addOrder = document.querySelector('.add-order')
@@ -601,6 +574,9 @@
                 $(".data-submit").text('추가')
             });
         }, 200)
+        tagify.on('change', (e)=>{
+            console.log(e)
+        })
         
     function handleDeleteClick(event) {
         event.preventDefault();
@@ -629,7 +605,7 @@
         $(".data-submit").text('수정')
         $(TagifyUserListEl).val(data.client.user_name).trigger('tagify:updated');
         requestUrl  = `/api/order/${data['id']}/`;
-        requestMethod = 'patch';
+        requestMethod = 'PATCH';
         
     }
 
@@ -648,7 +624,7 @@
                     });
                     $(TagifyUserListEl).val(data.client.user_name).trigger('tagify:updated');
                     requestUrl  = `/api/order/${data['id']}/`;
-                    requestMethod = 'patch';
+                    requestMethod = 'PATCH';
                     $(".data-submit").text('수정')
                 })
             })
@@ -726,10 +702,12 @@
         });
         formAddNewRecord.addEventListener('submit', function (e2) {
             e2.preventDefault();
+            $('#add-new-record').offcanvas('hide');
             fv.validate().then(function (status) {
                 if (status === 'Valid') {
                     const form = e2.target
                     const formData = new FormData(form)
+                    console.log($("#TagifyUserList").val())
                     formData.set('client', JSON.parse($("#TagifyUserList").val())[0].value)
                     fetch(requestUrl, {
                         method: requestMethod,
@@ -737,9 +715,12 @@
                         headers:{
                             'X-CSRFToken': '{{ csrf_token }}'
                         }
-                    }).then(response => response.json()).then(data => {
-                        $('#add-new-record').offcanvas('hide');
-                        dt_basic.ajax.reload();
+                    })
+                    .then(response => {
+                        dt_basic.ajax.reload(null, false);
+                        return response.json()
+                    })
+                    .then(data => {
                         form.reset();
                     });
                 }

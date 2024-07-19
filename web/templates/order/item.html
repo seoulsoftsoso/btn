@@ -238,9 +238,9 @@
       var dt_basic_table = $('.datatables-basic')
       dt_basic = dt_basic_table.DataTable({
         ajax: {
-          url: '/api/item/',
+          url: '/api/item/?format=datatables',
           dataSrc: function (json) {
-            return json;
+            return json.data
           },          
         },
         columns: [
@@ -321,7 +321,7 @@
                 <div class="d-inline-block">
                     <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></a>
                     <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a href="javascript:;" class="dropdown-item" data-bs-toggle="modal" action="patch" data-bs-target="#item"><i class="bx bxs-edit"></i> 수정</a></li>
+                        <li><a href="javascript:;" class="dropdown-item" data-bs-toggle="modal" action="PATCH" data-bs-target="#item"><i class="bx bxs-edit"></i> 수정</a></li>
                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record" data-bs-toggle="modal" action="delete" data-bs-target="#item"><i class="bx bxs-trash"></i> 삭제</a></li>
                     </ul>
                 </div>
@@ -516,13 +516,13 @@
         let rest = e.relatedTarget.getAttribute('action');
         const formRecordBtn = $(formRecord).find('button[type="submit"]')
         switch (rest) {
-          case 'patch':
+          case 'PATCH':
             formRecordBtn.text('수정');
             serverUrl = `/api/item/${dt_basic.row(tr).data().id}/`
             reqeustMethod = 'PATCH'
             $('h3.title').text('수정');
             break;
-          case 'delete':
+          case 'DELETE':
             formRecordBtn.text('삭제');
             serverUrl = `/api/item/${dt_basic.row(tr).data().id}/`
             reqeustMethod = 'DELETE'

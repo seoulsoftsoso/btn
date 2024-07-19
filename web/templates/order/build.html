@@ -20,9 +20,6 @@
                 </select>
             </div>
         </div>
-        <div class="d-flex align-content-center flex-wrap gap-2">
-            <button class="btn btn-label-danger delete-order">Delete Order</button>
-        </div>
     </div>
     <div class="row">
         <div class="col-12">
@@ -519,7 +516,7 @@
                 }
             }
             fetch(`/api/bom/${row.id}/edit_bom_data/`, {
-                method: 'Patch',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': '{{ csrf_token }}',
@@ -547,7 +544,7 @@
         let t = $('#tg');
         let row = t.treegrid('getSelected');
           fetch(`/api/bom/${row.id}`, {
-                method: 'delete',
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': '{{ csrf_token }}',

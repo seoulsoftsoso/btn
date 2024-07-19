@@ -212,7 +212,7 @@
   const thead = document.querySelector("table thead")
   async function drawCustomer(userData) {
     table.innerHTML = ''
-    userData.forEach((data, idx) => {
+    userData.results.forEach((data, idx) => {
       let regDate = data.created_at.split("T")[0]
       let lastLogin = data.updated_at.split("T")[0]
 
@@ -377,13 +377,13 @@
   document
     .getElementById("register")
     .addEventListener("click", async function () {
-      userData = userData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+      userData.results = userData.results.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
       await drawCustomer(userData)
     })
   document
     .getElementById("lastLogin")
     .addEventListener("click", async function () {
-      userData = userData.sort((a, b) => new Date(a.updated_at) - new Date(b.updated_at))
+      userData.results = userData.results.sort((a, b) => new Date(a.updated_at) - new Date(b.updated_at))
       await drawCustomer(userData)
     })
 
