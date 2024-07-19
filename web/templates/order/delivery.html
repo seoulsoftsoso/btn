@@ -166,12 +166,14 @@
 
         let dt_basic_table = $('.datatables-basic')
         const dt_basic = dt_basic_table.DataTable({
-        ajax: {
+        deferRender:true,
+            ajax: {
           url: '/api/order',
           dataSrc: function (json) {
             return json;
           },
         },
+
             columns: [
                 {
                     data: ''
@@ -601,7 +603,7 @@
                 $(".data-submit").text('추가')
             });
         }, 200)
-        
+
     function handleDeleteClick(event) {
         event.preventDefault();
         offCanvasEl.show();
@@ -615,7 +617,7 @@
             formAddNewRecord.querySelector(`[name="${item}"]`).value = (data[item] || '');
         });
     }
-    
+
     function handleEditClick(event){
         event.preventDefault()
         offCanvasEl.show();
@@ -630,7 +632,7 @@
         $(TagifyUserListEl).val(data.client.user_name).trigger('tagify:updated');
         requestUrl  = `/api/order/${data['id']}/`;
         requestMethod = 'patch';
-        
+
     }
 
 
