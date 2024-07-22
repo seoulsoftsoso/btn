@@ -225,7 +225,13 @@
                     }
                 }).then(response => {
                   if (response.ok) {
+                    Swal.fire({
+                      title: "완료",
+                      text: `${formData.get("item_name")}`,
+                      icon: "success"
+                  });
                     dt_basic.ajax.reload();
+                    
                     $('#item').modal('hide');
                   }
                 });

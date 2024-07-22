@@ -24,9 +24,6 @@
         <div class="menu-inner-shadow"></div>
         <ul class="menu-inner py-1">
             <!-- Dashboards -->
-            <li class="menu-header small text-uppercase fs-4">
-                <span class="menu-header-text">데이터</span>
-            </li>
             <li class="menu-item {% if request.resolver_match.route|slice:":7" == 'device/' %} open{% endif %}">
                 <a href="/device/control" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-home-circle"></i>
