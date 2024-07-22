@@ -736,5 +736,12 @@
         $("#order_tax").val(order_tax);
         $("#order_total").val(order_total);
     });
+
+    $("#order_cnt").on('input', function() {
+        let price = $("#order_price").val() || 1
+        let order_total = price * $(this).val()
+        $("#order_tax").val(order_total * 0.1)
+        $("#order_total").val(order_total)
+    })
 </script>
 {% include 'footer.html' %}

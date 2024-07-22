@@ -127,31 +127,17 @@
               email: {
                   validators: {
                       notEmpty: {
-                          message: 'The email is required'
+                          message: '이메일이 필요합니다'
                       },
                       emailAddress: {
-                          message: 'The value is not a valid email address'
-                      }
-                  }
-              },
-              password: {
-                    validators: {
-                      notEmpty: {
-                          message: 'The password is required'
-                      }
-                 }
-              },
-              confirm_password: {
-                  validators: {
-                      notEmpty: {
-                          message: 'The password is required'
+                          message: '적합한 이메일 형식이 아닙니다'
                       }
                   }
               },
               company_name: {
                   validators: {
                       notEmpty: {
-                          message: 'The company name is required'
+                          message: '기업명이 없습니다'
                       }
                   }
               },
@@ -193,9 +179,18 @@
                       }
                   }).then((res) => {
                       if (res.ok) {
-                          alert('성공적으로 추가되었습니다.')
+                        Swal.fire({
+                          title: "추가 완료",
+                          message: `${formData.get("user_name")}이 추가되었습니다`,
+                          icon: "success"
+                        });
                           location.reload()
                       } else {
+                        Swal.fire({
+                          title: "오류",
+                          message: `${formData.get("user_name")}이 추가 중 오류가 발생했습니다`,
+                          icon: "error"
+                        });
                           alert('추가에 실패하였습니다.')
                       }
                   })
@@ -292,7 +287,7 @@
                         <span class="input-group-text fs-tiny">
                           ${elements[el]}
                         </span>
-                        <input type="text" name="${el}" class="form-control border p-2" value="${data[el] || ''}">
+                        <input type="${el.includes("password") ? 'password': 'text'}" name="${el}" class="form-control border p-2" value="${data[el] || ''}" />
                     </div>
                   </div>`
                 }).join('')}
@@ -302,7 +297,7 @@
                         <span class="input-group-text fs-tiny">
                           ${elements[el]}
                         </span>
-                        <input type="text" name="${el}" class="form-control border p-2" value="${ent[el] || ''}">
+                        <input name="${el}" type="${el.includes("tel") ? "tel" : "text"}" class="form-control border p-2" value="${ent[el] || ''}"/>
                     </div>
                   </div>`
                 }).join('')}
@@ -348,6 +343,11 @@
               }
             }).then((res) => {
                $(`#collapseExample${idx}`).collapse('hide')
+               Swal.fire({
+                title: "수정 완료",
+                text: `${formData.get("user_name")}가 수정 완료 되었습니다.`,
+                icon: "success"
+              });
             })
           }
         })
@@ -360,6 +360,10 @@
       }
     }).then(async (res) => {
         $(`#collapseExample${idx}`).collapse('hide')
+        Swal.fire({
+          title: "삭제 완료",
+          icon: "success"
+        });
         drawCustomer(await getUserData())
     })
 })

@@ -234,7 +234,7 @@
         let res = await fetch(`/api/bom/?order=${order_id}`)
         let bomData = await res.json()
         console.log(bomData)
-        bomData = bomData.sort((a, b) => b.level - a.level)
+        bomData = bomData.results.sort((a, b) => b.level - a.level)
         let tempData =[]
         bomData.forEach(data => {
             let parent = data.parent || '#'
@@ -266,7 +266,7 @@
     async function getItemList() {
         let res = fetch('/api/item')
         let data = await res.then(res => res.json())
-        items = data
+        items = data.results
     }
 
     var editingId;
@@ -313,7 +313,7 @@
             return new Error('Network response was not ok');
         }
         let orderIdList = await orderIdListReq.json();
-        orderIdList = orderIdList.map(order => order.id);
+        orderIdList = orderIdList.results.map(order => order.id);
         orderIdList.forEach((orderId) => {
             $("#orderIdList").append(`<option value="${orderId}">${orderId}</option>`);
         });
@@ -430,11 +430,16 @@
                             let addedBomElement = addedBom[i]
                         }
                         await getBomTree()
+                        Swal.fire({
+                            title: "추가 완료",
+                            text: `${item_product_name}이 총 ${addedBom.length}개 추가되었습니다`,
+                            icon: "success"
+                        });
+                        offCanvasEl.hide()
                         $("#tg").treegrid('loadData', tree)
                     })
                 }
             })
-            offCanvasEl.hide()
         })
         $("#edit-item").on('click', function (e) {
 
@@ -529,6 +534,11 @@
                 })
             }).then(res => res.json())
             .then(data => {
+                Swal.fire({
+                    title: "수정 완료",
+                    text: `${row.product_name}에 코드와 이름이 수정되었습니다`,
+                    icon: "success"
+                });
                 console.log(data)
             })
             $("#tg").treegrid('reload');
@@ -551,6 +561,11 @@
                 },
             }).then(res => res)
             .then(data => {
+                Swal.fire({
+                    title: "삭제 완료",
+                    text: `${row.product_name}의 하위 제품과 함께 삭제 되었습니다`,
+                    icon: "success"
+                });
                 $("#tg").treegrid('remove', row.id);
             })
 

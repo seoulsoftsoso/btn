@@ -26,7 +26,9 @@ def format_data(data):
             'company_name': data['company_name'] if 'company_name' in data else '',
             'charge_pos': data['charge_pos'] if 'charge_pos' in data else '',
             'charge_tel': data['charge_tel'] if 'charge_tel' in data else '',
-        }
+        },
+        'password': data['password'],
+        'confirm_password': data['confirm_password']
     }
 
 
@@ -165,10 +167,14 @@ class UserViewSet(viewsets.ModelViewSet):
         rawData = format_data(request.data)
         with transaction.atomic():
             user = UserMaster.objects.get(id=kwargs['pk'])
+            auth_user = user.user
             user.__dict__.update(rawData['user'])
             ent = user.ent
             ent.__dict__.update(rawData['ent'])
             ent.save()
+            if rawData['confirm_password'] == rawData['password'] and len(rawData['password']) >=6 :
+                auth_user.set_password(rawData['password'])
+                auth_user.save()
             user.save()
         return Response({'status': 'success'})
 
