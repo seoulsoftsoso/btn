@@ -12,6 +12,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.views.decorators.csrf import csrf_exempt
 
+from button.ws.mongo_updates import start_listening_to_changes_flutter
+
 
 def csrf(request):
     csrf_token = get_token(request)
@@ -27,6 +29,9 @@ def login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             # Authentication successful
+            start_listening_to_changes_flutter(request)
+
+
             return JsonResponse({
                 'success': True,
                 'user': {
@@ -68,6 +73,7 @@ def container_map(request):
         initial_data = {
             'con_id_senid_map': cont
         }
+        print(initial_data)
         return JsonResponse(initial_data, encoder=DjangoJSONEncoder)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
@@ -148,6 +154,7 @@ def container_sen_map(request):
             'unique_gtr_sen_name': unique_gtr_items,
             'unique_sta_sen_name': unique_sta_items,
         }
+        print(initial_data)
         return JsonResponse(initial_data, encoder=DjangoJSONEncoder)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
