@@ -29,7 +29,6 @@ def login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             # Authentication successful
-            start_listening_to_changes_flutter(request)
 
 
             return JsonResponse({
@@ -85,6 +84,7 @@ def container_sen_map(request):
         data = json.loads(request.body)
         user_id = data.get('user_id')
         conId = data.get('conId')
+        start_listening_to_changes_flutter(conId)
 
         if not user_id:
             return JsonResponse({'error': 'User ID not provided'}, status=400)
@@ -100,11 +100,8 @@ def container_sen_map(request):
         dbSensorStatus = db['sen_status']
         dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
         dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-        #�ٷ� ������ �ε��� ó�� �ϴµ� ���⼭ �ð��� �� �ɸ�. ������ �ᱹ �ε��� ó���� �ʿ���. ������ ��ġ�� ��� ��ü���� �ϴ� ��� ����غ���!.
-        order_products = OrderProduct.objects.filter(order__client=user_id).values_list('bom', flat=True)
-        bom_masters = BomMaster.objects.filter(id__in=order_products, delete_flag='N')
 
-        container_bom_masters = bom_masters.filter(level=0, id=conId)
+        container_bom_masters = BomMaster.objects.filter(level=0, id=conId)
         controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', parent=conId, delete_flag='N')
         controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
         sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')

@@ -18,10 +18,8 @@ def listen_to_changes(request):
     dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
-    OrderMaster = apps.get_model('api', 'OrderMaster')
     OrderProduct = apps.get_model('api', 'OrderProduct')
     BomMaster = apps.get_model('api', 'BomMaster')
-    ItemMaster = apps.get_model('api', 'ItemMaster')
 
     order_products = OrderProduct.objects.filter(order__client=request.user.id)
     bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
@@ -101,7 +99,7 @@ def start_listening_to_changes(request):
     threading.Thread(target=listen_to_changes, args=(request,), daemon=True).start()
 
 
-def listen_to_changes_flutter(request):
+def listen_to_changes_flutter(conId):
     uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
     client = MongoClient(uri)
     db = client['djangoConnectTest']
@@ -111,16 +109,10 @@ def listen_to_changes_flutter(request):
     dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
-    OrderMaster = apps.get_model('api', 'OrderMaster')
-    OrderProduct = apps.get_model('api', 'OrderProduct')
     BomMaster = apps.get_model('api', 'BomMaster')
-    ItemMaster = apps.get_model('api', 'ItemMaster')
 
-    order_products = OrderProduct.objects.filter(order__client=request.user.id)
-    bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
-
-    container_bom_masters = bom_masters.filter(level=0)
-    controller_bom_masters = bom_masters.filter(level=1, item__item_type='AC')
+    container_bom_masters = BomMaster.objects.filter(level=0, id=conId)
+    controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', parent=conId)
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
     sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
     gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
@@ -163,30 +155,44 @@ def listen_to_changes_flutter(request):
                 con_inf['sta'] = sta_sen
                 cont[con_id] = con_inf
 
-            send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont)
+            averages = {}
+            for item in unique_gtr_items:
+                matching_gtr_sensors = [v['value'] for v in gtr_sen.values() if v['sen_name'] == item]
+                if matching_gtr_sensors:
+                    average_value = sum(matching_gtr_sensors) / len(matching_gtr_sensors)
+                else:
+                    average_value = 0
+                averages[item] = average_value
 
-            # document = change['fullDocument']
-            # asyncio.run(send_update_to_ws(document))
+            print("Average values for matching gtr_sensors:", averages)
 
-def send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont):
+            send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, averages)
+
+        # document = change['fullDocument']
+        # asyncio.run(send_update_to_ws(document))
+
+
+def send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, averages):
     #         # 클라이언트에게 초기 데이터를 전송하는 함수
     data = {
         'unique_gtr_sen_name': unique_gtr_items,
         'unique_sta_sen_name': unique_sta_items,
-        'con_id_senid_map': cont
+        'con_id_senid_map': cont,
+        'gtr_sen_average': averages
     }
     asyncio.run(send_update_to_ws_flutter(data))
 
 
-async def send_update_to_ws_flutter(document):
+async def send_update_to_ws_flutter(data):
     channel_layer = get_channel_layer()
     await channel_layer.group_send(
         'app_group_name',  # Send to the new group
         {
             'type': 'send_update',
-            'data': document
+            'data': data
         }
     )
 
-def start_listening_to_changes_flutter(request):
-    threading.Thread(target=listen_to_changes_flutter, args=(request,), daemon=True).start()
+
+def start_listening_to_changes_flutter(conId):
+    threading.Thread(target=listen_to_changes_flutter, args=(conId,), daemon=True).start()
