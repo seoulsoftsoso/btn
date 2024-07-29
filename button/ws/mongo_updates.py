@@ -164,9 +164,11 @@ def listen_to_changes_flutter(conId):
                     average_value = 0
                 averages[item] = average_value
 
+            int_averages = {k: int(v) for k, v in averages.items()}
+
             print("Average values for matching gtr_sensors:", averages)
 
-            send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, averages)
+            send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, int_averages)
 
         # document = change['fullDocument']
         # asyncio.run(send_update_to_ws(document))
