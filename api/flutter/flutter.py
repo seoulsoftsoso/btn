@@ -102,7 +102,7 @@ def container_sen_map(request):
         dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
 
         container_bom_masters = BomMaster.objects.filter(level=0, id=conId)
-        controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', parent=conId, delete_flag='N')
+        controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId, delete_flag='N')
         controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
         sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
         gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
