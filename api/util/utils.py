@@ -25,7 +25,7 @@ def user_table_data(request):
     bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True), delete_flag='N')
 
     container_bom_masters = bom_masters.filter(level=0)
-    controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', delete_flag='N')
+    controller_bom_masters = BomMaster.objects.filter(level=1, delete_flag='N', order__client=request.user.id)
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
     sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
     gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L', delete_flag='N')
