@@ -1,4 +1,114 @@
 {% include "header.html" %}
 {% include 'menu.html' %}
 {% load static %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class='d-flex justify-content-between align-items-center mb-4'>
+        <div>
+            <span class="mx-2">
+                최신 순 <span>▼</span>
+            </span>
+            <span class="ml-2">
+                재배동 많은 순 <span>▼</span>
+            </span>
+        </div>
+        <div class="ml-auto d-flex">
+            <input type="text" class="form-control mx-2" placeholder="검색어를 입력하세요">
+            <span class="btn btn-primary align-content-end inline"><i class="fas fa-edit"></i></span>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h5>제배동</h5>
+            <div class="mr-auto"><i class="bx bx-refresh"></i></div>
+        </div>
+        <div class="table-responsive text-nowrap">
+          <table class="table">
+            <thead class="table-light">
+              <tr>
+                <th>관리자</th>
+                <th>컨테이너</th>
+                <th>센서</th>
+                <th>상태</th>
+                <th>메시지</th>
+                <th>---</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0" id="plantation_tbody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+</div>
+<script>
+      $(document).ready(async function() {
+        let plantation = await fetch('/api/plantation/get_container_by_owner')
+        plantation = await plantation.json()
+          let userData = await fetch(`/api/user/${plantation[0].owner_id}`)
+          userData = await userData.json()
+          let header_row_span = 0;
+          await Promise.all(plantation.map(
+            async (data) => {
+            console.log(data.containers)
+            data.containers.forEach( async (container) => {
+                let seonsor_by_container_res = await fetch(`/api/planpart/?plantation__c_code=${container}`)
+                let seonsor_by_container = (await seonsor_by_container_res.json()).results
+                if(seonsor_by_container){
+                seonsor_by_container.map((data, idx)=>{
+                    header_row_span++
+                    $("#plantation_tbody").append(`
+                     <tr>
+                     ${idx === 0 ?
+                        `<td rowspan="${seonsor_by_container.length}">
+                            ${container}
+                        </td>` : ''
+                    }
+                        <td>
+                            ${data.p_name}
+                        </td>
+                        <td> ${data.status === "conn_ok" ?
+                        `<span class="badge bg-label-info me-1">Scheduled</span>` :
+                        `<span class="badge bg-label-danger me-1">error</span>`
+                        }</td>
+                        <td>
+                            <div title="${data.message}">
+                            ${data.message.slice(0,30)}
+                            </div>
+                        </td>
+                        <td>
+                          <div class="dropdown">
+                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                              <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
+                              >
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-trash me-1"></i> Delete</a
+                              >
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-info-circle me-1"></i> 상세정보</a
+                              >
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                `)})
+                }
+            })
+              $("#plantation_tbody").prepend(`
+                <tr>
+                  <td rowspan="${header_row_span}"
+                    <div>
+                      <span class="fw-medium">
+                        ${userData['ent']['company_name']}
+                        </span>
+                    </div>
+                    </td>
+                </tr>
+              `
+              )
+            }))
+        })
+</script>
 {% include 'footer.html' %}
