@@ -46,7 +46,7 @@ def bom_add(request, order):
         'tax': total * 0.1
     }
     boms = []
-    if level == 3:
+    if level == 2:
         bom = BomMaster.objects.create(
             **format_bom_data(RawBomData),
             **bomPriceData,

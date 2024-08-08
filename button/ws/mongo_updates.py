@@ -21,7 +21,7 @@ def listen_to_changes(request):
     OrderProduct = apps.get_model('api', 'OrderProduct')
     BomMaster = apps.get_model('api', 'BomMaster')
 
-    order_products = OrderProduct.objects.filter(order__client=request.user.id)
+    order_products = OrderProduct.objects.filter(order__client_id=request.user.id)
     bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
 
     container_bom_masters = bom_masters.filter(level=0)

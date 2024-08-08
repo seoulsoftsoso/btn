@@ -2,6 +2,7 @@ from django.urls import path, include
 from .bom.bom_restframework import BomViewSet
 from .item.item_rest_framework import ItemViewSet
 from .plantation.plantation import PlantationViewSet
+from .planpart.planpart import PlanPartViewSet
 from .user.user_restframework import UserViewSet
 from .order.order_restframework import OrderViewSet
 from .util.utils import *
@@ -13,6 +14,7 @@ router.register(r'item', ItemViewSet)
 router.register(r'user', UserViewSet)
 router.register(r'order', OrderViewSet)
 router.register(r'plantation', PlantationViewSet)
+router.register(r'planpart', PlanPartViewSet)
 
 
 urlpatterns = [

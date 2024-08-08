@@ -53,7 +53,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return OrderMaster.objects.filter(delete_flag='N')
+        return OrderMaster.objects.filter(delete_flag='N').order_by('-id')
 
     def create(self, request, *args, **kwargs):
         User = UserMaster.objects.get(user_id=request.user.id)
@@ -114,11 +114,18 @@ class OrderViewSet(viewsets.ModelViewSet):
                 updated_by=user,
             )
         for sensor in sensor_by_order:
+            controller = sensor.parent
+            container_id = controller.parent_id
+            plantation_id = Plantation.objects.get(bom_id = container_id).id
             PlanPart.objects.create(
                 p_name = sensor.part_code,
                 part = sensor,
+                plantation_id = plantation_id,
                 delete_flag = 'N',
-                reg_flag = 'Y',
+                reg_flag = 'N',
+                message = "init",
+                status = "WAIT_CON",
+                type=sensor.item.item_type,
                 created_by = user,
                 updated_by = user
             )

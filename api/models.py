@@ -136,7 +136,11 @@ class OrderProduct(models.Model):
 class PlanPart(models.Model):
     p_name = models.CharField(max_length=100)
     part = models.ForeignKey(BomMaster, on_delete=models.SET_NULL, null=True)
+    plantation = models.ForeignKey('Plantation', on_delete=models.SET_NULL, null=True)
     delete_flag = models.CharField(max_length=1, default='N')
+    status = models.CharField(max_length=10, null=True)
+    message = models.CharField(max_length=255, null=True)
+    type= models.CharField(max_length=10, null=True)
     reg_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
