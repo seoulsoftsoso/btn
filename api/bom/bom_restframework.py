@@ -1,14 +1,59 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster
+from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from datetime import datetime
 import uuid
-import json
+import certifi
+from pymongo import MongoClient
+from datetime import timezone
+
+DB_NAME = 'djangoConnectTest'
+GATHER = 'sen_gather'
+SENSOR = "sen_status"
+SERVER_URL = ('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName'
+              '=Cluster0')
+
+TEMP_UNI = {
+    "TEMP": "온도센서",
+    "HUMI": "습도센서",
+    "CO2": "CO2센서",
+    "PH": "PH",
+    "EC": "EC",
+    "LUX":  "광센서"
+}
+
+CONT_UNI = {
+    1: "FAN 1",
+    2: "FAN 2",
+    3: "LED Dimming 1",
+    4: "LED Dimming 2",
+    5: "LED Dimming 3",
+    6: "LED Dimming 4",
+    7: "양액기 Dispensor 1",
+    8: "양액기 Dispensor 2",
+    9: "양액기 Dispensor 3",
+    10: "양액기 Dispensor 4",
+    11: "양액기 Dispensor 5",
+    12: "양액기 Dispensor 6",
+    13: "순환 모터",
+    14: "열교환기 A",
+    15: "열교환기 B"
+}
+
+TEMP_UNI_SERIAL = [
+    0,0,0,0,0,
+    0,0,0,0,0,
+    0,0,0,0,0
+]
+
+TEMP_SERIAL_RES = [
+    {} for _ in range(15)
+]
+
 
 
 class BomMasterSerializer(serializers.ModelSerializer):
@@ -74,8 +119,7 @@ class BomViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order']
     read_only_fields = ['id']
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [IsAuthenticated]  # Default permission class
 
     def get_queryset(self):
         qs = BomMaster.objects.filter(delete_flag='N')
@@ -164,4 +208,82 @@ class BomViewSet(viewsets.ModelViewSet):
             children = BomMaster.objects.filter(parent_id=current.id)
             for child in children:
                 queue.append(child)
-        return Response({'message': 'success'}, status=status.HTTP_200_OK)
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def temp_uni_insert(self, request, *args, **kwargs):
+        data = request.data
+
+        try:
+            # 컨테이너 및 센서, 제어 장치 객체 가져오기
+            container = BomMaster.objects.get(part_code="uni-container")
+            sensor = BomMaster.objects.filter(order__client_id=6, item__item_type='L')
+            control = BomMaster.objects.filter(order__client_id=6, item__item_type='C')
+        except BomMaster.DoesNotExist:
+            return Response({'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # 센서 데이터 준비
+        pre_sensor_data = []
+        for key, value in TEMP_UNI.items():
+            try:
+                sensor_id = sensor.get(item__item_name=value).id
+                pre_sensor_data.append({
+                    "c_date": timezone.now(),
+                    "con_id": container.id,
+                    "senid": sensor_id,
+                    "type": "gta",
+                    "value": data.get(key, None)  # 데이터가 없는 경우를 처리
+                })
+            except BomMaster.DoesNotExist:
+                continue
+
+        # 제어 장치 데이터 준비
+        pre_control_data = []
+        for key, value in CONT_UNI.items():
+            try:
+                control_id = control.get(part_code=value).id
+                pre_control_data.append({
+                    "c_date": timezone.now(),
+                    "con_id": container.id,
+                    "senid": control_id,
+                    "type": "sta",
+                    "status": "on" if data['RELAY'][key - 1] == 1 else "off"
+                })
+                # 장비 연동을 확인하기 위한 임시 데이터와의 비교 후 제어 상태 업데이트
+                if TEMP_UNI_SERIAL[key - 1] != data['RELAY'][key - 1]:
+                    tempControl = TEMP_SERIAL_RES[key - 1]
+                    if tempControl:
+                        TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key - 1]
+                        tempUniControl.objects.filter(id=tempControl['id']).delete()
+                        TEMP_SERIAL_RES[key -1] = {}
+            except BomMaster.DoesNotExist:
+                continue
+            except IndexError:
+                continue  # 인덱스 오류 처리
+
+        # MongoDB에 데이터 삽입
+        try:
+            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+            db = mongo[DB_NAME]
+            sen_collection = db[GATHER]
+            con_collection = db[SENSOR]
+            sen_collection.insert_many(pre_sensor_data)
+            con_collection.insert_many(pre_control_data)
+        except Exception as e:
+            return Response({'message': 'Database error', 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # 제어 장치 데이터 준비
+        sen_control_data = []
+        for sen_control in tempUniControl.objects.all():
+            if sen_control.control_value != TEMP_UNI_SERIAL[sen_control.key - 1]:
+                data = {
+                    'key': f'relay {sen_control.key}',
+                    'control_value': sen_control.control_value
+                }
+                sen_control_data.append(data)
+                # 장비 연동 확인을 위한 데이터 임시 저장
+                TEMP_SERIAL_RES[sen_control.key - 1] = {
+                    'control_value': sen_control.control_value,
+                    'id': sen_control.id
+                }
+
+        return Response(sen_control_data, status=status.HTTP_200_OK)

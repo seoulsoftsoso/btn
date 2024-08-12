@@ -165,3 +165,11 @@ class Plantation(models.Model):
 
     class Meta:
         db_table = 'plantation'
+
+class tempUniControl(models.Model):
+    key = models.CharField(max_length=255)
+    serial = models.CharField(max_length=255)
+    control_value = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "tempUniControl"
