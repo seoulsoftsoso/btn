@@ -33,13 +33,9 @@ class tempUniCtlSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-            tempUniControl = tempUniControl.objects.create(**validated_data)
-            return tempUniControl
+            ret = tempUniControl.objects.create(**validated_data)
+            return ret
 
-    def update(self, instance, validated_data):
-        with transaction.atomic():
-            tempUniControl = tempUniControl.objects.filter(id=instance.id).update(**validated_data)
-            return tempUniControl
 
 class tempUniCtlViewSet(viewsets.ModelViewSet):
         queryset = tempUniControl.objects.all()
@@ -47,12 +43,13 @@ class tempUniCtlViewSet(viewsets.ModelViewSet):
         http_method_names = ['post']
         filter_backends = [DjangoFilterBackend]
         read_only_fields = ['id']
-        permission_classes = []
+        permission_classes = [AllowAny]
 
         def get_queryset(self):
-            return tempUniControl.objects.filter(delete_flag='N')
+            return tempUniControl.objects.filter()
 
         def create(self, request, *args, **kwargs):
-            request.data._mutable = True
-            request.data['key'] = CONT_UNI[BomMaster.objects.get(id=request.data['senid']).part_code]
+            part_code = BomMaster.objects.get(id=request.data['senid']).part_code
+            request.data['key'] = CONT_UNI[part_code]
+            request.data['serial'] = part_code
             return super().create(request, *args, **kwargs)
