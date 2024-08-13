@@ -282,7 +282,7 @@ class BomViewSet(viewsets.ModelViewSet):
                 }
                 sen_control_data.append(data)
                 # 장비 연동 확인을 위한 데이터 임시 저장
-                TEMP_SERIAL_RES[sen_control.key - 1] = {
+                TEMP_SERIAL_RES[(int(sen_control.key) - 1)] = {
                     'control_value': sen_control.control_value,
                     'id': sen_control.id
                 }
