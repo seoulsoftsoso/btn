@@ -10,7 +10,7 @@ from pytz import timezone
 import uuid
 import certifi
 from pymongo import MongoClient
-from datetime import timezone, datetime
+from datetime import datetime
 
 DB_NAME = 'djangoConnectTest'
 GATHER = 'sen_gather'
