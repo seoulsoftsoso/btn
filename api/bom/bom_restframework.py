@@ -280,7 +280,7 @@ class BomViewSet(viewsets.ModelViewSet):
                     'key': f'relay {sen_control.key}',
                     'control_value': sen_control.control_value
                 }
-                if TEMP_UNI_SERIAL[(int(sen_control.key) - 1)] is None:
+                if TEMP_UNI_SERIAL[(int(sen_control.key) - 1)] == {}:
                     sen_control_data.append(data)
                     # 장비 연동 확인을 위한 데이터 임시 저장
                     TEMP_SERIAL_RES[(int(sen_control.key) - 1)] = {
