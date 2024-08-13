@@ -9,7 +9,7 @@ from rest_framework import serializers
 import uuid
 import certifi
 from pymongo import MongoClient
-from datetime import timezone
+from datetime import timezone, datetime
 
 DB_NAME = 'djangoConnectTest'
 GATHER = 'sen_gather'
@@ -159,7 +159,7 @@ class BomViewSet(viewsets.ModelViewSet):
                     unique_no=str(uuid.uuid4()),
                     product_name=item.item_name,
                     order_id=rawData['order_id'],
-                    delivery_date=datetime.now(),
+                    delivery_date= datetime.now(timezone('Asia/Seoul')),
                     op_cnt=order_cnt,
                     delivery_addr='HCM',
                     request_note='Test',
@@ -227,7 +227,7 @@ class BomViewSet(viewsets.ModelViewSet):
             try:
                 sensor_id = sensor.get(item__item_name=value).id
                 pre_sensor_data.append({
-                    "c_date": timezone.now(),
+                    "c_date": datetime.now(timezone('Asia/Seoul')),
                     "con_id": container.id,
                     "senid": sensor_id,
                     "type": "gta",
@@ -242,7 +242,7 @@ class BomViewSet(viewsets.ModelViewSet):
             try:
                 control_id = control.get(part_code=value).id
                 pre_control_data.append({
-                    "c_date": timezone.now(),
+                    "c_date": datetime.now(timezone('Asia/Seoul')),
                     "con_id": container.id,
                     "senid": control_id,
                     "type": "sta",
