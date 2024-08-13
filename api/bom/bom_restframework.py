@@ -275,7 +275,7 @@ class BomViewSet(viewsets.ModelViewSet):
         # 제어 장치 데이터 준비
         sen_control_data = []
         for sen_control in tempUniControl.objects.all():
-            if sen_control.control_value != TEMP_UNI_SERIAL[sen_control.key - 1]:
+            if sen_control.control_value != TEMP_UNI_SERIAL[(sen_control.key - 1)]:
                 data = {
                     'key': f'relay {sen_control.key}',
                     'control_value': sen_control.control_value
