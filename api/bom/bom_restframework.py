@@ -253,14 +253,14 @@ class BomViewSet(viewsets.ModelViewSet):
                     "status": "on" if data['RELAY'][key - 1] == 1 else "off"
                 })
                 # 장비 연동을 확인하기 위한 임시 데이터와의 비교 후 제어 상태 업데이트
-                if TEMP_UNI_SERIAL[key -1] == data['RELAY'][key - 1]:
+                if TEMP_UNI_SERIAL[key -1] != data['RELAY'][key - 1]:
                     tempControl = TEMP_SERIAL_RES[key -1]
                     print(tempControl)
                     if not tempControl == {}:
-                        tempUniControl.objects.filter(id=tempControl['id']).delete()
-                        TEMP_SERIAL_RES[key - 1] = {}
-                TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key -1]
-                print(TEMP_UNI_SERIAL)
+                        if tempControl['control_value'] == data['RELAY'][key - 1]:
+                            tempUniControl.objects.filter(id=tempControl['id']).delete()
+                            TEMP_SERIAL_RES[key - 1] = {}
+                    TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key -1]
             except BomMaster.DoesNotExist:
                 continue
             except IndexError:
@@ -280,6 +280,7 @@ class BomViewSet(viewsets.ModelViewSet):
         # 제어 장치 데이터 준비
         sen_control_data = []
         for sen_control in tempUniControl.objects.all():
+            print(sen_control, 'sen_control')
             if sen_control.control_value != TEMP_UNI_SERIAL[int(sen_control.key) -1]:
                 key, value = sen_control.key, sen_control.control_value
                 key = int(key)
@@ -287,12 +288,9 @@ class BomViewSet(viewsets.ModelViewSet):
                     'key': f'relay {key}',
                     'control_value': value
                 }
-                if TEMP_SERIAL_RES[key -1] == {}:
-                    sen_control_data.append(data)
-                    # 장비 연동 확인을 위한 데이터 임시 저장
-                    TEMP_SERIAL_RES[key - 1] = {
-                        'control_value': value,
-                        'id': sen_control.id
-                    }
-
+                sen_control_data.append(data)
+                TEMP_SERIAL_RES[key - 1] = {
+                    'control_value': value,
+                    'id': sen_control.id
+                }
         return Response(sen_control_data, status=status.HTTP_200_OK)
