@@ -1,8 +1,11 @@
+import pytz
+from dateutil.parser import isoparse
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 import json
+from datetime import datetime, timedelta
 
 
 from django.http import JsonResponse
@@ -152,6 +155,130 @@ def container_sen_map(request):
             'unique_sta_sen_name': unique_sta_items,
         }
         print(initial_data)
+        client.close()
+
         return JsonResponse(initial_data, encoder=DjangoJSONEncoder)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+
+@csrf_exempt  # You can use this if you're not using CSRF tokens
+def sen_list(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        conId = data.get('conId')
+
+        if not conId:
+            return JsonResponse({'error': 'conID not provided'}, status=400)
+
+        # uri = "mongodb://localhost:27017/"
+        uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+        client = MongoClient(uri)
+        db = client['djangoConnectTest']
+        dbSensorGather = db['sen_gather']
+        dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
+
+        controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId, delete_flag='N')
+        controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
+        sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
+        gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
+        sen_Ids = list(gtr_bom_masters.values_list('id', flat=True))
+        unique_gtr_items = list(gtr_bom_masters.values_list('item__item_name', flat=True).distinct())
+
+        initial_data = {
+            'senIds': sen_Ids,
+            'uniqueGtrItems': unique_gtr_items,
+        }
+        print(initial_data)
+        client.close()
+
+        return JsonResponse(initial_data, encoder=DjangoJSONEncoder)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+@csrf_exempt
+def fetch_graph_data(request):
+    seoul_timezone = pytz.timezone('Asia/Seoul')
+    utc_timezone = pytz.utc
+
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        start_date = isoparse(data['startDate'])
+        end_date = isoparse(data['endDate'])
+        con_id = int(data['conId'])
+        day_index = int(data['dayIndex'])
+        sen_Ids = [int(sen_id) for sen_id in data['senIds']]
+        print(start_date)
+        print(end_date)
+        print(con_id)
+        print(sen_Ids)
+
+        client = MongoClient('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+        db = client['djangoConnectTest']
+        collection = db['sen_gather']
+
+        group_by = {
+            'year': {'$year': '$c_date'},
+            'month': {'$month': '$c_date'},
+            'day': {'$dayOfMonth': '$c_date'}
+        }
+        if day_index == 0:
+            group_by['hour'] = {'$hour': '$c_date'}
+
+        pipeline = [
+            {
+                '$match': {
+                    'c_date': {'$gte': start_date, '$lt': end_date},
+                    'con_id': con_id,
+                    'senid': {'$in': sen_Ids}
+                }
+            },
+            {
+                '$group': {
+                    '_id': group_by,
+                    'avgValue': {'$avg': '$value'}
+                }
+            },
+            {
+                '$sort': {
+                    '_id.year': 1,
+                    '_id.month': 1,
+                    '_id.day': 1,
+                }
+            }
+        ]
+
+        # Add hour sorting if day_index is 0 (hourly data)
+        if day_index == 0:
+            pipeline[-1]['$sort']['_id.hour'] = 1
+
+        results = list(collection.aggregate(pipeline))
+        formatted_results = []
+        for res in results:
+            if day_index == 0:
+                utc_datetime = datetime(
+                    res['_id']['year'],
+                    res['_id']['month'],
+                    res['_id']['day'],
+                    res['_id']['hour']
+                ).replace(tzinfo=utc_timezone)
+            else:
+                utc_datetime = datetime(
+                    res['_id']['year'],
+                    res['_id']['month'],
+                    res['_id']['day']
+                ).replace(tzinfo=utc_timezone)
+            seoul_datetime = utc_datetime.astimezone(seoul_timezone)
+            formatted_results.append({
+                'date': seoul_datetime.strftime('%Y-%m-%dT%H:%M:%S%z'),
+                'value': res['avgValue']
+            })
+
+        print(formatted_results)
+        client.close()
+        return JsonResponse(formatted_results, safe=False)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)

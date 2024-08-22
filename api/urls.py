@@ -29,5 +29,7 @@ urlpatterns = [
     path('flutter/csrf/', csrf),
     path('flutter/container-map/', container_map),
     path('flutter/container-sen-map/', container_sen_map),
+    path('flutter/fetch-graph-data/', fetch_graph_data),
+    path('flutter/sen-list/', sen_list),
 
 ]
