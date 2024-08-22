@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from rest_framework import serializers
 from pytz import timezone
 import uuid
@@ -80,13 +81,11 @@ class BomMasterSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data['updated_by'] = self.get_by_username()
-
         return super().update(instance, validated_data)
 
     def delete(self, instance):
         instance['delete_flag'] = 'Y'
         return super().update(instance)
-
 
 class BomCreateSerializer(serializers.ModelSerializer):
     created_by = serializers.StringRelatedField(read_only=True)
@@ -196,20 +195,24 @@ class BomViewSet(viewsets.ModelViewSet):
     def delete_bom(self, request, pk=None):
         bom = get_object_or_404(BomMaster, id=pk)
         queue = [bom]
+        batch_size = 100
         while queue:
-            current = queue.pop()
-            current.delete_flag = 'Y'
-            current.save()
-            try:
-                order_product = OrderProduct.objects.get(id=current.op_id)
-                order_product.delete_flag = 'Y'
-                order_product.save()
-            except OrderProduct.DoesNotExist:
-                pass
-            children = BomMaster.objects.filter(parent_id=current.id)
-            for child in children:
-                queue.append(child)
-            return Response({'message': 'success'}, status=status.HTTP_200_OK)
+            batch = queue[:batch_size]
+            queue = queue[batch_size:]
+            with transaction.atomic():
+                for current in batch:
+                    current.delete_flag = 'Y'
+                    current.save()
+                    try:
+                        order_product = OrderProduct.objects.get(id=current.op_id)
+                        order_product.delete_flag = 'Y'
+                        order_product.save()
+                    except OrderProduct.DoesNotExist:
+                        pass
+                    children = BomMaster.objects.filter(parent_id=current.id)
+                    queue.extend(children)
+        return Response({'message': 'success'}, status=status.HTTP_200_OK)
+        
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def temp_uni_insert(self, request, *args, **kwargs):
         data = request.data
@@ -250,12 +253,14 @@ class BomViewSet(viewsets.ModelViewSet):
                     "status": "on" if data['RELAY'][key - 1] == 1 else "off"
                 })
                 # 장비 연동을 확인하기 위한 임시 데이터와의 비교 후 제어 상태 업데이트
-                if TEMP_UNI_SERIAL[key - 1] != data['RELAY'][key - 1]:
-                    tempControl = TEMP_SERIAL_RES[key - 1]
-                    if tempControl:
-                        TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key - 1]
-                        tempUniControl.objects.filter(id=tempControl['id']).delete()
-                        TEMP_SERIAL_RES[key -1] = {}
+                if TEMP_UNI_SERIAL[key -1] != data['RELAY'][key - 1]:
+                    tempControl = TEMP_SERIAL_RES[key -1]
+                    print(tempControl)
+                    if not tempControl == {}:
+                        if tempControl['control_value'] == data['RELAY'][key - 1]:
+                            tempUniControl.objects.filter(id=tempControl['id']).delete()
+                            TEMP_SERIAL_RES[key - 1] = {}
+                    TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key -1]
             except BomMaster.DoesNotExist:
                 continue
             except IndexError:
@@ -275,17 +280,17 @@ class BomViewSet(viewsets.ModelViewSet):
         # 제어 장치 데이터 준비
         sen_control_data = []
         for sen_control in tempUniControl.objects.all():
-            if sen_control.control_value != TEMP_UNI_SERIAL[(int(sen_control.key) - 1)]:
+            print(sen_control, 'sen_control')
+            if sen_control.control_value != TEMP_UNI_SERIAL[int(sen_control.key) -1]:
+                key, value = sen_control.key, sen_control.control_value
+                key = int(key)
                 data = {
-                    'key': f'relay {sen_control.key}',
-                    'control_value': sen_control.control_value
+                    'key': f'relay {key}',
+                    'control_value': value
                 }
-                if TEMP_SERIAL_RES[(int(sen_control.key) - 1)] == {}:
-                    sen_control_data.append(data)
-                    # 장비 연동 확인을 위한 데이터 임시 저장
-                    TEMP_SERIAL_RES[(int(sen_control.key) - 1)] = {
-                        'control_value': sen_control.control_value,
-                        'id': sen_control.id
-                    }
-
+                sen_control_data.append(data)
+                TEMP_SERIAL_RES[key - 1] = {
+                    'control_value': value,
+                    'id': sen_control.id
+                }
         return Response(sen_control_data, status=status.HTTP_200_OK)
