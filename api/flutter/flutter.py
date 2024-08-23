@@ -120,40 +120,11 @@ def container_sen_map(request):
             lv2_gtr_ids = list(gtr_bom_masters.filter(parent__in=controller_bom_ids).values_list('id', flat=True))
             lv2_sta_ids = list(sta_bom_masters.filter(parent__in=controller_bom_ids).values_list('id', flat=True))
 
-            # gtr_sensor_data = list(
-            #     dbSensorGather.find({'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}, sort=[('c_date', DESCENDING)]))
-            #
-            # sta_sensor_data = list(
-            #     dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}, sort=[('c_date', DESCENDING)]))
-            # gtr_sensor_data에서 각 센서 ID별로 최신 데이터를 가져오기 위한 집계 파이프라인
-            gtr_sensor_data = list(dbSensorGather.aggregate([
-                {'$match': {'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}},  # 조건에 맞는 문서 필터링
-                {'$sort': {'senid': 1, 'c_date': DESCENDING}},  # 'senid'와 'c_date' 기준으로 내림차순 정렬
-                {'$group': {
-                    '_id': '$senid',  # 'senid'별로 그룹화
-                    'most_recent': {'$first': '$$ROOT'}  # 정렬된 상태에서 첫 번째 문서 가져오기 (가장 최신 데이터)
-                }}
-            ]))
+            gtr_sensor_data = list(
+                dbSensorGather.find({'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}, sort=[('c_date', DESCENDING)]))
 
-            # sta_sensor_data에서 각 센서 ID별로 최신 데이터를 가져오기 위한 집계 파이프라인
-            sta_sensor_data = list(dbSensorStatus.aggregate([
-                {'$match': {'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}},  # 조건에 맞는 문서 필터링
-                {'$sort': {'senid': 1, 'c_date': DESCENDING}},  # 'senid'와 'c_date' 기준으로 내림차순 정렬
-                {'$group': {
-                    '_id': '$senid',  # 'senid'별로 그룹화
-                    'most_recent': {'$first': '$$ROOT'}  # 정렬된 상태에서 첫 번째 문서 가져오기 (가장 최신 데이터)
-                }}
-            ]))
-
-            #
-            # gtr_sensor_data = list(dbSensorGather.find(
-            #     {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
-            #     sort=[('c_date', DESCENDING)]
-            # ).limit(lv2_gtr_ids.count()))
-            # sta_sensor_data = list(dbSensorGather.find(
-            #     {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-            #     sort=[('c_date', DESCENDING)]
-            # ).limit(lv2_sta_ids.count()))
+            sta_sensor_data = list(
+                dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}, sort=[('c_date', DESCENDING)]))
 
             gtr_sen = {
                 sensor.id: {
