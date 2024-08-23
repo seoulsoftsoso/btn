@@ -77,6 +77,7 @@ def user_table_data(request):
         for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
             sen_inf = {'sen_name': sensor.item.item_name}
             newest_value = next((x for x in gtr_sensor_data if x['senid'] == sensor.id), None)
+            print('newest gtr',newest_value)
             sen_inf['value'] = newest_value['value'] if newest_value else 0
             gtr_sen[sensor.id] = sen_inf
 
@@ -84,6 +85,7 @@ def user_table_data(request):
         for sensor in sta_bom_masters.filter(parent__in=controller_ids, item__item_type='C'):
             sen_inf = {'sen_name': sensor.part_code}
             newest_value = next((x for x in sta_sensor_data if x['senid'] == sensor.id), None)
+            print('newest sta',newest_value)
             sen_inf['status'] = newest_value['status'] if newest_value else '-'
             sta_sen[sensor.id] = sen_inf
 
