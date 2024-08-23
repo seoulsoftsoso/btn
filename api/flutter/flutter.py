@@ -101,8 +101,6 @@ def container_sen_map(request):
         db = client['djangoConnectTest']
         dbSensorGather = db['sen_gather']
         dbSensorStatus = db['sen_status']
-        dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-        dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
 
         container_bom_masters = BomMaster.objects.filter(level=0, id=conId)
         controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId, delete_flag='N')
@@ -122,11 +120,21 @@ def container_sen_map(request):
             lv2_gtr_ids = list(gtr_bom_masters.filter(parent__in=controller_bom_ids).values_list('id', flat=True))
             lv2_sta_ids = list(sta_bom_masters.filter(parent__in=controller_bom_ids).values_list('id', flat=True))
 
-            gtr_sensor_data = list(
-                dbSensorGather.find({'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}, sort=[('c_date', DESCENDING)]))
+            # gtr_sensor_data = list(
+            #     dbSensorGather.find({'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}, sort=[('c_date', DESCENDING)]))
+            #
+            # sta_sensor_data = list(
+            #     dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}, sort=[('c_date', DESCENDING)]))
 
-            sta_sensor_data = list(
-                dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}, sort=[('c_date', DESCENDING)]))
+
+            gtr_sensor_data = list(dbSensorGather.find(
+                {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
+                sort=[('c_date', DESCENDING)]
+            ).limit(lv2_gtr_ids.count()))
+            sta_sensor_data = list(dbSensorGather.find(
+                {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
+                sort=[('c_date', DESCENDING)]
+            ).limit(lv2_sta_ids.count()))
 
             gtr_sen = {
                 sensor.id: {
