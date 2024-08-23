@@ -46,11 +46,11 @@ def user_table_data(request):
         gtr_sensor_data = list(dbSensorGather.find(
             {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
             sort=[('c_date', DESCENDING)]
-        ).limit(1))
+        ).limit(lv2_gtr_ids.count()))
         sta_sensor_data = list(dbSensorGather.find(
             {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
             sort=[('c_date', DESCENDING)]
-        ).limit(1))
+        ).limit(lv2_sta_ids.count()))
 
         # gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
         #                                       sort=[('c_date', DESCENDING)]))
