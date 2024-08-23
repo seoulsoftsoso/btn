@@ -18,8 +18,8 @@ def user_table_data(request):
     db = client['djangoConnectTest']
     dbSensorGather = db['sen_gather']
     dbSensorStatus = db['sen_status']
-    dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-    dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
+    # dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
+    # dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
 
     order_products = OrderProduct.objects.filter(order__client=request.user.id)
     bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True), delete_flag='N')
