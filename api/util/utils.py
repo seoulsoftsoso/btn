@@ -84,7 +84,7 @@ def user_table_data(request):
         for sensor in sta_bom_masters.filter(parent__in=controller_ids, item__item_type='C'):
             sen_inf = {'sen_name': sensor.part_code}
             # newest_value = next((x for x in sta_sensor_data if x['senid'] == sensor.id), None)
-            sen_inf['status'] = sta_sensor_data[sensor.id]["status"]
+            sen_inf['status'] = sta_sensor_data['senid']["status"]
             sta_sen[sensor.id] = sen_inf
 
         con_inf['con_name'] = con_name
