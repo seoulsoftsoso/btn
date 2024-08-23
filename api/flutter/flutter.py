@@ -102,7 +102,7 @@ def container_sen_map(request):
         dbSensorGather = db['sen_gather']
         dbSensorStatus = db['sen_status']
 
-        container_bom_masters = BomMaster.objects.filter(level=0, id=conId)
+        container_bom_masters = BomMaster.objects.get(id=conId)
         controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId, delete_flag='N')
         controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
         sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
