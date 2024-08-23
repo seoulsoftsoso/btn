@@ -82,7 +82,7 @@
 
                                         function websocket(){
                                             let socket = new WebSocket(`wss://${window.location.host}/ws/landing/user/`);
-                                            socket.addEventListener("message", (error) => {
+                                            socket.addEventListener("error", (error) => {
                                               console.log("Error has occured:", error);
                                             });
                                             socket.addEventListener("open", () => {
