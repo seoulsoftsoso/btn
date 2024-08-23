@@ -9,15 +9,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 CONT_UNI = {
-    "FAN 1": 1,
-    "FAN 2": 2,
-    "LED Dimming 1": 3,
-    "LED Dimming 2": 4,
-    "LED Dimming 3": 5,
-    "LED Dimming 4": 6,
-    "양액기 Dispensor 1": 7,
-    "양액기 Dispensor 2": 8,
-    "양액기 Dispensor 3": 9,
+    "펌프": 1,
+    "교반기": 2,
+    "팬1,2": 3,
+    "led1": 4,
+    "led2": 5,
+    "디스펜스 1": 6,
+    "디스펜스 2": 7,
+    "디스펜스 3": 8,
+    "냉난방기": 9,
     "양액기 Dispensor 4": 10,
     "양액기 Dispensor 5": 11,
     "양액기 Dispensor 6": 12,
@@ -25,7 +25,6 @@ CONT_UNI = {
     "열교환기 A": 14,
     "열교환기 B": 15
 }
-
 class tempUniCtlSerializer(serializers.ModelSerializer):
     class Meta:
         model = tempUniControl
