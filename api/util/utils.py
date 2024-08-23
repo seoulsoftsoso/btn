@@ -47,7 +47,7 @@ def user_table_data(request):
             {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
             sort=[('c_date', DESCENDING)]
         ).limit(lv2_gtr_ids.count()))
-        sta_sensor_data = list(dbSensorGather.find(
+        sta_sensor_data = list(dbSensorStatus.find(
             {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
             sort=[('c_date', DESCENDING)]
         ).limit(lv2_sta_ids.count()))
@@ -83,8 +83,8 @@ def user_table_data(request):
         sta_sen = {}
         for sensor in sta_bom_masters.filter(parent__in=controller_ids, item__item_type='C'):
             sen_inf = {'sen_name': sensor.part_code}
-            # newest_value = next((x for x in sta_sensor_data if x['senid'] == sensor.id), None)
-            sen_inf['status'] = sta_sensor_data['senid']["status"]
+            newest_value = next((x for x in sta_sensor_data if x['senid'] == sensor.id), None)
+            sen_inf['status'] = newest_value['status'] if newest_value else '-'
             sta_sen[sensor.id] = sen_inf
 
         con_inf['con_name'] = con_name
