@@ -275,9 +275,8 @@ class BomViewSet(viewsets.ModelViewSet):
                     tempControl = TEMP_SERIAL_RES[key -1]
                     print(tempControl)
                     if not tempControl == {}:
-                        if tempControl['control_value'] == data['RELAY'][key - 1]:
-                            tempUniControl.objects.filter(id=tempControl['id']).delete()
-                            TEMP_SERIAL_RES[key - 1] = {}
+                        tempUniControl.objects.filter(id=tempControl['id']).delete()
+                        TEMP_SERIAL_RES[key - 1] = {}
                     TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key -1]
             except BomMaster.DoesNotExist:
                 continue
