@@ -112,50 +112,49 @@ def container_sen_map(request):
         unique_sta_items = list(sta_bom_masters.values_list('part_code', flat=True).distinct())
 
         cont = {}
-        for container in container_bom_masters:
-            con_inf = {}
-            con_name = container.part_code
-            con_id = container.id
+        con_inf = {}
+        con_name = container_bom_masters.part_code
+        con_id = container_bom_masters.id
 
-            lv2_gtr_ids = list(gtr_bom_masters.filter(parent__in=controller_bom_ids).values_list('id', flat=True))
-            lv2_sta_ids = list(sta_bom_masters.filter(parent__in=controller_bom_ids).values_list('id', flat=True))
+        lv2_gtr_ids = list(gtr_bom_masters.values_list('id', flat=True))
+        lv2_sta_ids = list(sta_bom_masters.values_list('id', flat=True))
 
-            gtr_sensor_data = list(
-                dbSensorGather.find({'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}, sort=[('c_date', DESCENDING)]).limit(lv2_gtr_ids.count()))
+        gtr_sensor_data = list(
+            dbSensorGather.find({'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}, sort=[('c_date', DESCENDING)]).limit(lv2_gtr_ids.count()))
 
-            sta_sensor_data = list(
-                dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}, sort=[('c_date', DESCENDING)]).limit(lv2_sta_ids.count()))
+        sta_sensor_data = list(
+            dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}, sort=[('c_date', DESCENDING)]).limit(lv2_sta_ids.count()))
 
-            #
-            # gtr_sensor_data = list(dbSensorGather.find(
-            #     {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
-            #     sort=[('c_date', DESCENDING)]
-            # ).limit(lv2_gtr_ids.count()))
-            # sta_sensor_data = list(dbSensorGather.find(
-            #     {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-            #     sort=[('c_date', DESCENDING)]
-            # ).limit(lv2_sta_ids.count()))
+        #
+        # gtr_sensor_data = list(dbSensorGather.find(
+        #     {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
+        #     sort=[('c_date', DESCENDING)]
+        # ).limit(lv2_gtr_ids.count()))
+        # sta_sensor_data = list(dbSensorGather.find(
+        #     {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
+        #     sort=[('c_date', DESCENDING)]
+        # ).limit(lv2_sta_ids.count()))
 
-            gtr_sen = {
-                sensor.id: {
-                    'sen_name': sensor.item.item_name,
-                    'value': next((x['value'] for x in gtr_sensor_data if x['senid'] == sensor.id), 0)
-                }
-                for sensor in gtr_bom_masters.filter(parent__in=controller_bom_ids, item__item_type='L')
+        gtr_sen = {
+            sensor.id: {
+                'sen_name': sensor.item.item_name,
+                'value': next((x['value'] for x in gtr_sensor_data if x['senid'] == sensor.id), 0)
             }
+            for sensor in gtr_bom_masters.filter(parent__in=controller_bom_ids, item__item_type='L')
+        }
 
-            sta_sen = {
-                sensor.id: {
-                    'sen_name': sensor.part_code,
-                    'status': next((x['status'] for x in sta_sensor_data if x['senid'] == sensor.id), '-')
-                }
-                for sensor in sta_bom_masters.filter(parent__in=controller_bom_ids, item__item_type='C')
+        sta_sen = {
+            sensor.id: {
+                'sen_name': sensor.part_code,
+                'status': next((x['status'] for x in sta_sensor_data if x['senid'] == sensor.id), '-')
             }
+            for sensor in sta_bom_masters.filter(parent__in=controller_bom_ids, item__item_type='C')
+        }
 
-            con_inf['con_name'] = con_name
-            con_inf['gtr'] = gtr_sen
-            con_inf['sta'] = sta_sen
-            cont[con_id] = con_inf
+        con_inf['con_name'] = con_name
+        con_inf['gtr'] = gtr_sen
+        con_inf['sta'] = sta_sen
+        cont[con_id] = con_inf
 
         initial_data = {
             'con_id_senid_map': cont,
