@@ -43,10 +43,35 @@ def user_table_data(request):
         controller_ids = controller_bom_masters.filter(parent=con_id).values_list('id', flat=True)
         lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
         lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
-        gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
-                                              sort=[('c_date', DESCENDING)]))
-        sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-                                              sort=[('c_date', DESCENDING)]))
+        gtr_sensor_data = list(dbSensorGather.find(
+            {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
+            sort=[('c_date', DESCENDING)]
+        ).limit(1))
+        sta_sensor_data = list(dbSensorGather.find(
+            {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
+            sort=[('c_date', DESCENDING)]
+        ).limit(1))
+
+        # gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
+        #                                       sort=[('c_date', DESCENDING)]))
+        # sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
+        #                                       sort=[('c_date', DESCENDING)]))
+        # gtr_sensor_data = list(dbSensorGather.aggregate([
+        #     {'$match': {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}}},  # Filter matching documents
+        #     {'$sort': {'c_date': DESCENDING}},  # Sort by 'c_date' in descending order
+        #     {'$group': {
+        #         '_id': '$senid',  # Group by 'senid'
+        #         'most_recent': {'$first': '$$ROOT'}  # Take the first document in each group after sorting
+        #     }}
+        # ]))
+        # sta_sensor_data = list(dbSensorStatus.aggregate([
+        #     {'$match': {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}}},  # Filter matching documents
+        #     {'$sort': {'c_date': DESCENDING}},  # Sort by 'c_date' in descending order
+        #     {'$group': {
+        #         '_id': '$senid',  # Group by 'senid'
+        #         'most_recent': {'$first': '$$ROOT'}  # Take the first document in each group after sorting
+        #     }}
+        # ]))
 
         gtr_sen = {}
         for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
