@@ -121,10 +121,10 @@ def container_sen_map(request):
             lv2_sta_ids = list(sta_bom_masters.filter(parent__in=controller_bom_ids).values_list('id', flat=True))
 
             gtr_sensor_data = list(
-                dbSensorGather.find({'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}, sort=[('c_date', DESCENDING)]))
+                dbSensorGather.find({'con_id': con_id, 'senid': {'$in': lv2_gtr_ids}}, sort=[('c_date', DESCENDING)]).limit(lv2_gtr_ids.count()))
 
             sta_sensor_data = list(
-                dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}, sort=[('c_date', DESCENDING)]))
+                dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': lv2_sta_ids}}, sort=[('c_date', DESCENDING)]).limit(lv2_sta_ids.count()))
 
             #
             # gtr_sensor_data = list(dbSensorGather.find(
