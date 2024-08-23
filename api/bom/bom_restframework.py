@@ -28,16 +28,33 @@ TEMP_UNI = {
     "LUX":  "광센서"
 }
 
+# CONT_UNI = {
+#     1: "FAN 1",
+#     2: "FAN 2",
+#     3: "LED Dimming 1",
+#     4: "LED Dimming 2",
+#     5: "LED Dimming 3",
+#     6: "LED Dimming 4",
+#     7: "양액기 Dispensor 1",
+#     8: "양액기 Dispensor 2",
+#     9: "양액기 Dispensor 3",
+#     10: "양액기 Dispensor 4",
+#     11: "양액기 Dispensor 5",
+#     12: "양액기 Dispensor 6",
+#     13: "순환 모터",
+#     14: "열교환기 A",
+#     15: "열교환기 B"
+# }
 CONT_UNI = {
-    1: "FAN 1",
-    2: "FAN 2",
-    3: "LED Dimming 1",
-    4: "LED Dimming 2",
-    5: "LED Dimming 3",
-    6: "LED Dimming 4",
-    7: "양액기 Dispensor 1",
-    8: "양액기 Dispensor 2",
-    9: "양액기 Dispensor 3",
+    1: "펌프",
+    2: "교반기",
+    3: "팬1,2",
+    4: "led1",
+    5: "led2",
+    6: "디스펜스 1",
+    7: "디스펜스 2",
+    8: "디스펜스 3",
+    9: "냉난방기",
     10: "양액기 Dispensor 4",
     11: "양액기 Dispensor 5",
     12: "양액기 Dispensor 6",
@@ -45,6 +62,7 @@ CONT_UNI = {
     14: "열교환기 A",
     15: "열교환기 B"
 }
+
 
 TEMP_UNI_SERIAL = [
     0,0,0,0,0,
