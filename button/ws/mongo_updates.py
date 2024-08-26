@@ -6,6 +6,7 @@ from channels.layers import get_channel_layer
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.apps import apps
+import datetime
 
 
 def listen_to_changes(request):
@@ -110,50 +111,69 @@ def listen_to_changes_flutter(conId):
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
     BomMaster = apps.get_model('api', 'BomMaster')
-
+    print(conId,'conid')
     container_bom_masters = BomMaster.objects.get(id=conId)
-    controller_bom_masters = BomMaster.objects.filter(level=1, item__item_type='AC', parent=conId)
+    controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId)
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
+    print(list(controller_bom_ids),'controller ids')
     sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
     gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
     sta_bom_masters = sensor_bom_masters.filter(item__item_type='C')
 
     unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
     unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
+    print(unique_gtr_items,'dd')
+    print(unique_sta_items,'dd')
+    last_processed_id = None
+    last_cluster_time = None
 
     with db.watch(pipeline) as stream:
         for change in stream:
+            document_id = change['documentKey']['_id']
+            cluster_time = change['clusterTime']
+
+            # 중복된 이벤트 필터링
+            if document_id == last_processed_id and cluster_time == last_cluster_time:
+                continue
+
+            last_processed_id = document_id
+            last_cluster_time = cluster_time
+
+            # Change Stream의 데이터 처리 로직
+            full_document = change['fullDocument']
+            print(full_document, 'Received new document')
+
+            print(change)
             cont = {}
-            for container in container_bom_masters:
-                con_inf = {}
-                con_name = container.part_code
-                con_id = container.id
+            con_inf = {}
+            con_name = container_bom_masters.part_code
+            con_id = container_bom_masters.id
 
-                controller_ids = controller_bom_masters.filter(parent=con_id).values_list('id', flat=True)
-                lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
-                lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
-                gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
-                                                           sort=[('c_date', DESCENDING)]))
-                sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-                                                           sort=[('c_date', DESCENDING)]))
-                gtr_sen = {}
-                for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
-                    sen_inf = {'sen_name': sensor.item.item_name}
-                    newest_value = next((x for x in gtr_sensor_data if x['senid'] == sensor.id), None)
-                    sen_inf['value'] = newest_value['value'] if newest_value else 0
-                    gtr_sen[sensor.id] = sen_inf
+            controller_ids = controller_bom_masters.filter(parent=con_id).values_list('id', flat=True)
+            lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
+            lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
+            gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
+                                                       sort=[('c_date', DESCENDING)]).limit(sta_bom_masters.count()))
+            sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
+                                                       sort=[('c_date', DESCENDING)]).limit(sta_bom_masters.count()))
+            gtr_sen = {}
+            for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
+                sen_inf = {'sen_name': sensor.item.item_name}
+                newest_value = next((x for x in gtr_sensor_data if x['senid'] == sensor.id), None)
+                sen_inf['value'] = newest_value['value'] if newest_value else 0
+                gtr_sen[sensor.id] = sen_inf
 
-                sta_sen = {}
-                for sensor in sta_bom_masters.filter(parent__in=controller_ids, item__item_type='C'):
-                    sen_inf = {'sen_name': sensor.part_code}
-                    newest_value = next((x for x in sta_sensor_data if x['senid'] == sensor.id), None)
-                    sen_inf['status'] = newest_value['status'] if newest_value else '-'
-                    sta_sen[sensor.id] = sen_inf
+            sta_sen = {}
+            for sensor in sta_bom_masters.filter(parent__in=controller_ids, item__item_type='C'):
+                sen_inf = {'sen_name': sensor.part_code}
+                newest_value = next((x for x in sta_sensor_data if x['senid'] == sensor.id), None)
+                sen_inf['status'] = newest_value['status'] if newest_value else '-'
+                sta_sen[sensor.id] = sen_inf
 
-                con_inf['con_name'] = con_name
-                con_inf['gtr'] = gtr_sen
-                con_inf['sta'] = sta_sen
-                cont[con_id] = con_inf
+            con_inf['con_name'] = con_name
+            con_inf['gtr'] = gtr_sen
+            con_inf['sta'] = sta_sen
+            cont[con_id] = con_inf
 
             averages = {}
             for item in unique_gtr_items:
