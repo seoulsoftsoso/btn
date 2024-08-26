@@ -47,9 +47,9 @@ def listen_to_changes(request):
                 lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
                 lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
                 gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
-                                                           sort=[('c_date', DESCENDING)]))
+                                                           sort=[('c_date', DESCENDING)]).limit(sta_bom_masters.count()))
                 sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-                                                           sort=[('c_date', DESCENDING)]))
+                                                           sort=[('c_date', DESCENDING)]).limit(sta_bom_masters.count()))
                 gtr_sen = {}
                 for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
                     sen_inf = {'sen_name': sensor.item.item_name}
