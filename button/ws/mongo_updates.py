@@ -15,6 +15,8 @@ def listen_to_changes(request):
     db = client['djangoConnectTest']
     dbSensorGather = db['sen_gather']
     dbSensorStatus = db['sen_status']
+    dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
+    dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
     OrderProduct = apps.get_model('api', 'OrderProduct')
@@ -24,7 +26,7 @@ def listen_to_changes(request):
     bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
 
     container_bom_masters = bom_masters.filter(level=0)
-    controller_bom_masters = bom_masters.filter(level=1, order__client=request.user.id)
+    controller_bom_masters = bom_masters.filter(level=1, item__item_type='AC')
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
     sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
     gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
@@ -45,9 +47,9 @@ def listen_to_changes(request):
                 lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
                 lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
                 gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
-                                                           sort=[('c_date', DESCENDING)]).limit(lv2_gtr_ids.count()))
+                                                           sort=[('c_date', DESCENDING)]))
                 sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-                                                           sort=[('c_date', DESCENDING)]).limit(lv2_sta_ids.count()))
+                                                           sort=[('c_date', DESCENDING)]))
                 gtr_sen = {}
                 for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
                     sen_inf = {'sen_name': sensor.item.item_name}
