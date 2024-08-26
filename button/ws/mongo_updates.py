@@ -184,13 +184,13 @@ def listen_to_changes_flutter(conId):
 
             print("Average values for matching gtr_sensors:", averages)
 
-            send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, int_averages)
+            send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, int_averages, conId)
 
         # document = change['fullDocument']
         # asyncio.run(send_update_to_ws(document))
 
 
-def send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, averages):
+def send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, averages, conId):
     #         # 클라이언트에게 초기 데이터를 전송하는 함수
     data = {
         'unique_gtr_sen_name': unique_gtr_items,
@@ -198,13 +198,15 @@ def send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, averages
         'con_id_senid_map': cont,
         'gtr_sen_average': averages
     }
-    asyncio.run(send_update_to_ws_flutter(data))
+    asyncio.run(send_update_to_ws_flutter(data, conId))
 
 
-async def send_update_to_ws_flutter(data):
+async def send_update_to_ws_flutter(data, conId):
     channel_layer = get_channel_layer()
+    group_name = f'group_{conId}'  # 동적으로 생성된 그룹 이름 사용
+
     await channel_layer.group_send(
-        'app_group_name',  # Send to the new group
+        group_name,  # Send to the new group
         {
             'type': 'send_update',
             'data': data

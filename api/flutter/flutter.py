@@ -87,7 +87,7 @@ def container_sen_map(request):
         data = json.loads(request.body)
         user_id = data.get('user_id')
         conId = data.get('conId')
-        start_listening_to_changes_flutter(conId)
+        # start_listening_to_changes_flutter(conId)
 
         if not user_id:
             return JsonResponse({'error': 'User ID not provided'}, status=400)
