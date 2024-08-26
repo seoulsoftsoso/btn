@@ -25,6 +25,15 @@ CONT_UNI = {
     "열교환기 A": 14,
     "열교환기 B": 15
 }
+Except = {
+    '양액기 Dispensor 4': 10,
+    '양액기 Dispensor 5': 11,
+    '양액기 Dispensor 6': 12,
+    '순환 모터': 13,
+    '열교환기 A': 14,
+    '열교환기 B': 15
+}
+
 class tempUniCtlSerializer(serializers.ModelSerializer):
     class Meta:
         model = tempUniControl
@@ -49,6 +58,8 @@ class tempUniCtlViewSet(viewsets.ModelViewSet):
 
         def create(self, request, *args, **kwargs):
             part_code = BomMaster.objects.get(id=request.data['senid']).part_code
+            if part_code in Except:
+                return;
             request.data['key'] = CONT_UNI[part_code]
             request.data['serial'] = part_code
             return super().create(request, *args, **kwargs)
