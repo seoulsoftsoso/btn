@@ -106,8 +106,6 @@ def listen_to_changes_flutter(conId):
     db = client['djangoConnectTest']
     dbSensorGather = db['sen_gather']
     dbSensorStatus = db['sen_status']
-    dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-    dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
     BomMaster = apps.get_model('api', 'BomMaster')
@@ -122,28 +120,26 @@ def listen_to_changes_flutter(conId):
 
     unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
     unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
-    print(unique_gtr_items,'dd')
-    print(unique_sta_items,'dd')
-    last_processed_id = None
-    last_cluster_time = None
+    # last_processed_id = None
+    # last_cluster_time = None
 
     with db.watch(pipeline) as stream:
         for change in stream:
-            document_id = change['documentKey']['_id']
-            cluster_time = change['clusterTime']
-
-            # 중복된 이벤트 필터링
-            if document_id == last_processed_id and cluster_time == last_cluster_time:
-                continue
-
-            last_processed_id = document_id
-            last_cluster_time = cluster_time
-
-            # Change Stream의 데이터 처리 로직
-            full_document = change['fullDocument']
-            print(full_document, 'Received new document')
-
-            print(change)
+            # document_id = change['documentKey']['_id']
+            # cluster_time = change['clusterTime']
+            #
+            # # 중복된 이벤트 필터링
+            # if document_id == last_processed_id and cluster_time == last_cluster_time:
+            #     continue
+            #
+            # last_processed_id = document_id
+            # last_cluster_time = cluster_time
+            #
+            # # Change Stream의 데이터 처리 로직
+            # full_document = change['fullDocument']
+            # print(full_document, 'Received new document')
+            #
+            # print(change)
             cont = {}
             con_inf = {}
             con_name = container_bom_masters.part_code
@@ -153,9 +149,9 @@ def listen_to_changes_flutter(conId):
             lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
             lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
             gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
-                                                       sort=[('c_date', DESCENDING)]).limit(sta_bom_masters.count()))
+                                                       sort=[('c_date', DESCENDING)]).limit(lv2_gtr_ids.count()))
             sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-                                                       sort=[('c_date', DESCENDING)]).limit(sta_bom_masters.count()))
+                                                       sort=[('c_date', DESCENDING)]).limit(lv2_sta_ids.count()))
             gtr_sen = {}
             for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
                 sen_inf = {'sen_name': sensor.item.item_name}
