@@ -127,7 +127,7 @@
                                                             count++;
                                                         }
                                                     });
-                                                    let value = count > 0 ? Math.round(sum / count)  : "-";
+                                                    let value = count > 0 ? (sum / count).toFixed(2)  : "-";
                                                     row += `<td style="border-bottom: 1px solid var(--30-b, #C9CACA);text-align: center;background: var(--5-b, #F6F6F6);"><a href="#" onclick="handleClick(event, '${value}')">${value}</a></td>`;
                                                 });
                                                 {#이 부분은 제어 센서#}
