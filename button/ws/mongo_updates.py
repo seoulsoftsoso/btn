@@ -173,14 +173,15 @@ def listen_to_changes_flutter(conId):
 
             averages = {}
             for item in unique_gtr_items:
-                matching_gtr_sensors = [v['value'] for v in gtr_sen.values() if v['sen_name'] == item]
+                matching_gtr_sensors = [v['value'] for v in gtr_sen.values() if
+                                        v['sen_name'] == item and v['value'] is not None]
                 if matching_gtr_sensors:
                     average_value = sum(matching_gtr_sensors) / len(matching_gtr_sensors)
                 else:
-                    average_value = 0
+                    average_value = None
                 averages[item] = average_value
 
-            int_averages = {k: int(v) for k, v in averages.items()}
+            int_averages = {k: int(v) if v is not None else None for k, v in averages.items()}
 
             print("Average values for matching gtr_sensors:", averages)
 
