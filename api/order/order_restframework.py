@@ -7,14 +7,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from django.db import transaction
 from rest_framework.response import Response
-import uuid, json
+import uuid
 
 from api.user.user_restframework import ClientSerializer
 
 
 class OrderMasterSerializer(serializers.ModelSerializer):
-    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
-    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
     delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
 
     class Meta:

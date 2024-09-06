@@ -151,12 +151,19 @@ class PlanPart(models.Model):
         db_table = 'planPart'
 
 
+class PlanType(models.Model): 
+    name= models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'planType'
+
 class Plantation(models.Model):
     c_code = models.CharField(max_length=50, unique=True)
     c_name = models.CharField(max_length=100)
     owner = models.ForeignKey(UserMaster, on_delete=models.CASCADE)
     bom = models.ForeignKey(BomMaster, on_delete=models.SET_NULL, null=True)
     delete_flag = models.CharField(max_length=1, default='N')
+    plant_type = models.ForeignKey('PlanType', on_delete=models.SET_NULL, null=True)
     reg_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -170,6 +177,94 @@ class tempUniControl(models.Model):
     key = models.CharField(max_length=255)
     serial = models.CharField(max_length=255)
     control_value = models.BooleanField(default=False)
+    reserve = models.BooleanField(default=False, null=True)
+    set_value = models.FloatField(null=True)
+    start_time = models.DateTimeField(null=True)
+    end_time = models.DateTimeField(null=True)
 
     class Meta:
         db_table = "tempUniControl"
+
+class Manual(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    delete_flag = models.CharField(max_length=1, default='N')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(UserMaster, related_name='created_manuals', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='updated_manuals', on_delete=models.CASCADE)
+    plant_type = models.ForeignKey('PlanType', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'manual'
+
+class script (models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    d_day = models.IntegerField()
+    image = models.ImageField(upload_to='manual_images/', null=True)
+    manual = models.ForeignKey('Manual', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(UserMaster, related_name='created_scripts', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='updated_scripts', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'script'
+
+class EntScript(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    date = models.DateField()
+    manual = models.ForeignKey('Manual', on_delete=models.CASCADE)
+    script = models.ForeignKey('script', on_delete=models.CASCADE)
+    plantation = models.ForeignKey('Plantation', on_delete=models.CASCADE)
+    done_flag = models.CharField(max_length=1, default='N')
+    delete_flag = models.CharField(max_length=1, default='N')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(UserMaster, related_name='created_ent_scripts', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='updated_ent_scripts', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'entScript'
+
+class Journal(models.Model):
+    amount = models.IntegerField()
+    unit = models.CharField(max_length=255)
+    temp = models.IntegerField()
+    humi = models.IntegerField()
+    # title =('입고', '배지관리', '솎아내기', '수확')
+    delete_flag = models.CharField(max_length=1, default='N')
+    done_flag = models.CharField(max_length=1, default='N')
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(UserMaster, related_name='created_journals', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='updated_journals', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'journal'
+
+class imgJournal(models.Model):
+    image = models.ImageField(upload_to='journal_images/', null=True)
+    journal = models.ForeignKey('Journal', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'imgJournal'
+
+class JournalDone(models.Model):
+    grade = models.CharField(max_length=1, choices=(('A', 'A등급'), ('B', 'B등급'), ('X', '가치없음')))
+    amount = models.FloatField()
+    unit = models.CharField(max_length=25, choices=(('kg', '킬로그램'), ('g', '그램'), ('ea', '개'), ('box', '박스')))
+    photo = models.ImageField(upload_to='journal_done_images/', null=True)
+    journal = models.ForeignKey('Journal', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(UserMaster, related_name='created_journal_done', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='updated_journal_done', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'journalDone'
+    

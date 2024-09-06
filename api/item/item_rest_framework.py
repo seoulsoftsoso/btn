@@ -8,8 +8,6 @@ from rest_framework.response import Response
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
-    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
     delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
     class Meta:
         model = ItemMaster
@@ -19,19 +17,15 @@ class ItemSerializer(serializers.ModelSerializer):
         }
         read_only_fields = ['id']
 
-    def get_by_username(self):
-        return UserMaster.objects.get(user =self.context['request'].user)
-
     def create(self, instance):
-        instance['created_by'] = self.get_by_username()
-        instance['updated_by'] = self.get_by_username()
+        instance['created_by'] = UserMaster.objects.get(user=self.context['request'].user)
+        instance['updated_by'] = UserMaster.objects.get(user=self.context['request'].user)
         instance['delete_flag'] = 'N'
 
         return super().create(instance)
 
     def update(self, instance, validated_data):
-        validated_data['updated_by'] = self.get_by_username()
-
+        validated_data['updated_by'] = UserMaster.objects.get(user=self.context['request'].user)
         return super().update(instance, validated_data)
 
     def delete (self, instance):
@@ -49,7 +43,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return ItemMaster.objects.filter(delete_flag='N').prefetch_related('created_by', 'updated_by')
+        return ItemMaster.objects.filter(delete_flag='N')
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
