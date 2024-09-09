@@ -19,18 +19,19 @@ def listen_to_changes(request):
     OrderProduct = apps.get_model('api', 'OrderProduct')
     BomMaster = apps.get_model('api', 'BomMaster')
 
-    order_products = OrderProduct.objects.filter(order__client=request.user.id)
-    bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True))
+    order_products = OrderProduct.objects.filter(order__client_id=request.user.id)
+    bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True), delete_flag='N')
 
     container_bom_masters = bom_masters.filter(level=0)
-    controller_bom_masters = bom_masters.filter(level=1, item__item_type='AC')
+    controller_bom_masters = BomMaster.objects.filter(level=1, delete_flag='N', order__client=request.user.id)
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
-    sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
-    gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
-    sta_bom_masters = sensor_bom_masters.filter(item__item_type='C')
+    sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
+    gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L', delete_flag='N')
+    sta_bom_masters = sensor_bom_masters.filter(item__item_type='C', delete_flag='N')
 
     unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
     unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
+
 
     # 최초 연결 시 데이터를 한 번 전송
     cont = {}
