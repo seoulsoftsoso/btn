@@ -74,11 +74,12 @@
                                             fetch('/api/util/user-table-data/')
                                                 .then(response => response.json())
                                                 .then(data => {
-                                                    updateTable(data);
+                                                    updateTable(data);                                                console.log("WebSocket is open");
+                                                    console.log("update table");
+
                                                 })
                                                 .catch(error => console.error('Error fetching initial data:', error));
                                         }
-                                        fetchInitialData()
 
                                         function websocket(){
                                             let socket = new WebSocket(`wss://${window.location.host}/ws/landing/user/`);
@@ -97,6 +98,7 @@
                                             });
                                         }
                                         websocket()
+                                        fetchInitialData()
 
                                         function updateTable(data) {
                                             let uniqueGtrSenName = data.unique_gtr_sen_name;
