@@ -15,8 +15,6 @@ def listen_to_changes(request):
     db = client['djangoConnectTest']
     dbSensorGather = db['sen_gather']
     dbSensorStatus = db['sen_status']
-    dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-    dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
     OrderProduct = apps.get_model('api', 'OrderProduct')
@@ -47,9 +45,9 @@ def listen_to_changes(request):
                 lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
                 lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
                 gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
-                                                           sort=[('c_date', DESCENDING)]))
+                                                           sort=[('c_date', DESCENDING)]).limit(lv2_gtr_ids.count()))
                 sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-                                                           sort=[('c_date', DESCENDING)]))
+                                                           sort=[('c_date', DESCENDING)]).limit(lv2_sta_ids.count()))
                 gtr_sen = {}
                 for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
                     sen_inf = {'sen_name': sensor.item.item_name}
@@ -88,7 +86,7 @@ def send_initial_data(unique_gtr_items, unique_sta_items, cont):
 async def send_update_to_ws(document):
     channel_layer = get_channel_layer()
     await channel_layer.group_send(
-        'your_group_name',
+        'web-table',
         {
             'type': 'send_update',
             'data': document
@@ -109,11 +107,9 @@ def listen_to_changes_flutter(conId):
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
     BomMaster = apps.get_model('api', 'BomMaster')
-    print(conId,'conid')
     container_bom_masters = BomMaster.objects.get(id=conId)
     controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId)
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
-    print(list(controller_bom_ids),'controller ids')
     sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
     gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
     sta_bom_masters = sensor_bom_masters.filter(item__item_type='C')

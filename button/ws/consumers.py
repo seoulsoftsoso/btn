@@ -8,7 +8,7 @@ from button.ws.mongo_updates import start_listening_to_changes_flutter
 
 class MyConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.group_name = 'your_group_name'
+        self.group_name = 'web-table'
         await self.channel_layer.group_add(
             self.group_name,
             self.channel_name
