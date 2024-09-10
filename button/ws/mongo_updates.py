@@ -213,14 +213,14 @@ def listen_to_changes_flutter(conId):
 
     BomMaster = apps.get_model('api', 'BomMaster')
     container_bom_masters = BomMaster.objects.get(id=conId)
-    controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId)
+    controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId, delete_flag='N')
     controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
-    sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2)
+    sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
     gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
     sta_bom_masters = sensor_bom_masters.filter(item__item_type='C')
 
-    unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
-    unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
+    unique_gtr_items = list(gtr_bom_masters.values_list('item__item_name', flat=True).distinct())
+    unique_sta_items = list(sta_bom_masters.values_list('part_code', flat=True).distinct())
     # last_processed_id = None
     # last_cluster_time = None
 
