@@ -58,8 +58,17 @@ class tempUniCtlViewSet(viewsets.ModelViewSet):
 
         def create(self, request, *args, **kwargs):
             part_code = BomMaster.objects.get(id=request.data['senid']).part_code
+            reserved = request.data['reserved']
             if part_code in Except:
                 return;
             request.data['key'] = CONT_UNI[part_code]
             request.data['serial'] = part_code
+            request.data['control_value'] = 1
+            request.data['reserved'] = reserved
+            request.data['start_time'] = request.data['start_time'] if reserved == 1 in request.data else None
+            request.data['end_time'] = request.data['end_time'] if reserved == 1 in request.data else None
+            request.data['exec_period'] = request.data['exec_period'] if 'exec_period' in request.data else None
+            request.data['rest_period'] = request.data['rest_period'] if 'rest_period' in request.data else None
+            request.data['mode'] = request.data['mode'] if 'mode' in request.data else 'M'
+            
             return super().create(request, *args, **kwargs)
