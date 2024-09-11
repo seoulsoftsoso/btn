@@ -60,7 +60,11 @@ class tempUniCtlViewSet(viewsets.ModelViewSet):
                 return 1
             request.data['key'] = CONT_UNI[part_code]
             request.data['serial'] = part_code
-            request.data['control_value'] = 1
+            try:
+                control_value = request.data['control_value']
+                request.data['control_value'] = control_value
+            except:
+                pass
             try:
                 reserved = request.data['reserved']
                 request.data['reserved'] = reserved
