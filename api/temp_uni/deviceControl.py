@@ -4,8 +4,6 @@ from api.models import BomMaster, tempUniControl
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from django.db import transaction
-from django.contrib.auth.models import User
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 CONT_UNI = {

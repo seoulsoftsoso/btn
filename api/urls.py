@@ -7,8 +7,10 @@ from .user.user_restframework import UserViewSet
 from .order.order_restframework import OrderViewSet
 from .temp_uni.deviceControl import tempUniCtlViewSet
 from .util.utils import *
+from .journal.journal_rest_framework import JounralViewSet
 from rest_framework.routers import DefaultRouter
 from .flutter.flutter import *
+from .project.project_rest_frameowork import ProjectViewSet
 router = DefaultRouter()
 
 router.register(r'bom', BomViewSet)
@@ -18,6 +20,8 @@ router.register(r'order', OrderViewSet)
 router.register(r'plantation', PlantationViewSet)
 router.register(r'planpart', PlanPartViewSet)
 router.register(r'tempuni', tempUniCtlViewSet)
+router.register(r'journal', JounralViewSet)
+router.register(r'project', ProjectViewSet)
 
 
 urlpatterns = [

@@ -8,6 +8,9 @@ class EnsureUserMiddleware:
     def __call__(self, request):
         if request.path.startswith('/api/'):
             return self.get_response(request)
+        
+        if request.path.startswith('/register/'):
+            return self.get_response(request)
 
         if not request.user.is_authenticated and request.path != '/auth/login/' and request.path != '/':
             return redirect('/')

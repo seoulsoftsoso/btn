@@ -21,6 +21,7 @@ class PlantationSerializer(serializers.ModelSerializer):
             'updated_by': {'required': False},
         }
         read_only_fields = ['id']
+        ref_name= 'PlanPartPlantationSerializer'
 
     def create(self, validated_data):
         User = UserMaster.objects.get(user_id=self.context['request'].user.id)

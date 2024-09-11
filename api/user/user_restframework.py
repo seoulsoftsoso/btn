@@ -21,7 +21,7 @@ def format_data(data):
         },
         'ent': {
             'licensee_no': data['licensee_no'],
-            'owner_name': data['owner_name'],
+            'owner_name': data['owner_name'] if 'owner_name' in data else '',
             'charge_name': data['charge_name'] if 'charge_name' in data else '',
             'company_name': data['company_name'] if 'company_name' in data else '',
             'charge_pos': data['charge_pos'] if 'charge_pos' in data else '',
@@ -33,8 +33,7 @@ def format_data(data):
 
 
 class EntSerializer(serializers.ModelSerializer):
-    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
-    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
+
     class Meta:
         model = EnterpriseMaster
         fields = '__all__'
@@ -85,8 +84,7 @@ class EntViewSet(viewsets.ModelViewSet):
             return ent
 class UserSerializer(serializers.ModelSerializer):
     ent = EntSerializer()
-    created_by = serializers.StringRelatedField(read_only=True)
-    updated_by = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = UserMaster
         fields = '__all__'
