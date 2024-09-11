@@ -177,7 +177,7 @@ class tempUniControl(models.Model):
     key = models.CharField(max_length=255)
     serial = models.CharField(max_length=255, null=True)
     control_value = models.BooleanField(default=False, null=True)
-    reserve = models.BooleanField(default=False, null=True)
+    reserved = models.BooleanField(default=False, null=True)
     set_value = models.FloatField(null=True)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
