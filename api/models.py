@@ -175,12 +175,15 @@ class Plantation(models.Model):
 
 class tempUniControl(models.Model):
     key = models.CharField(max_length=255)
-    serial = models.CharField(max_length=255)
-    control_value = models.BooleanField(default=False)
+    serial = models.CharField(max_length=255, null=True)
+    control_value = models.BooleanField(default=False, null=True)
     reserve = models.BooleanField(default=False, null=True)
     set_value = models.FloatField(null=True)
-    start_time = models.DateTimeField(null=True)
-    end_time = models.DateTimeField(null=True)
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
+    exec_period = models.IntegerField(null=True)
+    rest_period = models.IntegerField(null=True)
+    mode = models.CharField(choices=(("A", "Auto"), ("M", "Manual")), max_length=1)
 
     class Meta:
         db_table = "tempUniControl"
