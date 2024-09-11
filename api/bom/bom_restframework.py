@@ -12,8 +12,6 @@ import uuid
 import certifi
 from pymongo import MongoClient
 from datetime import datetime
-from io import BytesIO
-
 
 DB_NAME = 'djangoConnectTest'
 GATHER = 'sen_gather'
@@ -27,7 +25,7 @@ TEMP_UNI = {
     "CO2": "CO2센서",
     "PH": "PH",
     "EC": "EC",
-    "LUX":  "광센서"
+    "LUX": "광센서"
 }
 
 # CONT_UNI = {
@@ -65,11 +63,10 @@ CONT_UNI = {
     15: "열교환기 B"
 }
 
-
 TEMP_UNI_SERIAL = [
-    0,0,0,0,0,
-    0,0,0,0,0,
-    0,0,0,0,0
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0
 ]
 
 TEMP_SERIAL_RES = [
@@ -77,35 +74,39 @@ TEMP_SERIAL_RES = [
 ]
 
 
-
 class BomMasterSerializer(serializers.ModelSerializer):
     item_price = serializers.FloatField(source='item.standard_price', read_only=True)
     product_info = serializers.CharField(source='item.item_name', read_only=True)
     image = serializers.CharField(source='item.brand', read_only=True)
     product_name = serializers.CharField(source='item.item_name', read_only=True)
+    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
+    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
     delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
 
     class Meta:
         model = BomMaster
         fields = "__all__"
 
-
     def create(self, instance):
-        instance['created_by'] = UserMaster.objects.get(user_id=self.context['request']).id
-        instance['updated_by'] = UserMaster.objects.get(user_id=self.context['request']).id
+        instance['created_by'] = self.get_by_username()
+        instance['updated_by'] = self.get_by_username()
         instance['delete_flag'] = 'N'
 
         return super().create(instance)
 
     def update(self, instance, validated_data):
-        validated_data['updated_by'] = UserMaster.objects.get(user_id=self.context['request']).id
+        validated_data['updated_by'] = self.get_by_username()
         return super().update(instance, validated_data)
 
     def delete(self, instance):
         instance['delete_flag'] = 'Y'
         return super().update(instance)
 
+
 class BomCreateSerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField(read_only=True)
+    updated_by = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = BomMaster
         fields = '__all__'
@@ -118,7 +119,6 @@ class BomCreateSerializer(serializers.ModelSerializer):
         instance['created_by_id'] = self.get_by_username()
 
         instance['updated_by_id'] = self.get_by_username()
-
 
         return super().create(instance)
 
@@ -159,15 +159,15 @@ class BomViewSet(viewsets.ModelViewSet):
                 part_code=rawData.get('text', ''),
                 item_id=rawData['item_id'],
                 order_cnt=1,
-                total = item.standard_price,
-                tax = item.standard_price * 0.1,
+                total=item.standard_price,
+                tax=item.standard_price * 0.1,
                 order_id=rawData['order_id'],
                 parent_id=parent,
                 level=level,
                 delete_flag='N',
                 created_by=user,
                 updated_by=user,
-                op_id = parent_op_id
+                op_id=parent_op_id
             )
             boms.append(bom.id)
             if level == 0:
@@ -175,7 +175,7 @@ class BomViewSet(viewsets.ModelViewSet):
                     unique_no=str(uuid.uuid4()),
                     product_name=item.item_name,
                     order_id=rawData['order_id'],
-                    delivery_date= datetime.now(timezone('Asia/Seoul')),
+                    delivery_date=datetime.now(timezone('Asia/Seoul')),
                     op_cnt=order_cnt,
                     delivery_addr='HCM',
                     request_note='Test',
@@ -228,7 +228,7 @@ class BomViewSet(viewsets.ModelViewSet):
                     children = BomMaster.objects.filter(parent_id=current.id)
                     queue.extend(children)
         return Response({'message': 'success'}, status=status.HTTP_200_OK)
-        
+
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def temp_uni_insert(self, request, *args, **kwargs):
         data = request.data
@@ -240,7 +240,7 @@ class BomViewSet(viewsets.ModelViewSet):
             control = BomMaster.objects.filter(order__client_id=6, item__item_type='C')
         except BomMaster.DoesNotExist:
             return Response({'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
-        
+
         # 센서 데이터 준비
         pre_sensor_data = []
         for key, value in TEMP_UNI.items():
@@ -269,45 +269,44 @@ class BomViewSet(viewsets.ModelViewSet):
                     "status": "on" if data['RELAY'][key - 1] == 1 else "off"
                 })
                 # 장비 연동을 확인하기 위한 임시 데이터와의 비교 후 제어 상태 업데이트
-                if TEMP_UNI_SERIAL[key -1] != data['RELAY'][key - 1]:
-                    tempControl = TEMP_SERIAL_RES[key -1]
+                if TEMP_UNI_SERIAL[key - 1] != data['RELAY'][key - 1]:
+                    tempControl = TEMP_SERIAL_RES[key - 1]
+                    print(tempControl)
                     if not tempControl == {}:
                         tempUniControl.objects.filter(id=tempControl['id']).delete()
                         TEMP_SERIAL_RES[key - 1] = {}
-                    TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key -1]
+                    TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key - 1]
             except BomMaster.DoesNotExist:
                 continue
             except IndexError:
                 continue  # 인덱스 오류 처리
 
         # MongoDB에 데이터 삽입
-        # try:
-        #     mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
-        #     db = mongo[DB_NAME]
-        #     sen_collection = db[GATHER]
-        #     con_collection = db[SENSOR]
-        #     sen_collection.insert_many(pre_sensor_data)
-        #     con_collection.insert_many(pre_control_data)
-        # except Exception as e:
-        #     return Response({'message': 'Database error', 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        try:
+            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+            db = mongo[DB_NAME]
+            sen_collection = db[GATHER]
+            con_collection = db[SENSOR]
+            sen_collection.insert_many(pre_sensor_data)
+            con_collection.insert_many(pre_control_data)
+        except Exception as e:
+            return Response({'message': 'Database error', 'error': str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # 제어 장치 데이터 준비
-        sen_control_data = [[] for _ in range(len(TEMP_UNI_SERIAL))]
+        sen_control_data = []
         for sen_control in tempUniControl.objects.all():
-            if sen_control.control_value != TEMP_UNI_SERIAL[int(sen_control.key) -1]:
-                key, value, = sen_control.key, sen_control.control_value,
-                sv, reserve = sen_control.set_value, sen_control.reserve
-                data = [value, sv, reserve]
-                if reserve == 1:
-                    data.append([sen_control.start_time, sen_control.end_time])
-                # [value, set_value, reserve, [start_time, end_time]]
-                # sen_control_data[key] = [0, 23, 1, [0320, 1020]]
-                sen_control_data[key - 1] = data
-                if key in TEMP_SERIAL_RES:
-                    tempUniControl.objects.filter(id=TEMP_SERIAL_RES[key - 1]['id']).delete()
-                else:
-                    TEMP_SERIAL_RES[key - 1] = {
-                        'control_value': value,
-                        'id': sen_control.id
-                    }
-        return Response(sen_control_data)
+            print(sen_control, 'sen_control')
+            if sen_control.control_value != TEMP_UNI_SERIAL[int(sen_control.key) - 1]:
+                key, value = sen_control.key, sen_control.control_value
+                key = int(key)
+                data = {
+                    'key': f'relay {key}',
+                    'control_value': value
+                }
+                sen_control_data.append(data)
+                TEMP_SERIAL_RES[key - 1] = {
+                    'control_value': value,
+                    'id': sen_control.id
+                }
+        return Response(sen_control_data, status=status.HTTP_200_OK)
