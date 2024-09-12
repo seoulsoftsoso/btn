@@ -9,12 +9,16 @@ from datetime import datetime, timedelta
 
 
 from django.http import JsonResponse
-from api.models import BomMaster, ItemMaster, OrderProduct, OrderMaster
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import AllowAny
+
+from api.models import BomMaster, ItemMaster, OrderProduct, OrderMaster, tempUniControl
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.views.decorators.csrf import csrf_exempt
 
+from api.temp_uni.deviceControl import tempUniCtlSerializer
 from button.ws.mongo_updates import start_listening_to_changes_flutter
 
 
@@ -291,3 +295,28 @@ def fetch_graph_data(request):
         return JsonResponse(formatted_results, safe=False)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def term_set_data(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        senid = data.get('senid')
+        if senid is None:
+            return JsonResponse({'error': 'senid not provided'}, status=400)
+
+        try:
+            temp_uni_control_data = tempUniControl.objects.get(senid=senid)
+        except tempUniControl.DoesNotExist:
+            return JsonResponse({'error': 'Data not found'}, status=404)
+
+        exec_period = temp_uni_control_data.exec_period if temp_uni_control_data.exec_period is not None else 0
+        rest_period = temp_uni_control_data.rest_period if temp_uni_control_data.rest_period is not None else 0
+
+            # 데이터를 JSON 형식으로 변환하여 반환
+        response_data = {
+            'exec_period': exec_period,  # 원하는 필드 추가
+            'rest_period': rest_period,
+        }
+
+        return JsonResponse(response_data, status=200)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
