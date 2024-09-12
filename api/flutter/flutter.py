@@ -296,27 +296,42 @@ def fetch_graph_data(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+
+@csrf_exempt
 def term_set_data(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        senid = data.get('senid')
-        if senid is None:
-            return JsonResponse({'error': 'senid not provided'}, status=400)
-
         try:
-            temp_uni_control_data = tempUniControl.objects.get(senid=senid)
-        except tempUniControl.DoesNotExist:
-            return JsonResponse({'error': 'Data not found'}, status=404)
+            # POST 요청에서 데이터를 JSON으로 로드
+            data = json.loads(request.body)
+            print("Received data:", data)
 
-        exec_period = temp_uni_control_data.exec_period if temp_uni_control_data.exec_period is not None else 0
-        rest_period = temp_uni_control_data.rest_period if temp_uni_control_data.rest_period is not None else 0
+            # 요청 데이터에서 'senid' 가져오기
+            senid = data.get('senid')
+            if senid is None:
+                return JsonResponse({'error': 'senid not provided'}, status=400)
 
-            # 데이터를 JSON 형식으로 변환하여 반환
-        response_data = {
-            'exec_period': exec_period,  # 원하는 필드 추가
-            'rest_period': rest_period,
-        }
+            # 'serial' 필드로 데이터 검색
+            try:
+                temp_uni_control_data = tempUniControl.objects.get(id=senid)
+                exec_period = temp_uni_control_data.exec_period if temp_uni_control_data.exec_period is not None else 0
+                rest_period = temp_uni_control_data.rest_period if temp_uni_control_data.rest_period is not None else 0
 
-        return JsonResponse(response_data, status=200)
+                response_data = {
+                    'exec_period': exec_period,
+                    'rest_period': rest_period,
+                }
+
+                return JsonResponse(response_data, status=200)
+
+            except tempUniControl.DoesNotExist:
+                # 데이터가 없을 때 빈 값 반환
+                return JsonResponse({
+                    'exec_period': 0,
+                    'rest_period': 0,
+                }, status=200)
+
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON: {e}")
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
