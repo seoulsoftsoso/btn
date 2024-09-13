@@ -314,7 +314,7 @@ class BomViewSet(viewsets.ModelViewSet):
             if exec_time == 0 and rest_time == 0:
                 for cycle, idx in CYCLE_RES:
                     if cycle["key"] == key:
-                        CYCLE_RES.pop(idx)
+                        CYCLE_RES.__delitem__(cycle)
                         break
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
@@ -347,7 +347,7 @@ class BomViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def get_cycle(self, request, *args, **kwargs):
-        return Response(CYCLE_RES)
+        return Response(CYCLE_RES, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
