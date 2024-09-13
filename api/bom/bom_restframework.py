@@ -314,7 +314,7 @@ class BomViewSet(viewsets.ModelViewSet):
             if exec_time == 0 and rest_time == 0:
                 for cycle in CYCLE_RES:
                     if cycle["key"] == key:
-                        CYCLE_RES = [cycle for cycle in CYCLE_RES if cycle["key"] != key]
+                        CYCLE_RES.remove(cycle)
                         break
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
