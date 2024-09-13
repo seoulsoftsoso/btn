@@ -1,7 +1,5 @@
 import json
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -236,7 +234,6 @@ class BomViewSet(viewsets.ModelViewSet):
     def temp_uni_insert(self, request, prev_time=None, *args, **kwargs):
         data = request.data
         print(CYCLE_RES)
-        channel_layer = get_channel_layer()
 
         for cycle in CYCLE_RES:
             time_after = (datetime.now() - cycle["currentTime"]).total_seconds() / 60
@@ -258,12 +255,6 @@ class BomViewSet(viewsets.ModelViewSet):
                     control_value=1,
                     mode="M"
                 )
-            async_to_sync(channel_layer.group_send)(
-                "cycle_updates",  # 그룹 이름
-                {
-                    'type': 'send_cycle_status',  # send_cycle_status 메소드 호출
-                }
-            )
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code="uni-container")
