@@ -347,7 +347,7 @@ class BomViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def get_cycle(self, request, *args, **kwargs):
-        return Response(CYCLE_RES, status=status.HTTP_200_OK)
+        return Response(CYCLE_RES)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
