@@ -318,7 +318,8 @@ class BomViewSet(viewsets.ModelViewSet):
                     if cycle["key"] == key:
                         CYCLE_RES.remove(cycle)
                         break
-                sen_control.delete()
+                sen_control.delete_flag = 'Y'
+                sen_control.save()
                 continue
             if exec_time:
                 CYCLE_RES.append({
@@ -342,7 +343,8 @@ class BomViewSet(viewsets.ModelViewSet):
                 'control_value': value
             }
             sen_control_data.append(data)
-            sen_control.delete()
+            sen_control.delete_flag = "Y"
+            sen_control.save()
         return Response(sen_control_data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
