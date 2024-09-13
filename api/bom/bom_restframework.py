@@ -233,11 +233,9 @@ class BomViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def temp_uni_insert(self, request, prev_time=None, *args, **kwargs):
         data = request.data
-        print(CYCLE_RES)
 
         for cycle in CYCLE_RES:
             time_after = (datetime.now() - cycle["currentTime"]).total_seconds() / 60
-            print(time_after, cycle["current"])
             if time_after > cycle["exec_time"] and cycle["current"] == "exec":
                 cycle["current"] = "rest"
                 cycle["currentTime"] = datetime.now()
@@ -347,6 +345,10 @@ class BomViewSet(viewsets.ModelViewSet):
             sen_control.save()
         return Response(sen_control_data, status=status.HTTP_200_OK)
 
+    @action
+    def get_cycle(self):
+        return Response(CYCLE_RES, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
         data = request.data
@@ -431,3 +433,5 @@ class BomViewSet(viewsets.ModelViewSet):
             })
             sen_control.delete()
         return Response(res)
+
+    #
