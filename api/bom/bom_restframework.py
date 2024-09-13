@@ -1,9 +1,11 @@
+import json
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl
+from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl, SenControl
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework import serializers
@@ -69,8 +71,7 @@ TEMP_UNI_SERIAL = [
     0, 0, 0, 0, 0
 ]
 
-TEMP_SERIAL_RES = [
-    {} for _ in range(15)
+CYCLE_RES = [
 ]
 
 
@@ -230,9 +231,30 @@ class BomViewSet(viewsets.ModelViewSet):
         return Response({'message': 'success'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
-    def temp_uni_insert(self, request, *args, **kwargs):
+    def temp_uni_insert(self, request, prev_time=None, *args, **kwargs):
         data = request.data
+        print(CYCLE_RES)
 
+        for cycle in CYCLE_RES:
+            time_after = (datetime.now() - cycle["currentTime"]).total_seconds() / 60
+            print(time_after, cycle["current"])
+            if time_after > cycle["exec_time"] and cycle["current"] == "exec":
+                cycle["current"] = "rest"
+                cycle["currentTime"] = datetime.now()
+                tempUniControl.objects.create(
+                    key=cycle["key"],
+                    control_value=0,
+                    mode="M"
+                )
+                time_after = 0
+            if time_after > cycle["rest_time"] and cycle["current"] == "rest":
+                cycle["current"] = "exec"
+                cycle["currentTime"] = datetime.now()
+                tempUniControl.objects.create(
+                    key=cycle["key"],
+                    control_value=1,
+                    mode="M"
+                )
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code="uni-container")
@@ -268,14 +290,116 @@ class BomViewSet(viewsets.ModelViewSet):
                     "type": "sta",
                     "status": "on" if data['RELAY'][key - 1] == 1 else "off"
                 })
-                # 장비 연동을 확인하기 위한 임시 데이터와의 비교 후 제어 상태 업데이트
-                if TEMP_UNI_SERIAL[key - 1] != data['RELAY'][key - 1]:
-                    tempControl = TEMP_SERIAL_RES[key - 1]
-                    print(tempControl)
-                    if not tempControl == {}:
-                        tempUniControl.objects.filter(id=tempControl['id']).delete()
-                        TEMP_SERIAL_RES[key - 1] = {}
-                    TEMP_UNI_SERIAL[key - 1] = data['RELAY'][key - 1]
+            except BomMaster.DoesNotExist:
+                continue
+            except IndexError:
+                continue  # 인덱스 오류 처리
+
+        try:
+            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+            db = mongo[DB_NAME]
+            sen_collection = db[GATHER]
+            con_collection = db[SENSOR]
+            sen_collection.insert_many(pre_sensor_data)
+            con_collection.insert_many(pre_control_data)
+        except Exception as e:
+            return Response({'message': 'Database error', 'error': str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # 제어 장치 데이터 준비
+        sen_control_data = []
+        for sen_control in tempUniControl.objects.all():
+            print(sen_control, 'sen_control')
+            key, value = sen_control.key, sen_control.control_value
+
+            exec_time, rest_time = sen_control.exec_period, sen_control.rest_period
+            if exec_time == 0 and rest_time == 0:
+                for cycle in CYCLE_RES:
+                    if cycle["key"] == key:
+                        CYCLE_RES.remove(cycle)
+                        break
+                sen_control.delete()
+                continue
+            if exec_time:
+                CYCLE_RES.append({
+                    "key": key,
+                    "current": "exec",
+                    "currentTime": datetime.now(),
+                    "exec_time": exec_time,
+                    "rest_time": rest_time
+                })
+                sen_control.delete()
+                data = {
+                    'key': f'relay {key}',
+                    'control_value': 1
+                }
+                sen_control_data.append(data)
+                continue
+            key = int(key)
+            data = {
+                'key': f'relay {key}',
+                'control_value': value
+            }
+            sen_control_data.append(data)
+            sen_control.delete()
+        return Response(sen_control_data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def sen_control(self, request, *args, **kwargs):
+        data = request.data
+        print(data)
+        try:
+            # 컨테이너 및 센서, 제어 장치 객체 가져오기
+            container = BomMaster.objects.get(part_code=data['container'])
+            sensor = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='L')
+            control = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='C')
+        except BomMaster.DoesNotExist:
+            return Response({'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 센서 데이터 준비
+        pre_sensor_data = []
+        for key, value in TEMP_UNI.items():
+            try:
+                sensor_id = sensor.get(item__item_name=value).id
+                pre_sensor_data.append({
+                    "c_date": datetime.now(timezone('Asia/Seoul')),
+                    "con_id": container.id,
+                    "senid": sensor_id,
+                    "type": "gta",
+                    "value": data.get(key, None)  # 데이터가 없는 경우를 처리
+                })
+            except BomMaster.DoesNotExist:
+                continue
+
+        # 제어 장치 데이터 준비
+        relay = data["RELAY"]
+        pre_control_data = []
+        print(relay)
+        for part_code in relay["ON"]:
+            try:
+                control_id = control.get(part_code=part_code).id
+                pre_control_data.append({
+                    "c_date": datetime.now(timezone('Asia/Seoul')),
+                    "con_id": container.id,
+                    "senid": control_id,
+                    "type": "sta",
+                    "status": "on"
+                })
+            except BomMaster.DoesNotExist:
+                continue
+            except IndexError:
+                continue  # 인덱스 오류 처리
+
+        for part_code in relay["OFF"]:
+            try:
+                control_id = control.get(part_code=part_code).id
+                pre_control_data.append({
+                    "c_date": datetime.now(timezone('Asia/Seoul')),
+                    "con_id": container.id,
+                    "senid": control_id,
+                    "type": "sta",
+                    "status": "off"
+                })
             except BomMaster.DoesNotExist:
                 continue
             except IndexError:
@@ -294,19 +418,13 @@ class BomViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # 제어 장치 데이터 준비
-        sen_control_data = []
-        for sen_control in tempUniControl.objects.all():
-            print(sen_control, 'sen_control')
-            if sen_control.control_value != TEMP_UNI_SERIAL[int(sen_control.key) - 1]:
-                key, value = sen_control.key, sen_control.control_value
-                key = int(key)
-                data = {
-                    'key': f'relay {key}',
-                    'control_value': value
-                }
-                sen_control_data.append(data)
-                TEMP_SERIAL_RES[key - 1] = {
-                    'control_value': value,
-                    'id': sen_control.id
-                }
-        return Response(sen_control_data, status=status.HTTP_200_OK)
+        res = []
+        for sen_control in SenControl.objects.all():
+            mode, value, part_code = sen_control.mode, sen_control.value, sen_control.part_code,
+            res.append({
+                'name': part_code,
+                "mode": mode,
+                "value": value
+            })
+            sen_control.delete()
+        return Response(res)
