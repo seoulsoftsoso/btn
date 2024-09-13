@@ -10,6 +10,7 @@ from .util.utils import *
 from .journal.journal_rest_framework import JounralViewSet
 from rest_framework.routers import DefaultRouter
 from .flutter.flutter import *
+from .control.senControl import senControlViewSet
 from .project.project_rest_frameowork import ProjectViewSet
 router = DefaultRouter()
 
@@ -22,8 +23,7 @@ router.register(r'planpart', PlanPartViewSet)
 router.register(r'tempuni', tempUniCtlViewSet)
 router.register(r'journal', JounralViewSet)
 router.register(r'project', ProjectViewSet)
-
-
+router.register(r'senControl', senControlViewSet)
 urlpatterns = [
     path('', include(router.urls)),
 
