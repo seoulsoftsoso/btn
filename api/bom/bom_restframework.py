@@ -324,7 +324,7 @@ class BomViewSet(viewsets.ModelViewSet):
             if exec_time:
                 CYCLE_RES.append({
                     "key": key,
-                    "current": "rest",
+                    "current": "exec",
                     "currentTime": datetime.now(),
                     "exec_time": exec_time,
                     "rest_time": rest_time
