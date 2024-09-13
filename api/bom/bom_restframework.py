@@ -331,11 +331,11 @@ class BomViewSet(viewsets.ModelViewSet):
                 })
                 sen_control.delete_flag = "Y"
                 sen_control.save()
-                data = {
-                    'key': f'relay {key}',
-                    'control_value': 1
-                }
-                sen_control_data.append(data)
+                tempUniControl.objects.create(
+                    key=key,
+                    control_value=1,
+                    mode="M"
+                )
                 continue
             key = int(key)
             data = {
