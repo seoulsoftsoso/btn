@@ -181,6 +181,7 @@ class tempUniControl(models.Model):
     set_value = models.FloatField(null=True)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
+    delete_flag = models.CharField(max_length=1, default='N')
     exec_period = models.IntegerField(null=True)
     rest_period = models.IntegerField(null=True)
     mode = models.CharField(choices=(("A", "Auto"), ("M", "Manual")), max_length=1)

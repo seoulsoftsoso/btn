@@ -308,7 +308,7 @@ class BomViewSet(viewsets.ModelViewSet):
 
         # 제어 장치 데이터 준비
         sen_control_data = []
-        for sen_control in tempUniControl.objects.all():
+        for sen_control in tempUniControl.objects.filter(delete_flag='N'):
             print(sen_control, 'sen_control')
             key, value = sen_control.key, sen_control.control_value
 
@@ -323,12 +323,13 @@ class BomViewSet(viewsets.ModelViewSet):
             if exec_time:
                 CYCLE_RES.append({
                     "key": key,
-                    "current": "exec",
+                    "current": "rest",
                     "currentTime": datetime.now(),
                     "exec_time": exec_time,
                     "rest_time": rest_time
                 })
-                sen_control.delete()
+                sen_control.delete_flag = "Y"
+                sen_control.save()
                 data = {
                     'key': f'relay {key}',
                     'control_value': 1
