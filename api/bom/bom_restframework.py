@@ -345,7 +345,7 @@ class BomViewSet(viewsets.ModelViewSet):
             sen_control.save()
         return Response(sen_control_data, status=status.HTTP_200_OK)
 
-    @action
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def get_cycle(self):
         return Response(CYCLE_RES, status=status.HTTP_200_OK)
 
