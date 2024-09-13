@@ -9,6 +9,7 @@ websocket_urlpatterns = [
     re_path(r'ws/landing/user/$', consumers.MyConsumer.as_asgi()),
     # path('ws/flutter/gtrsen', consumers.AppConsumer.as_asgi()),  # New WebSocket route
     re_path(r'^ws/flutter/gtrsen/(?P<conId>\d+)/$', consumers.AppConsumer.as_asgi()),  # URL에서 conId를 추출
+    re_path(r'^ws/flutter/cycle/$', consumers.CycleConsumer.as_asgi()),
 
 ]
 logger.info('WebSocket URL 패턴 설정 완료')
