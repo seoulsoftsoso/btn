@@ -270,4 +270,12 @@ class JournalDone(models.Model):
 
     class Meta:
         db_table = 'journalDone'
+
+class SenControl(models.Model):
+    part_code = models.CharField(max_length=255)
+    mode = models.CharField(max_length=20)
+    value = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = "senControl"
     
