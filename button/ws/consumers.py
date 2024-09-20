@@ -3,7 +3,7 @@ import threading
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from button.ws.mongo_updates import start_listening_to_changes_flutter
+from button.ws.flutter.sensors_updates import start_listening_to_changes_flutter
 
 
 class MyConsumer(AsyncWebsocketConsumer):
