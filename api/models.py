@@ -276,6 +276,7 @@ class SenControl(models.Model):
     part_code = models.CharField(max_length=255)
     mode = models.CharField(max_length=20)
     value = models.CharField(max_length=255)
+    relay = models.ForeignKey('Relay', on_delete=models.SET_NULL, null=True)
     delete_flag = models.CharField(max_length=1, default='N')
 
     class Meta:

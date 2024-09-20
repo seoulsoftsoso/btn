@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 
-from api.models import BomMaster, SenControl
+from api.models import BomMaster, SenControl, Relay
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from django.db import transaction
@@ -31,9 +31,14 @@ class senControlViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         if request.data['senid'] != "ALL":
-            part_code = BomMaster.objects.get(id=request.data['senid']).part_code
+            senId = request.data['senid']
+            bom = BomMaster.objects.get(id=senId)
+            part_code = bom.part_code
+            print(Relay.objects.get(sen_id=senId).id)
+            request.data['relay'] = Relay.objects.get(sen_id=senId).id
         else: 
             part_code = "ALL"
+        
         request.data['part_code'] = part_code
 
         return super().create(request, *args, **kwargs)

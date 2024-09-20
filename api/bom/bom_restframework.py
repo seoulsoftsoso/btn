@@ -347,10 +347,10 @@ class BomViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Database error', 'error': str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # 제어 장치 데이터 준비
+        # # 제어 장치 데이터 준비
         res = []
         for sen_control in SenControl.objects.filter(delete_flag='N'):
-            mode, value, part_code = sen_control.mode, sen_control.value, sen_control.part_code
+            mode, value, part_code, relay = sen_control.mode, sen_control.value, sen_control.part_code, sen_control.relay
             res_date = datetime.now(timezone('Asia/Seoul'))
             res_time = res_date.strftime("%H%M")
             if part_code == "ALL":
@@ -391,7 +391,6 @@ class BomViewSet(viewsets.ModelViewSet):
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
                 continue
-            realy_key = Relay.objects.get(name=part_code).key
             if mode == "CHK":
                 curr_status = SenControl.objects.filter(
                     Q(part_code=part_code) | Q(part_code="ALL")
@@ -400,7 +399,7 @@ class BomViewSet(viewsets.ModelViewSet):
                     curr_mode = curr_status.mode
                     curr_value = curr_status.value
                     res.append({
-                        'key': realy_key,
+                        'key': relay.key,
                         "chk": 1,
                         "mode": curr_mode,
                         "value": curr_value,
@@ -408,14 +407,14 @@ class BomViewSet(viewsets.ModelViewSet):
                     })
                 else:
                     res.append({
-                        'key': realy_key,
+                        'key': relay.key,
                         "chk": 0,
                         "time": res_time
                     })
                 sen_control.delete()
             else:
                 res.append({
-                    'key': realy_key,
+                    'key': relay.key,
                     "mode": mode,
                     "value": value,
                     "time": res_time
