@@ -1,8 +1,6 @@
 import threading
 import asyncio
 from channels.layers import get_channel_layer
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 
 from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl, SenControl, Relay, Plantation
 
