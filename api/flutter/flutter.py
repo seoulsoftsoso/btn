@@ -1,25 +1,16 @@
 import pytz
 from dateutil.parser import isoparse
 from django.contrib.auth import authenticate
-from django.http import JsonResponse
 from django.middleware.csrf import get_token
-from django.views.decorators.csrf import csrf_exempt
-import json
-from datetime import datetime, timedelta
-
+from datetime import datetime
 
 from django.http import JsonResponse
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import AllowAny
 
-from api.models import BomMaster, ItemMaster, OrderProduct, OrderMaster, tempUniControl
-from pymongo import MongoClient, ASCENDING, DESCENDING
+from api.models import BomMaster, OrderProduct
+from pymongo import MongoClient, DESCENDING
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.views.decorators.csrf import csrf_exempt
-
-from api.temp_uni.deviceControl import tempUniCtlSerializer
-from button.ws.mongo_updates import start_listening_to_changes_flutter
 
 
 def csrf(request):
@@ -297,41 +288,41 @@ def fetch_graph_data(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-@csrf_exempt
-def term_set_data(request):
-    if request.method == 'POST':
-        try:
-            # POST 요청에서 데이터를 JSON으로 로드
-            data = json.loads(request.body)
-            print("Received data:", data)
-
-            # 요청 데이터에서 'senid' 가져오기
-            senid = data.get('senid')
-            if senid is None:
-                return JsonResponse({'error': 'senid not provided'}, status=400)
-
-            # 'serial' 필드로 데이터 검색
-            try:
-                temp_uni_control_data = tempUniControl.objects.get(id=senid)
-                exec_period = temp_uni_control_data.exec_period if temp_uni_control_data.exec_period is not None else 0
-                rest_period = temp_uni_control_data.rest_period if temp_uni_control_data.rest_period is not None else 0
-
-                response_data = {
-                    'exec_period': exec_period,
-                    'rest_period': rest_period,
-                }
-
-                return JsonResponse(response_data, status=200)
-
-            except tempUniControl.DoesNotExist:
-                # 데이터가 없을 때 빈 값 반환
-                return JsonResponse({
-                    'exec_period': 0,
-                    'rest_period': 0,
-                }, status=200)
-
-        except json.JSONDecodeError as e:
-            print(f"Error decoding JSON: {e}")
-            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+# @csrf_exempt
+# def term_set_data(request):
+#     if request.method == 'POST':
+#         try:
+#             # POST 요청에서 데이터를 JSON으로 로드
+#             data = json.loads(request.body)
+#             print("Received data:", data)
+#
+#             # 요청 데이터에서 'senid' 가져오기
+#             senid = data.get('senid')
+#             if senid is None:
+#                 return JsonResponse({'error': 'senid not provided'}, status=400)
+#
+#             # 'serial' 필드로 데이터 검색
+#             try:
+#                 temp_uni_control_data = tempUniControl.objects.get(id=senid)
+#                 exec_period = temp_uni_control_data.exec_period if temp_uni_control_data.exec_period is not None else 0
+#                 rest_period = temp_uni_control_data.rest_period if temp_uni_control_data.rest_period is not None else 0
+#
+#                 response_data = {
+#                     'exec_period': exec_period,
+#                     'rest_period': rest_period,
+#                 }
+#
+#                 return JsonResponse(response_data, status=200)
+#
+#             except tempUniControl.DoesNotExist:
+#                 # 데이터가 없을 때 빈 값 반환
+#                 return JsonResponse({
+#                     'exec_period': 0,
+#                     'rest_period': 0,
+#                 }, status=200)
+#
+#         except json.JSONDecodeError as e:
+#             print(f"Error decoding JSON: {e}")
+#             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+#
+#     return JsonResponse({'error': 'Invalid request method'}, status=405)

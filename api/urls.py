@@ -35,6 +35,6 @@ urlpatterns = [
     path('flutter/container-sen-map/', container_sen_map),
     path('flutter/fetch-graph-data/', fetch_graph_data),
     path('flutter/sen-list/', sen_list),
-    path('flutter/term-set-data/', term_set_data),
+    # path('flutter/term-set-data/', term_set_data),
 
 ]
