@@ -12,7 +12,7 @@ import os
 from django.core.asgi import get_asgi_application
 import button.ws.routing  # 웹소켓 라우팅 파일
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'button.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Button_Project.settings')
 
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
