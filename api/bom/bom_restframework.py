@@ -273,7 +273,6 @@ class BomViewSet(viewsets.ModelViewSet):
         # 제어 장치 데이터 준비
         sen_control_data = []
         for sen_control in tempUniControl.objects.filter(delete_flag='N'):
-            print(sen_control, 'sen_control')
             key, value = sen_control.key, sen_control.control_value
             key = int(key)
             data = {
@@ -288,7 +287,6 @@ class BomViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
         data = request.data
-        print(data)
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code=data['container'])
@@ -316,14 +314,12 @@ class BomViewSet(viewsets.ModelViewSet):
         # 제어 장치 데이터 준비
         relay = data["RELAY"]
         pre_control_data = []
-        print(relay)
-        for key, name in Relay.objects.filter(container_id=plantation_id).values_list('key', 'name'):
+        for key,sen in Relay.objects.filter(container_id=plantation_id).values_list('key', "sen"):
             try:
-                control_id = control.get(part_code=name).id
                 pre_control_data.append({
                     "c_date": datetime.now(timezone('Asia/Seoul')),
                     "con_id": container.id,
-                    "senid": control_id,
+                    "senid": sen,
                     "type": "sta",
                     "status": "on" if relay[key - 1] == 1 else "off"
                 })
@@ -332,8 +328,6 @@ class BomViewSet(viewsets.ModelViewSet):
             except IndexError:
                 continue
 
-        print(pre_sensor_data)
-        print(pre_control_data)
 
         # MongoDB에 데이터 삽입
         try:
@@ -349,14 +343,18 @@ class BomViewSet(viewsets.ModelViewSet):
 
         # # 제어 장치 데이터 준비
         res = []
+        req_time = data['TIME']
+        now_date = datetime.now(timezone('Asia/Seoul'))
+        now_time = now_date.strftime("%H%M%S")
+        time_set = False
+        if req_time != now_time:
+            time_set = True
+
         for sen_control in SenControl.objects.filter(delete_flag='N'):
             mode, value, part_code, relay = sen_control.mode, sen_control.value, sen_control.part_code, sen_control.relay
-            res_date = datetime.now(timezone('Asia/Seoul'))
-            res_time = res_date.strftime("%H%M")
             if part_code == "ALL":
                 if mode == "CHK":
                     for i in Relay.objects.filter(container_id=plantation_id):
-                        print(i.key)
                         curr_status = SenControl.objects.filter(
                             Q(part_code=i.key) | Q(part_code="ALL")
                         ).exclude(id=sen_control.id).last()
@@ -368,26 +366,21 @@ class BomViewSet(viewsets.ModelViewSet):
                                 "chk": 1,
                                 "mode": curr_mode,
                                 "value": curr_value,
-                                "time": res_time
                             })
                         else:
                             res.append({
                                 'key': i.key,
                                 "chk": 0,
-                                "time": res_time
                             })
                     sen_control.delete()
                     continue
                 else:                    
                     for i in Relay.objects.filter(container_id=plantation_id):
-                        print(i.key)
                         res.append({
                             'key': i.key,
                             "mode": mode,
                             "value": value,
-                            "time": res_time
                         })
-                print(res)
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
                 continue
@@ -403,13 +396,11 @@ class BomViewSet(viewsets.ModelViewSet):
                         "chk": 1,
                         "mode": curr_mode,
                         "value": curr_value,
-                        "time": res_time
                     })
                 else:
                     res.append({
                         'key': relay.key,
                         "chk": 0,
-                        "time": res_time
                     })
                 sen_control.delete()
             else:
@@ -417,10 +408,11 @@ class BomViewSet(viewsets.ModelViewSet):
                     'key': relay.key,
                     "mode": mode,
                     "value": value,
-                    "time": res_time
                 })
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
+        if time_set and res:
+            res[0]['time'] = now_time
         return Response(res)
 
     #

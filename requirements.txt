@@ -24,6 +24,7 @@ importlib_metadata==7.1.0
 incremental==22.10.0
 inflection==0.5.1
 Markdown==3.6
+motor==3.5.1
 mysqlclient==2.2.4
 packaging==24.0
 paho-mqtt==2.1.0
