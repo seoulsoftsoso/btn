@@ -276,7 +276,16 @@ class SenControl(models.Model):
     part_code = models.CharField(max_length=255)
     mode = models.CharField(max_length=20)
     value = models.CharField(max_length=255)
+    delete_flag = models.CharField(max_length=1, default='N')
 
     class Meta:
         db_table = "senControl"
+
+class Relay(models.Model):
+    key = models.IntegerField()
+    name = models.CharField(max_length=20)
+    sen = models.ForeignKey('BomMaster', on_delete=models.CASCADE)
+    container = models.ForeignKey('Plantation', on_delete=models.CASCADE)
     
+    class Meta:
+        db_table = "relay"    

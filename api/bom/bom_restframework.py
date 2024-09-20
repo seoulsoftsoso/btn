@@ -5,12 +5,14 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl, SenControl
+from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl, SenControl, Relay, Plantation
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework import serializers
 from pytz import timezone
 import uuid
+
+from django.db.models import Q
 import certifi
 from pymongo import MongoClient
 from datetime import datetime
@@ -21,7 +23,8 @@ SENSOR = "sen_status"
 SERVER_URL = ('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName'
               '=Cluster0')
 
-TEMP_UNI = {
+
+ENV_STATUS = {
     "TEMP": "온도센서",
     "HUMI": "습도센서",
     "CO2": "CO2센서",
@@ -30,23 +33,6 @@ TEMP_UNI = {
     "LUX": "광센서"
 }
 
-# CONT_UNI = {
-#     1: "FAN 1",
-#     2: "FAN 2",
-#     3: "LED Dimming 1",
-#     4: "LED Dimming 2",
-#     5: "LED Dimming 3",
-#     6: "LED Dimming 4",
-#     7: "양액기 Dispensor 1",
-#     8: "양액기 Dispensor 2",
-#     9: "양액기 Dispensor 3",
-#     10: "양액기 Dispensor 4",
-#     11: "양액기 Dispensor 5",
-#     12: "양액기 Dispensor 6",
-#     13: "순환 모터",
-#     14: "열교환기 A",
-#     15: "열교환기 B"
-# }
 CONT_UNI = {
     1: "펌프",
     2: "교반기",
@@ -233,26 +219,6 @@ class BomViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def temp_uni_insert(self, request, prev_time=None, *args, **kwargs):
         data = request.data
-
-        for cycle in CYCLE_RES:
-            time_after = (datetime.now() - cycle["currentTime"]).total_seconds() / 60
-            if time_after > cycle["exec_time"] and cycle["current"] == "exec":
-                cycle["current"] = "rest"
-                cycle["currentTime"] = datetime.now()
-                tempUniControl.objects.create(
-                    key=cycle["key"],
-                    control_value=0,
-                    mode="M"
-                )
-                time_after = 0
-            if time_after > cycle["rest_time"] and cycle["current"] == "rest":
-                cycle["current"] = "exec"
-                cycle["currentTime"] = datetime.now()
-                tempUniControl.objects.create(
-                    key=cycle["key"],
-                    control_value=1,
-                    mode="M"
-                )
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code="uni-container")
@@ -263,7 +229,7 @@ class BomViewSet(viewsets.ModelViewSet):
 
         # 센서 데이터 준비
         pre_sensor_data = []
-        for key, value in TEMP_UNI.items():
+        for key, value in ENV_STATUS.items():
             try:
                 sensor_id = sensor.get(item__item_name=value).id
                 pre_sensor_data.append({
@@ -309,32 +275,6 @@ class BomViewSet(viewsets.ModelViewSet):
         for sen_control in tempUniControl.objects.filter(delete_flag='N'):
             print(sen_control, 'sen_control')
             key, value = sen_control.key, sen_control.control_value
-
-            exec_time, rest_time = sen_control.exec_period, sen_control.rest_period
-            if exec_time == 0 and rest_time == 0:
-                for cycle, idx in CYCLE_RES:
-                    if cycle["key"] == key:
-                        CYCLE_RES.__delitem__(cycle)
-                        break
-                sen_control.delete_flag = 'Y'
-                sen_control.save()
-                continue
-            if exec_time:
-                CYCLE_RES.append({
-                    "key": key,
-                    "current": "exec",
-                    "currentTime": datetime.now(),
-                    "exec_time": exec_time,
-                    "rest_time": rest_time
-                })
-                sen_control.delete_flag = "Y"
-                sen_control.save()
-                tempUniControl.objects.create(
-                    key=key,
-                    control_value=1,
-                    mode="M"
-                )
-                continue
             key = int(key)
             data = {
                 'key': f'relay {key}',
@@ -345,11 +285,6 @@ class BomViewSet(viewsets.ModelViewSet):
             sen_control.save()
         return Response(sen_control_data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
-    def get_cycle(self, request, *args, **kwargs):
-        cycle_res_copy = CYCLE_RES.copy()  # Create a copy of CYCLE_RES
-        return Response(cycle_res_copy, status=status.HTTP_200_OK)
-
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
         data = request.data
@@ -357,6 +292,7 @@ class BomViewSet(viewsets.ModelViewSet):
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code=data['container'])
+            plantation_id = Plantation.objects.get(bom_id=container.id).id
             sensor = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='L')
             control = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='C')
         except BomMaster.DoesNotExist:
@@ -364,7 +300,7 @@ class BomViewSet(viewsets.ModelViewSet):
 
         # 센서 데이터 준비
         pre_sensor_data = []
-        for key, value in TEMP_UNI.items():
+        for key, value in ENV_STATUS.items():
             try:
                 sensor_id = sensor.get(item__item_name=value).id
                 pre_sensor_data.append({
@@ -381,35 +317,23 @@ class BomViewSet(viewsets.ModelViewSet):
         relay = data["RELAY"]
         pre_control_data = []
         print(relay)
-        for part_code in relay["ON"]:
+        for key, name in Relay.objects.filter(container_id=plantation_id).values_list('key', 'name'):
             try:
-                control_id = control.get(part_code=part_code).id
+                control_id = control.get(part_code=name).id
                 pre_control_data.append({
                     "c_date": datetime.now(timezone('Asia/Seoul')),
                     "con_id": container.id,
                     "senid": control_id,
                     "type": "sta",
-                    "status": "on"
+                    "status": "on" if relay[key - 1] == 1 else "off"
                 })
             except BomMaster.DoesNotExist:
                 continue
             except IndexError:
-                continue  # 인덱스 오류 처리
+                continue
 
-        for part_code in relay["OFF"]:
-            try:
-                control_id = control.get(part_code=part_code).id
-                pre_control_data.append({
-                    "c_date": datetime.now(timezone('Asia/Seoul')),
-                    "con_id": container.id,
-                    "senid": control_id,
-                    "type": "sta",
-                    "status": "off"
-                })
-            except BomMaster.DoesNotExist:
-                continue
-            except IndexError:
-                continue  # 인덱스 오류 처리
+        print(pre_sensor_data)
+        print(pre_control_data)
 
         # MongoDB에 데이터 삽입
         try:
@@ -425,14 +349,79 @@ class BomViewSet(viewsets.ModelViewSet):
 
         # 제어 장치 데이터 준비
         res = []
-        for sen_control in SenControl.objects.all():
-            mode, value, part_code = sen_control.mode, sen_control.value, sen_control.part_code,
-            res.append({
-                'name': part_code,
-                "mode": mode,
-                "value": value
-            })
-            sen_control.delete()
+        for sen_control in SenControl.objects.filter(delete_flag='N'):
+            mode, value, part_code = sen_control.mode, sen_control.value, sen_control.part_code
+            res_date = datetime.now(timezone('Asia/Seoul'))
+            res_time = res_date.strftime("%H%M")
+            if part_code == "ALL":
+                if mode == "CHK":
+                    for i in Relay.objects.filter(container_id=plantation_id):
+                        print(i.key)
+                        curr_status = SenControl.objects.filter(
+                            Q(part_code=i.key) | Q(part_code="ALL")
+                        ).exclude(id=sen_control.id).last()
+                        if curr_status:
+                            curr_mode = curr_status.mode
+                            curr_value = curr_status.value
+                            res.append({
+                                'key': i.key,
+                                "chk": 1,
+                                "mode": curr_mode,
+                                "value": curr_value,
+                                "time": res_time
+                            })
+                        else:
+                            res.append({
+                                'key': i.key,
+                                "chk": 0,
+                                "time": res_time
+                            })
+                    sen_control.delete()
+                    continue
+                else:                    
+                    for i in Relay.objects.filter(container_id=plantation_id):
+                        print(i.key)
+                        res.append({
+                            'key': i.key,
+                            "mode": mode,
+                            "value": value,
+                            "time": res_time
+                        })
+                print(res)
+                sen_control.delete_flag = 'Y'
+                sen_control.save()
+                continue
+            realy_key = Relay.objects.get(name=part_code).key
+            if mode == "CHK":
+                curr_status = SenControl.objects.filter(
+                    Q(part_code=part_code) | Q(part_code="ALL")
+                ).exclude(id=sen_control.id).last()
+                if curr_status:
+                    curr_mode = curr_status.mode
+                    curr_value = curr_status.value
+                    res.append({
+                        'key': realy_key,
+                        "chk": 1,
+                        "mode": curr_mode,
+                        "value": curr_value,
+                        "time": res_time
+                    })
+                else:
+                    res.append({
+                        'key': realy_key,
+                        "chk": 0,
+                        "time": res_time
+                    })
+                sen_control.delete()
+            else:
+                res.append({
+                    'key': realy_key,
+                    "mode": mode,
+                    "value": value,
+                    "time": res_time
+                })
+                sen_control.delete_flag = 'Y'
+                sen_control.save()
         return Response(res)
 
     #

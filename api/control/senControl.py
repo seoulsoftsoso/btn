@@ -30,7 +30,10 @@ class senControlViewSet(viewsets.ModelViewSet):
         return SenControl.objects.filter()
 
     def create(self, request, *args, **kwargs):
-        part_code = BomMaster.objects.get(id=request.data['senid']).part_code
+        if request.data['senid'] != "ALL":
+            part_code = BomMaster.objects.get(id=request.data['senid']).part_code
+        else: 
+            part_code = "ALL"
         request.data['part_code'] = part_code
 
         return super().create(request, *args, **kwargs)
