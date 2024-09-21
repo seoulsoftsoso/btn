@@ -287,6 +287,7 @@ class BomViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
         data = request.data
+        print(data)
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code=data['container'])
