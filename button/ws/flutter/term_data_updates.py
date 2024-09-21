@@ -4,8 +4,14 @@ import asyncio
 from channels.layers import get_channel_layer
 from django.apps import apps
 from rest_framework import status
+from django.core.exceptions import AppRegistryNotReady
 
-from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl, SenControl, Relay, Plantation
+
+try:
+    from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl, SenControl, Relay, Plantation
+except AppRegistryNotReady:
+    # 앱이 준비되지 않았을 때 처리할 로직
+    print("Django apps are not loaded yet.")
 
 def listen_to_changes_flutter_term(conId):
     # container_id를 기준으로 모든 Relay 객체를 가져옴
