@@ -59,7 +59,6 @@ class AppConsumer(AsyncWebsocketConsumer):
         # Handle received message if needed
 
     async def send_update(self, event):
-        print('send?')
         data = event['data']
         await self.send(text_data=json.dumps(data))
 
@@ -92,6 +91,5 @@ class FlutterTermConsumer(AsyncWebsocketConsumer):
         # Handle received message if needed
 
     async def send_update(self, event):
-        print('send?')
         data = event['data']
         await self.send(text_data=json.dumps(data))
