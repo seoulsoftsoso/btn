@@ -1,19 +1,13 @@
-from pymongo import MongoClient, DESCENDING
 import threading
 import asyncio
 from channels.layers import get_channel_layer
 from django.apps import apps
-from rest_framework import status
-from django.core.exceptions import AppRegistryNotReady
 
-
-try:
-    from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl, SenControl, Relay, Plantation
-except AppRegistryNotReady:
-    # 앱이 준비되지 않았을 때 처리할 로직
-    print("Django apps are not loaded yet.")
 
 def listen_to_changes_flutter_term(conId):
+    Plantation = apps.get_model('api', 'Plantation')
+    Relay = apps.get_model('api', 'Relay')
+    SenControl = apps.get_model('api', 'SenControl')
     plantations = Plantation.objects.filter(bom_id=conId)
     relays = Relay.objects.filter(container_id__in=plantations)  # Relay 객체 전체를 가져옴
     result = {}
