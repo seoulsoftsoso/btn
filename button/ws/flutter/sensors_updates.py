@@ -27,21 +27,6 @@ def listen_to_changes_flutter(conId):
 
     with db.watch(pipeline) as stream:
         for change in stream:
-            # document_id = change['documentKey']['_id']
-            # cluster_time = change['clusterTime']
-            #
-            # # 중복된 이벤트 필터링
-            # if document_id == last_processed_id and cluster_time == last_cluster_time:
-            #     continue
-            #
-            # last_processed_id = document_id
-            # last_cluster_time = cluster_time
-            #
-            # # Change Stream의 데이터 처리 로직
-            # full_document = change['fullDocument']
-            # print(full_document, 'Received new document')
-            #
-            # print(change)
             cont = {}
             con_inf = {}
             con_name = container_bom_masters.part_code

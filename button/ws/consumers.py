@@ -76,6 +76,7 @@ class FlutterTermConsumer(AsyncWebsocketConsumer):
         await self.accept()
         if self.conId:  # conId가 있는지 확인
             threading.Thread(target=start_listening_to_changes_flutter_term, args=(self.conId,), daemon=True).start()
+        await self.send('dh')
 
     async def disconnect(self, close_code):
         print('disconnected')
