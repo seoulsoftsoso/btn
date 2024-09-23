@@ -34,16 +34,16 @@ def listen_to_changes_flutter_term(conId):
     send_initial_term_data_flutter(result, conId)
 
 
-def send_initial_term_data_flutter(result, conId):
+def send_initial_term_data_flutter(result, conid):
     data = {
         'term': result
     }
-    asyncio.run(send_update_term_to_ws_flutter(data, conId))
+    asyncio.run(send_update_term_to_ws_flutter(data, conid))
 
 
-async def send_update_term_to_ws_flutter(data, conId):
+async def send_update_term_to_ws_flutter(data, conid):
     channel_layer = get_channel_layer()
-    group_name = f'term_{conId}'  # 동적으로 생성된 그룹 이름 사용
+    group_name = f'term_{conid}'  # 동적으로 생성된 그룹 이름 사용
     await channel_layer.group_send(
         group_name,  # Send to the new group
         {
@@ -53,5 +53,5 @@ async def send_update_term_to_ws_flutter(data, conId):
     )
 
 
-def start_listening_to_changes_flutter_term(conId):
-    threading.Thread(target=listen_to_changes_flutter_term, args=(conId,), daemon=True).start()
+def start_listening_to_changes_flutter_term(conid):
+    threading.Thread(target=listen_to_changes_flutter_term, args=(conid,), daemon=True).start()
