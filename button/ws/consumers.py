@@ -4,7 +4,7 @@ import threading
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from button.ws.flutter.sensors_updates import start_listening_to_changes_flutter
-from button.ws.flutter.term_data_updates import start_listening_to_changes_flutter_term
+from button.ws.flutter.term_data_updates import start_listening_to_changes_flutter_term, listen_to_changes_flutter_term
 
 
 class MyConsumer(AsyncWebsocketConsumer):
@@ -75,7 +75,7 @@ class FlutterTermConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
         if self.conId:  # conId가 있는지 확인
-            threading.Thread(target=start_listening_to_changes_flutter_term, args=(self.conId,), daemon=True).start()
+            threading.Thread(target=listen_to_changes_flutter_term, args=(self.conId,), daemon=True).start()
 
     async def disconnect(self, close_code):
         print('disconnected')
