@@ -4,7 +4,7 @@ import asyncio
 from channels.layers import get_channel_layer
 from django.apps import apps
 
-def listen_to_changes_flutter(conId):
+def listen_to_changes_flutter(conId, consumer):
     uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
     client = MongoClient(uri)
     db = client['djangoConnectTest']
@@ -22,11 +22,15 @@ def listen_to_changes_flutter(conId):
 
     unique_gtr_items = list(gtr_bom_masters.values_list('item__item_name', flat=True).distinct())
     unique_sta_items = list(sta_bom_masters.values_list('part_code', flat=True).distinct())
-    # last_processed_id = None
-    # last_cluster_time = None
 
     with db.watch(pipeline) as stream:
+        consumer.stream = stream  # MongoDB 스트림을 consumer 객체에 저장
         for change in stream:
+            # 웹소켓이 끊어진 경우 MongoDB 리슨을 중단
+            if not consumer.mongo_listening:
+                print('Stopping MongoDB listener')
+                return
+
             cont = {}
             con_inf = {}
             con_name = container_bom_masters.part_code
@@ -35,10 +39,12 @@ def listen_to_changes_flutter(conId):
             controller_ids = controller_bom_masters.filter(parent=con_id).values_list('id', flat=True)
             lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
             lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
+
             gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
                                                        sort=[('c_date', DESCENDING)]).limit(lv2_gtr_ids.count()))
             sta_sensor_data = list(dbSensorStatus.find({'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
                                                        sort=[('c_date', DESCENDING)]).limit(lv2_sta_ids.count()))
+
             gtr_sen = {}
             for sensor in gtr_bom_masters.filter(parent__in=controller_ids, item__item_type='L'):
                 sen_inf = {'sen_name': sensor.item.item_name}
@@ -74,8 +80,6 @@ def listen_to_changes_flutter(conId):
 
             send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, int_averages, conId)
 
-        # document = change['fullDocument']
-        # asyncio.run(send_update_to_ws(document))
 
 
 def send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, averages, conId):
@@ -102,5 +106,5 @@ async def send_update_to_ws_flutter(data, conId):
     )
 
 
-def start_listening_to_changes_flutter(conId):
-    threading.Thread(target=listen_to_changes_flutter, args=(conId,), daemon=True).start()
+# def start_listening_to_changes_flutter(conId):
+#     threading.Thread(target=listen_to_changes_flutter, args=(conId,), daemon=True).start()

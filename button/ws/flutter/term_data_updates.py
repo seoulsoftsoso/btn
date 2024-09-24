@@ -52,7 +52,3 @@ async def send_update_term_to_ws_flutter(data, conid):
             'data': data
         }
     )
-
-
-def start_listening_to_changes_flutter_term(conid):
-    threading.Thread(target=listen_to_changes_flutter_term, args=(conid,), daemon=True).start()
