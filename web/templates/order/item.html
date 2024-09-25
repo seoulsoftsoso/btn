@@ -19,6 +19,7 @@
                         <th>제조사</th>
                         <th>유형</th>
                         <th>표준단가</th>
+                        <th>센서유형</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -128,6 +129,40 @@
                                        aria-describedby="standard_price" />
                             </div>
                         </div>
+                        <div class="col-sm-12 col-md-6">
+                          <label class="form-label" for="sensor_type">센서 연관 유형</label>
+                          <select class="form-select select2" id="sensor_type" name="sensor_type">
+                              <option value="HUM">
+                                  HUM<span>(습도)</span>
+                              </option>
+                              <option value="TEM">
+                                  TEM<span>(온도)</span>
+                              </option>
+                              <option value="CO2">
+                                  CO2<span>(CO2)</span>
+                              </option>
+                              <option value="EC">
+                                  EC<span>(풍량)</span>
+                              </option>
+                              <option value="PH">
+                                  PH<span>(산성도)</span>
+                              </option>
+                              <option value="LUX">
+                                  LUX<span>(빛 세기)</span>
+                              </option>
+                          </select>
+                      </div>
+                      <div class="col-sm-12 col-md-6">
+                        <label class="form-label" for="sv_reverse">제어 반대로</label>
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text">제어 반대로 설정</span>
+                            <input type="checkbox"
+                                   id="sv_reverse"
+                                   name="sv_reverse"
+                                   aria-describedby="sv_reverse" />
+                        </div>
+                      </div>
+
                         <div class="col-sm-12 mt-3">
                             <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">추가</button>
                             <button type="reset" class="btn btn-outline-info" data-bs-dismiss="modal">초기화</button>
@@ -261,6 +296,7 @@
           { data: 'brand' },
           { data: 'level' },
           { data: 'standard_price' },
+          { data: 'sensor_type' },
           { data: '' }
         ],
         columnDefs: [

@@ -43,7 +43,11 @@ class EnterpriseMaster(models.Model):
 class ItemMaster(models.Model):
     item_code = models.CharField(max_length=255, unique=True)
     item_name = models.CharField(max_length=255)
-    item_type = models.CharField(max_length=255)
+    item_type = models.CharField(max_length=255)  # L = sensor / C = controller
+    sensor_type = models.CharField(max_length=3, choices=( ('HUM', 'HUM'), ('TEM', 'TEM'), ("CO2", "CO2"),
+                                                           ("PH", "PH"), ("EC", "EC"), ("LUX", "LUX")
+                                                        ), null=True)
+    sv_reverse = models.BooleanField(default=False)
     specification = models.TextField(blank=True, null=True)
     model = models.TextField(blank=True, null=True)
     brand = models.CharField(max_length=255, blank=True, null=True)
