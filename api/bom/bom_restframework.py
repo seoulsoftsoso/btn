@@ -304,11 +304,6 @@ class BomViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
-        utc_time_now = datetime.now(utc) - timedelta(minutes=10)
-        print(utc_time_now)
-        now_minutes = datetime.now(timezone('Asia/Seoul')).minute
-        options = CodecOptions(tz_aware = True)
-        data = request.data
         
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
@@ -322,29 +317,6 @@ class BomViewSet(viewsets.ModelViewSet):
         pre_sensor_data = []
         for key, value in ENV_STATUS.items():
             sensor_id = sensor.get(item__item_name=value).id
-            try:         
-                if now_minutes % 10 == 0:
-                    mongo = MongoClient(SERVER_URL)
-                    db = mongo[DB_NAME]
-                    sen_collection = db.get_collection(GATHER, options)
-                    query = {"con_id": container.id, "senid": sensor_id, "c_date": { "$gte": utc_time_now}}
-                    cursor = list(sen_collection.find(query))
-                    print(len(cursor))
-                    # Calculate the average value from the gathered data
-                    if cursor:
-                        average_value = sum(item['value'] for item in cursor) / len(cursor)
-                        sen_collection.delete_many(query)
-                        sen_collection.insert_one({
-                            "c_date": datetime.now(timezone('Asia/Seoul')),
-                            "con_id": container.id,
-                            "senid": sensor_id,
-                            "type": "gta",
-                            "value": round(average_value, 3)
-                        })
-                else:
-                    print(now_minutes)
-            except Exception as e:
-                print(e)
             try:
                 pre_sensor_data.append({
                     "c_date": datetime.now(timezone('Asia/Seoul')),
