@@ -348,16 +348,16 @@ class BomViewSet(viewsets.ModelViewSet):
 
 
         # MongoDB에 데이터 삽입
-        # try:
-        #     mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
-        #     db = mongo[DB_NAME]
-        #     sen_collection = db[GATHER]
-        #     con_collection = db[SENSOR]
-        #     sen_collection.insert_many(pre_sensor_data)
-        #     con_collection.insert_many(pre_control_data)
-        # except Exception as e:
-        #     return Response({'message': 'Database error', 'error': str(e)},
-        #                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        try:
+            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+            db = mongo[DB_NAME]
+            sen_collection = db[GATHER]
+            con_collection = db[SENSOR]
+            sen_collection.insert_many(pre_sensor_data)
+            con_collection.insert_many(pre_control_data)
+        except Exception as e:
+            return Response({'message': 'Database error', 'error': str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         print(pre_control_data)
         # # 제어 장치 데이터 준비
