@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from api.models import BomMaster, ItemMaster, OrderProduct, OrderMaster
+from api.models import BomMaster, ItemMaster, OrderProduct, OrderMaster, Relay, Plantation
 import json
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from dateutil.parser import isoparse
@@ -10,6 +10,8 @@ from django.db.models import Subquery
 import json
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
+from django.core.cache import cache
+
 
 
 def user_table_data(request):
@@ -17,7 +19,6 @@ def user_table_data(request):
     client = MongoClient(uri)
     db = client['djangoConnectTest']
     dbSensorGather = db['sen_gather']
-    dbSensorStatus = db['sen_status']
     # dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     # dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
 
@@ -30,6 +31,7 @@ def user_table_data(request):
     sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
     gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L', delete_flag='N')
     sta_bom_masters = sensor_bom_masters.filter(item__item_type='C', delete_flag='N')
+     
 
     unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
     unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
@@ -39,6 +41,7 @@ def user_table_data(request):
         con_inf = {}
         con_name = container.part_code
         con_id = container.id
+        plantation_id = Plantation.objects.get(bom_id=con_id).id
 
         controller_ids = controller_bom_masters.filter(parent=con_id).values_list('id', flat=True)
         lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
@@ -47,10 +50,18 @@ def user_table_data(request):
             {'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
             sort=[('c_date', DESCENDING)]
         ).limit(lv2_gtr_ids.count()))
-        sta_sensor_data = list(dbSensorStatus.find(
-            {'con_id': con_id, 'senid': {'$in': list(lv2_sta_ids)}},
-            sort=[('c_date', DESCENDING)]
-        ).limit(lv2_sta_ids.count()))
+        sta_sensor_data = []
+        print(plantation_id)
+        relay = Relay.objects.filter(container_id=plantation_id).values_list('sen')
+        relay = list(relay)
+        control_data = cache.get("{}_{}".format(container, "sensor"), [])
+        for idx,key in enumerate(relay):
+            sta_sensor_data.append({
+                'senid': key[0],
+                'status': "on" if control_data[idx] == 1 else "off" if control_data else "-",
+                'con_id': con_id
+            })
+
 
         # gtr_sensor_data = list(dbSensorGather.find({'con_id': con_id, 'senid': {'$in': list(lv2_gtr_ids)}},
         #                                       sort=[('c_date', DESCENDING)]))

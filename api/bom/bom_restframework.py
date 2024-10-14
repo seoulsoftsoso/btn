@@ -1,5 +1,4 @@
-import json
-
+import ast
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -8,20 +7,27 @@ from rest_framework.decorators import action
 from api.models import BomMaster, ItemMaster, OrderProduct, UserMaster, tempUniControl, SenControl, Relay, Plantation
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.db.models import Q
 from rest_framework import serializers
-from pytz import timezone
+from pytz import timezone, utc
 import uuid
+from django.core.cache import cache
+from pytz import timezone, utc
+from datetime import datetime, timedelta
+from bson.codec_options import CodecOptions
+
+
+
 
 from django.db.models import Q
 import certifi
 from pymongo import MongoClient
-from datetime import datetime
 
 DB_NAME = 'djangoConnectTest'
 GATHER = 'sen_gather'
 SENSOR = "sen_status"
-SERVER_URL = ('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName'
-              '=Cluster0')
+SERVER_URL = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
 
 
 ENV_STATUS = {
@@ -258,9 +264,21 @@ class BomViewSet(viewsets.ModelViewSet):
                 continue
             except IndexError:
                 continue  # 인덱스 오류 처리
+        mongo = MongoClient(SERVER_URL)
+
 
         try:
-            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+            db = mongo[DB_NAME]
+            collection = db.list_collection_names()
+            if GATHER not in collection:
+                db.create_collection(GATHER)
+            if SENSOR not in collection:
+                db.create_collection(SENSOR)
+        except Exception as e:
+            return Response({'message': 'Database error', 'error': str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
             db = mongo[DB_NAME]
             sen_collection = db[GATHER]
             con_collection = db[SENSOR]
@@ -286,8 +304,12 @@ class BomViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
+        utc_time_now = datetime.now(utc) - timedelta(minutes=10)
+        print(utc_time_now)
+        now_minutes = datetime.now(timezone('Asia/Seoul')).minute
+        options = CodecOptions(tz_aware = True)
         data = request.data
-        print(data)
+        
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code=data['container'])
@@ -296,12 +318,34 @@ class BomViewSet(viewsets.ModelViewSet):
             control = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='C')
         except BomMaster.DoesNotExist:
             return Response({'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
-
         # 센서 데이터 준비
         pre_sensor_data = []
         for key, value in ENV_STATUS.items():
+            sensor_id = sensor.get(item__item_name=value).id
+            try:         
+                if now_minutes % 10 == 0:
+                    mongo = MongoClient(SERVER_URL)
+                    db = mongo[DB_NAME]
+                    sen_collection = db.get_collection(GATHER, options)
+                    query = {"con_id": container.id, "senid": sensor_id, "c_date": { "$gte": utc_time_now}}
+                    cursor = list(sen_collection.find(query))
+                    print(len(cursor))
+                    # Calculate the average value from the gathered data
+                    if cursor:
+                        average_value = sum(item['value'] for item in cursor) / len(cursor)
+                        sen_collection.delete_many(query)
+                        sen_collection.insert_one({
+                            "c_date": datetime.now(timezone('Asia/Seoul')),
+                            "con_id": container.id,
+                            "senid": sensor_id,
+                            "type": "gta",
+                            "value": round(average_value, 3)
+                        })
+                else:
+                    print(now_minutes)
+            except Exception as e:
+                print(e)
             try:
-                sensor_id = sensor.get(item__item_name=value).id
                 pre_sensor_data.append({
                     "c_date": datetime.now(timezone('Asia/Seoul')),
                     "con_id": container.id,
@@ -313,35 +357,37 @@ class BomViewSet(viewsets.ModelViewSet):
                 continue
 
         # 제어 장치 데이터 준비
+        control_data = cache.get("{}_{}".format(container, "sensor"), {})
+        print(control_data)
         relay = data["RELAY"]
         pre_control_data = []
-        for key,sen in Relay.objects.filter(container_id=plantation_id).values_list('key', "sen"):
-            try:
+        if not control_data:
+            cache.set("{}_{}".format(container, "sensor"), relay)
+        for idx, sen in Relay.objects.filter(container_id=plantation_id).values_list('key', "sen"):
+            if relay[idx - 1] != control_data[idx -1]:
                 pre_control_data.append({
                     "c_date": datetime.now(timezone('Asia/Seoul')),
                     "con_id": container.id,
                     "senid": sen,
                     "type": "sta",
-                    "status": "on" if relay[key - 1] == 1 else "off"
+                    "status": "on" if relay[idx -1] == 1 else "off"
                 })
-            except BomMaster.DoesNotExist:
-                continue
-            except IndexError:
-                continue
+        cache.set("{}_{}".format(container, "sensor"), relay)
 
 
         # MongoDB에 데이터 삽입
-        try:
-            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
-            db = mongo[DB_NAME]
-            sen_collection = db[GATHER]
-            con_collection = db[SENSOR]
-            sen_collection.insert_many(pre_sensor_data)
-            con_collection.insert_many(pre_control_data)
-        except Exception as e:
-            return Response({'message': 'Database error', 'error': str(e)},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # try:
+        #     mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+        #     db = mongo[DB_NAME]
+        #     sen_collection = db[GATHER]
+        #     con_collection = db[SENSOR]
+        #     sen_collection.insert_many(pre_sensor_data)
+        #     con_collection.insert_many(pre_control_data)
+        # except Exception as e:
+        #     return Response({'message': 'Database error', 'error': str(e)},
+        #                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        print(pre_control_data)
         # # 제어 장치 데이터 준비
         res = []
         req_time = data['TIME']
@@ -353,7 +399,38 @@ class BomViewSet(viewsets.ModelViewSet):
 
         for sen_control in SenControl.objects.filter(delete_flag='N'):
             mode, value, part_code, relay = sen_control.mode, sen_control.value, sen_control.part_code, sen_control.relay
-            if part_code == "ALL":
+            if mode == "SV":
+                sv_relay = control.filter(
+                    item__sensor_type=part_code,
+                    item__sv_reverse=None
+                ).values_list('id', flat=True)
+                sv_relay_reverse = control.filter(
+                    item__sensor_type=part_code,
+                    item__sv_reverse=1
+                ).values_list('id', flat=True)
+                print(sv_relay, sv_relay_reverse)
+                keys = Relay.objects.filter(
+                    container_id=plantation_id, sen_id__in=sv_relay
+                ).values_list('key', flat=True)
+                keys_reverse = Relay.objects.filter(container_id=plantation_id, sen_id__in=sv_relay_reverse).values_list('key', flat=True)
+                print(keys, keys_reverse)
+                if keys:
+                    res.append({
+                        'key': list(keys),
+                        "mode": mode,
+                        "value": ast.literal_eval(value),
+                        'reverse': False
+                    })
+                if keys_reverse:
+                    res.append({
+                        'key': list(keys_reverse),
+                        "mode": mode,
+                        "value": ast.literal_eval(value),
+                        "reverse": True
+                    })
+                sen_control.delete_flag = 'Y'
+                sen_control.save()
+            elif part_code == "ALL":
                 if mode == "CHK":
                     for i in Relay.objects.filter(container_id=plantation_id):
                         curr_status = SenControl.objects.filter(
@@ -366,7 +443,7 @@ class BomViewSet(viewsets.ModelViewSet):
                                 'key': i.key,
                                 "chk": 1,
                                 "mode": curr_mode,
-                                "value": curr_value,
+                                "value": ast.literal_eval(curr_value),
                             })
                         else:
                             res.append({
@@ -375,17 +452,17 @@ class BomViewSet(viewsets.ModelViewSet):
                             })
                     sen_control.delete()
                     continue
-                else:                    
+                else:
                     for i in Relay.objects.filter(container_id=plantation_id):
                         res.append({
                             'key': i.key,
                             "mode": mode,
-                            "value": value,
+                            "value": ast.literal_eval(value),
                         })
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
                 continue
-            if mode == "CHK":
+            elif mode == "CHK":
                 curr_status = SenControl.objects.filter(
                     Q(part_code=part_code) | Q(part_code="ALL")
                 ).exclude(id=sen_control.id).last()
@@ -396,7 +473,7 @@ class BomViewSet(viewsets.ModelViewSet):
                         'key': relay.key,
                         "chk": 1,
                         "mode": curr_mode,
-                        "value": curr_value,
+                        "value": ast.literal_eval(curr_value),
                     })
                 else:
                     res.append({
@@ -408,12 +485,10 @@ class BomViewSet(viewsets.ModelViewSet):
                 res.append({
                     'key': relay.key,
                     "mode": mode,
-                    "value": value,
+                    "value": ast.literal_eval(value),
                 })
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
         if time_set and res:
             res[0]['time'] = now_time
         return Response(res)
-
-    #
