@@ -9,7 +9,6 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import Q
 from rest_framework import serializers
-from pytz import timezone, utc
 import uuid
 from pytz import timezone, utc
 from datetime import datetime, timedelta
@@ -336,7 +335,7 @@ class BomViewSet(viewsets.ModelViewSet):
                 "con_id": container.id,
                 "senid": sen,
                 "type": "sta",
-                "status": "on" if relay[idx -1] == 1 else "off"
+                "status": "on" if data['RELAY'][idx - 1] == 1 else "off"
             })
 
 
