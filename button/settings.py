@@ -50,12 +50,8 @@ INSTALLED_APPS = [
     'channels',
     'django_filters',
     'rest_framework',
-    'django_cron',
 ]
 
-CRON_CLASSES = [
-    'button.scheduling.cron.AggregateDataCronJob',
-]
 
 CHANNEL_LAYERS = {
     'default': {
