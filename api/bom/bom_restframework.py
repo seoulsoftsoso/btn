@@ -11,7 +11,6 @@ from django.db.models import Q
 from rest_framework import serializers
 from pytz import timezone, utc
 import uuid
-from django.core.cache import cache
 from pytz import timezone, utc
 from datetime import datetime, timedelta
 from bson.codec_options import CodecOptions
@@ -304,7 +303,7 @@ class BomViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
-        
+        data = request.data
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code=data['container'])
@@ -329,22 +328,16 @@ class BomViewSet(viewsets.ModelViewSet):
                 continue
 
         # 제어 장치 데이터 준비
-        control_data = cache.get("{}_{}".format(container, "sensor"), {})
-        print(control_data)
-        relay = data["RELAY"]
         pre_control_data = []
-        if not control_data:
-            cache.set("{}_{}".format(container, "sensor"), relay)
+
         for idx, sen in Relay.objects.filter(container_id=plantation_id).values_list('key', "sen"):
-            if relay[idx - 1] != control_data[idx -1]:
-                pre_control_data.append({
-                    "c_date": datetime.now(timezone('Asia/Seoul')),
-                    "con_id": container.id,
-                    "senid": sen,
-                    "type": "sta",
-                    "status": "on" if relay[idx -1] == 1 else "off"
-                })
-        cache.set("{}_{}".format(container, "sensor"), relay)
+            pre_control_data.append({
+                "c_date": datetime.now(timezone('Asia/Seoul')),
+                "con_id": container.id,
+                "senid": sen,
+                "type": "sta",
+                "status": "on" if relay[idx -1] == 1 else "off"
+            })
 
 
         # MongoDB에 데이터 삽입
