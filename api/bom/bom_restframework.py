@@ -13,6 +13,8 @@ import uuid
 from pytz import timezone, utc
 from datetime import datetime, timedelta
 from bson.codec_options import CodecOptions
+from functools import reduce
+import operator
 
 
 
@@ -351,7 +353,6 @@ class BomViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Database error', 'error': str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        print(pre_control_data)
         # # 제어 장치 데이터 준비
         res = []
         req_time = data['TIME']
@@ -363,6 +364,7 @@ class BomViewSet(viewsets.ModelViewSet):
 
         for sen_control in SenControl.objects.filter(delete_flag='N'):
             mode, value, part_code, relay = sen_control.mode, sen_control.value, sen_control.part_code, sen_control.relay
+            value = ast.literal_eval(value)
             if mode == "SV":
                 sv_relay = control.filter(
                     item__sensor_type=part_code,
@@ -372,24 +374,22 @@ class BomViewSet(viewsets.ModelViewSet):
                     item__sensor_type=part_code,
                     item__sv_reverse=1
                 ).values_list('id', flat=True)
-                print(sv_relay, sv_relay_reverse)
                 keys = Relay.objects.filter(
                     container_id=plantation_id, sen_id__in=sv_relay
                 ).values_list('key', flat=True)
                 keys_reverse = Relay.objects.filter(container_id=plantation_id, sen_id__in=sv_relay_reverse).values_list('key', flat=True)
-                print(keys, keys_reverse)
                 if keys:
                     res.append({
                         'key': list(keys),
                         "mode": mode,
-                        "value": ast.literal_eval(value),
+                        "value": reduce(operator.concat, value) if type(value) == list else value,
                         'reverse': False
                     })
                 if keys_reverse:
                     res.append({
                         'key': list(keys_reverse),
                         "mode": mode,
-                        "value": ast.literal_eval(value),
+                        "value": reduce(operator.concat, value) if type(value) == list else value,
                         "reverse": True
                     })
                 sen_control.delete_flag = 'Y'
@@ -407,7 +407,7 @@ class BomViewSet(viewsets.ModelViewSet):
                                 'key': i.key,
                                 "chk": 1,
                                 "mode": curr_mode,
-                                "value": ast.literal_eval(curr_value),
+                                "value":  reduce(operator.concat, value) if type(value) == list else value,
                             })
                         else:
                             res.append({
@@ -421,7 +421,7 @@ class BomViewSet(viewsets.ModelViewSet):
                         res.append({
                             'key': i.key,
                             "mode": mode,
-                            "value": ast.literal_eval(value),
+                            "value":  reduce(operator.concat, value) if type(value) == list else value,
                         })
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
@@ -437,7 +437,7 @@ class BomViewSet(viewsets.ModelViewSet):
                         'key': relay.key,
                         "chk": 1,
                         "mode": curr_mode,
-                        "value": ast.literal_eval(curr_value),
+                        "value":  reduce(operator.concat, value) if type(value) == list else value,
                     })
                 else:
                     res.append({
@@ -449,7 +449,7 @@ class BomViewSet(viewsets.ModelViewSet):
                 res.append({
                     'key': relay.key,
                     "mode": mode,
-                    "value": ast.literal_eval(value),
+                    "value":  reduce(operator.concat, value) if type(value) == list else value,
                 })
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
