@@ -364,7 +364,7 @@ class BomViewSet(viewsets.ModelViewSet):
 
         for sen_control in SenControl.objects.filter(delete_flag='N'):
             mode, value, part_code, relay = sen_control.mode, sen_control.value, sen_control.part_code, sen_control.relay
-            value = ast.literal_eval(value)
+            value = ast.literal_eval(value) 
             if mode == "SV":
                 sv_relay = control.filter(
                     item__sensor_type=part_code,
@@ -382,14 +382,14 @@ class BomViewSet(viewsets.ModelViewSet):
                     res.append({
                         'key': list(keys),
                         "mode": mode,
-                        "value": reduce(operator.concat, value) if type(value) == list else value,
+                        "value": reduce(operator.concat, value) if type(value) == "list" else value,
                         'reverse': False
                     })
                 if keys_reverse:
                     res.append({
                         'key': list(keys_reverse),
                         "mode": mode,
-                        "value": reduce(operator.concat, value) if type(value) == list else value,
+                        "value": reduce(operator.concat, value) if type(value) == "list" else value,
                         "reverse": True
                     })
                 sen_control.delete_flag = 'Y'
@@ -407,7 +407,7 @@ class BomViewSet(viewsets.ModelViewSet):
                                 'key': i.key,
                                 "chk": 1,
                                 "mode": curr_mode,
-                                "value":  reduce(operator.concat, value) if type(value) == list else value,
+                                "value":  reduce(operator.concat, value) if type(value) == "list" else value,
                             })
                         else:
                             res.append({
@@ -421,7 +421,7 @@ class BomViewSet(viewsets.ModelViewSet):
                         res.append({
                             'key': i.key,
                             "mode": mode,
-                            "value":  reduce(operator.concat, value) if type(value) == list else value,
+                            "value":  reduce(operator.concat, value) if type(value) == "list" else value,
                         })
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
@@ -437,7 +437,7 @@ class BomViewSet(viewsets.ModelViewSet):
                         'key': relay.key,
                         "chk": 1,
                         "mode": curr_mode,
-                        "value":  reduce(operator.concat, value) if type(value) == list else value,
+                        "value":  reduce(operator.concat, value) if type(value) == "list" else value,
                     })
                 else:
                     res.append({
@@ -449,7 +449,7 @@ class BomViewSet(viewsets.ModelViewSet):
                 res.append({
                     'key': relay.key,
                     "mode": mode,
-                    "value":  reduce(operator.concat, value) if type(value) == list else value,
+                    "value":  reduce(operator.concat, value) if type(value) == "list" else value,
                 })
                 sen_control.delete_flag = 'Y'
                 sen_control.save()
