@@ -45,7 +45,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
     read_only_fields = ['id']
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
 
     def get_queryset(self):
         ret = EntScript.objects.filter(delete_flag='N').prefetch_related('created_by', 'updated_by')
@@ -53,11 +53,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if user_id:
             ret = ret.filter(created_by__user_id=user_id)
         if self.request.query_params.get('fr_date'):
-            ret = ret.filter(date__gte=self.request.get('fr_date'))
+            ret = ret.filter(date__gte=self.request.query_params.get('fr_date'))
         if self.request.query_params.get('to_date'):
-            ret = ret.filter(date__lte=self.request.get('to_date'))
+            ret = ret.filter(date__lte=self.request.query_params.get('to_date'))
         if self.request.query_params.get('current_date'):
-            ret = ret.filter(date=self.request.get('current_date'))
+            ret = ret.filter(date=self.request.query_params.get('current_date'))
         return ret    
     
     def retrieve(self, request, *args, **kwargs):
