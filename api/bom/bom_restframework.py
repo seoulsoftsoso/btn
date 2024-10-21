@@ -305,6 +305,8 @@ class BomViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def sen_control(self, request, *args, **kwargs):
         data = request.data
+        now_date = datetime.now(timezone('Asia/Seoul'))
+        now_time = now_date.strftime("%H%M")
         try:
             # 컨테이너 및 센서, 제어 장치 객체 가져오기
             container = BomMaster.objects.get(part_code=data['container'])
@@ -331,7 +333,7 @@ class BomViewSet(viewsets.ModelViewSet):
         # 제어 장치 데이터 준비
         pre_control_data = []
 
-        for idx, sen in Relay.objects.filter(container_id=plantation_id).values_list('key', "sen"):
+        for idx, sen, relay in Relay.objects.filter(container_id=plantation_id).values_list('key', "sen", "id" ):
             pre_control_data.append({
                 "c_date": datetime.now(timezone('Asia/Seoul')),
                 "con_id": container.id,
@@ -339,8 +341,20 @@ class BomViewSet(viewsets.ModelViewSet):
                 "type": "sta",
                 "status": "on" if data['RELAY'][idx - 1] == 1 else "off"
             })
-
-
+            current_status = SenControl.objects.filter(relay = relay).last()
+            if current_status and current_status.mode.startswith("RSV"):
+                day = 0
+                value = ast.literal_eval(current_status.value)
+                end_time = value[1]
+                if(datetime.strptime(now_time, "%H%M") > datetime.strptime(end_time, "%H%M")):
+                    day = 1
+                if datetime.strptime(now_time, "%H%M") >= datetime.strptime(end_time, "%H%M") + timedelta(days=day):
+                    SenControl.objects.create(
+                        part_code=current_status.part_code,
+                        mode="CTR_VAL",
+                        value=0,
+                        relay_id=relay
+                    )
         # MongoDB에 데이터 삽입
         try:
             mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
@@ -356,8 +370,6 @@ class BomViewSet(viewsets.ModelViewSet):
         # # 제어 장치 데이터 준비
         res = []
         req_time = data['TIME']
-        now_date = datetime.now(timezone('Asia/Seoul'))
-        now_time = now_date.strftime("%H%M%S")
         time_set = False
         if req_time != now_time:
             time_set = True
