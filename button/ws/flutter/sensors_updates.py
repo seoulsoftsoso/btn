@@ -77,7 +77,7 @@ def listen_to_changes_flutter(conId, consumer):
             int_averages = {k: int(v) if v is not None else None for k, v in averages.items()}
 
             print("Average values for matching gtr_sensors:", averages)
-
+            print(cont)
             send_initial_data_flutter(unique_gtr_items, unique_sta_items, cont, int_averages, conId)
 
 
