@@ -346,6 +346,8 @@ class BomViewSet(viewsets.ModelViewSet):
                 day = 0
                 value = ast.literal_eval(current_status.value)
                 end_time = value[1]
+                if type(end_time) == "int":
+                    end_time = str(end_time)
                 if(datetime.strptime(now_time, "%H%M") > datetime.strptime(end_time, "%H%M")):
                     day = 1
                 if datetime.strptime(now_time, "%H%M") >= datetime.strptime(end_time, "%H%M") + timedelta(days=day):
