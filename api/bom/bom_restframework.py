@@ -235,7 +235,7 @@ class BomViewSet(viewsets.ModelViewSet):
                 continue  # 인덱스 오류 처리
         mongo = MongoClient(SERVER_URL)
 
-
+        DB_NAME = data['container']
         try:
             db = mongo[DB_NAME]
             collection = db.list_collection_names()
