@@ -91,11 +91,7 @@ def container_sen_map(request):
             return JsonResponse({'error': 'conID not provided'}, status=400)
 
         # uri = "mongodb://localhost:27017/"
-        uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-        client = MongoClient(uri)
-        db = client['djangoConnectTest']
-        dbSensorGather = db['sen_gather']
-        dbSensorStatus = db['sen_status']
+
 
         container_bom_masters = BomMaster.objects.get(id=conId)
         controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId, delete_flag='N')
@@ -110,6 +106,14 @@ def container_sen_map(request):
         con_inf = {}
         con_name = container_bom_masters.part_code
         con_id = container_bom_masters.id
+
+        uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+        client = MongoClient(uri)
+        db = client[con_name]
+        dbSensorGather = db['sen_gather']
+        dbSensorStatus = db['sen_status']
+
+
 
         lv2_gtr_ids = list(gtr_bom_masters.values_list('id', flat=True))
         lv2_sta_ids = list(sta_bom_masters.values_list('id', flat=True))
@@ -177,19 +181,20 @@ def sen_list(request):
         if not conId:
             return JsonResponse({'error': 'conID not provided'}, status=400)
 
-        # uri = "mongodb://localhost:27017/"
-        uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-        client = MongoClient(uri)
-        db = client['djangoConnectTest']
-        dbSensorGather = db['sen_gather']
-        dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-
+        container_bom_masters = BomMaster.objects.get(id=conId)
         controller_bom_masters = BomMaster.objects.filter(level=1, parent=conId, delete_flag='N')
         controller_bom_ids = controller_bom_masters.values_list('id', flat=True)
         sensor_bom_masters = BomMaster.objects.filter(parent__in=controller_bom_ids, level=2, delete_flag='N')
         gtr_bom_masters = sensor_bom_masters.filter(item__item_type='L')
         sen_Ids = list(gtr_bom_masters.values_list('id', flat=True))
         unique_gtr_items = list(gtr_bom_masters.values_list('item__item_name', flat=True).distinct())
+
+        # uri = "mongodb://localhost:27017/"
+        uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+        client = MongoClient(uri)
+        db = client[container_bom_masters.part_code]
+        dbSensorGather = db['sen_gather']
+        dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
 
         initial_data = {
             'senIds': sen_Ids,
@@ -219,9 +224,11 @@ def fetch_graph_data(request):
         print(end_date)
         print(con_id)
         print(sen_Ids)
+        container_bom_masters = BomMaster.objects.get(id=con_id)
+        con_name = container_bom_masters.part_code
 
         client = MongoClient('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
-        db = client['djangoConnectTest']
+        db = client[con_name]
         collection = db['sen_gather']
 
         group_by = {
