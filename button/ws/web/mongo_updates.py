@@ -7,9 +7,7 @@ from django.apps import apps
 def listen_to_changes(request):
     uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
     client = MongoClient(uri)
-    db = client['djangoConnectTest']
-    dbSensorGather = db['sen_gather']
-    dbSensorStatus = db['sen_status']
+
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
     OrderProduct = apps.get_model('api', 'OrderProduct')
@@ -36,6 +34,9 @@ def listen_to_changes(request):
         con_name = container.part_code
         con_id = container.id
 
+        db = client[con_name]
+        dbSensorGather = db['sen_gather']
+        dbSensorStatus = db['sen_status']
         controller_ids = controller_bom_masters.filter(parent=con_id).values_list('id', flat=True)
         lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
         lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
@@ -69,12 +70,15 @@ def listen_to_changes(request):
     # MongoDB 변경 사항을 감지하는 스트림
     with db.watch(pipeline) as stream:
         for change in stream:
+            print('hi')
             cont = {}
             for container in container_bom_masters:
                 con_inf = {}
                 con_name = container.part_code
                 con_id = container.id
-
+                db = client[con_name]
+                dbSensorGather = db['sen_gather']
+                dbSensorStatus = db['sen_status']
                 controller_ids = controller_bom_masters.filter(parent=con_id).values_list('id', flat=True)
                 lv2_gtr_ids = gtr_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
                 lv2_sta_ids = sta_bom_masters.filter(parent__in=controller_ids).values_list('id', flat=True)
