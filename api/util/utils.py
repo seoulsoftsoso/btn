@@ -15,9 +15,6 @@ from datetime import datetime, timedelta
 def user_table_data(request):
     uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
     client = MongoClient(uri)
-    db = client['djangoConnectTest']
-    dbSensorGather = db['sen_gather']
-    dbSensorStatus = db['sen_status']
     # dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     # dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
 
@@ -36,6 +33,9 @@ def user_table_data(request):
 
     cont = {}
     for container in container_bom_masters:
+        db = client[container.part_code]
+        dbSensorGather = db['sen_gather']
+        dbSensorStatus = db['sen_status']
         con_inf = {}
         con_name = container.part_code
         con_id = container.id
