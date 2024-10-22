@@ -16,9 +16,6 @@ from bson.codec_options import CodecOptions
 from functools import reduce
 import operator
 
-
-
-
 from django.db.models import Q
 import certifi
 from pymongo import MongoClient
@@ -38,34 +35,6 @@ ENV_STATUS = {
     "EC": "EC",
     "LUX": "광센서"
 }
-
-CONT_UNI = {
-    1: "펌프",
-    2: "교반기",
-    3: "팬1,2",
-    4: "led1",
-    5: "led2",
-    6: "디스펜스 1",
-    7: "디스펜스 2",
-    8: "디스펜스 3",
-    9: "냉난방기",
-    10: "양액기 Dispensor 4",
-    11: "양액기 Dispensor 5",
-    12: "양액기 Dispensor 6",
-    13: "순환 모터",
-    14: "열교환기 A",
-    15: "열교환기 B"
-}
-
-TEMP_UNI_SERIAL = [
-    0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0
-]
-
-CYCLE_RES = [
-]
-
 
 class BomMasterSerializer(serializers.ModelSerializer):
     item_price = serializers.FloatField(source='item.standard_price', read_only=True)
@@ -313,26 +282,29 @@ class BomViewSet(viewsets.ModelViewSet):
             plantation_id = Plantation.objects.get(bom_id=container.id).id
             sensor = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='L')
             control = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='C')
+            print(sensor, container.id)
         except BomMaster.DoesNotExist:
             return Response({'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
         # 센서 데이터 준비
         pre_sensor_data = []
         for key, value in ENV_STATUS.items():
-            sensor_id = sensor.get(item__item_name=value).id
             try:
+                sen = sensor.filter(item__item_name=value).first().id
+                print(sen)
                 pre_sensor_data.append({
                     "c_date": datetime.now(timezone('Asia/Seoul')),
                     "con_id": container.id,
-                    "senid": sensor_id,
+                    "senid": sen,
                     "type": "gta",
                     "value": data.get(key, None)  # 데이터가 없는 경우를 처리
                 })
             except BomMaster.DoesNotExist:
                 continue
-
+            except AttributeError:
+                continue
         # 제어 장치 데이터 준비
         pre_control_data = []
-
+        DB_NAME = 'djangoConnectTest' if 'cica-gs' == data['container'] else data['container']
         for idx, sen, relay in Relay.objects.filter(container_id=plantation_id).values_list('key', "sen", "id" ):
             pre_control_data.append({
                 "c_date": datetime.now(timezone('Asia/Seoul')),
@@ -358,13 +330,23 @@ class BomViewSet(viewsets.ModelViewSet):
                         relay_id=relay
                     )
         # MongoDB에 데이터 삽입
+        try :
+            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+            if mongo[DB_NAME].list_collection_names() == []:
+                mongo[DB_NAME].create_collection(GATHER)
+                mongo[DB_NAME].create_collection(SENSOR)
+        except Exception as e:
+            return Response({'message': 'Database error', 'error': str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
             mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
             db = mongo[DB_NAME]
-            sen_collection = db[GATHER]
-            con_collection = db[SENSOR]
-            sen_collection.insert_many(pre_sensor_data)
-            con_collection.insert_many(pre_control_data)
+            if len(pre_sensor_data) > 0:
+                sen_collection = db[GATHER]
+                sen_collection.insert_many(pre_sensor_data)
+            if len(pre_control_data) > 0:
+                con_collection = db[SENSOR]
+                con_collection.insert_many(pre_control_data)
         except Exception as e:
             return Response({'message': 'Database error', 'error': str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
