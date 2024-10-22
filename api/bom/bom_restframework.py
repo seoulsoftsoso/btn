@@ -235,7 +235,7 @@ class BomViewSet(viewsets.ModelViewSet):
                 continue  # 인덱스 오류 처리
         mongo = MongoClient(SERVER_URL)
 
-
+        DB_NAME = data['container']
         try:
             db = mongo[DB_NAME]
             collection = db.list_collection_names()
@@ -304,7 +304,6 @@ class BomViewSet(viewsets.ModelViewSet):
                 continue
         # 제어 장치 데이터 준비
         pre_control_data = []
-        DB_NAME = 'djangoConnectTest' if 'cica-gs' == data['container'] else data['container']
         for idx, sen, relay in Relay.objects.filter(container_id=plantation_id).values_list('key', "sen", "id" ):
             pre_control_data.append({
                 "c_date": datetime.now(timezone('Asia/Seoul')),
