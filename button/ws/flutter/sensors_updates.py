@@ -5,12 +5,7 @@ from channels.layers import get_channel_layer
 from django.apps import apps
 
 def listen_to_changes_flutter(conId, consumer):
-    uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    client = MongoClient(uri)
-    db = client['djangoConnectTest']
-    dbSensorGather = db['sen_gather']
-    dbSensorStatus = db['sen_status']
-    pipeline = [{'$match': {'operationType': 'insert'}}]
+
 
     BomMaster = apps.get_model('api', 'BomMaster')
     container_bom_masters = BomMaster.objects.get(id=conId)
@@ -22,6 +17,13 @@ def listen_to_changes_flutter(conId, consumer):
 
     unique_gtr_items = list(gtr_bom_masters.values_list('item__item_name', flat=True).distinct())
     unique_sta_items = list(sta_bom_masters.values_list('part_code', flat=True).distinct())
+
+    uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    client = MongoClient(uri)
+    db = client[container_bom_masters.part_code]
+    dbSensorGather = db['sen_gather']
+    dbSensorStatus = db['sen_status']
+    pipeline = [{'$match': {'operationType': 'insert'}}]
 
     with db.watch(pipeline) as stream:
         consumer.stream = stream  # MongoDB 스트림을 consumer 객체에 저장
