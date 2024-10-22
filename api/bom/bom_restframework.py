@@ -234,8 +234,7 @@ class BomViewSet(viewsets.ModelViewSet):
             except IndexError:
                 continue  # 인덱스 오류 처리
         mongo = MongoClient(SERVER_URL)
-
-        DB_NAME = data['container']
+        print(data['container'])
         try:
             db = mongo[DB_NAME]
             collection = db.list_collection_names()
@@ -282,7 +281,6 @@ class BomViewSet(viewsets.ModelViewSet):
             plantation_id = Plantation.objects.get(bom_id=container.id).id
             sensor = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='L')
             control = BomMaster.objects.filter(parent__parent_id=container.id, item__item_type='C')
-            print(sensor, container.id)
         except BomMaster.DoesNotExist:
             return Response({'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
         # 센서 데이터 준비
@@ -290,7 +288,6 @@ class BomViewSet(viewsets.ModelViewSet):
         for key, value in ENV_STATUS.items():
             try:
                 sen = sensor.filter(item__item_name=value).first().id
-                print(sen)
                 pre_sensor_data.append({
                     "c_date": datetime.now(timezone('Asia/Seoul')),
                     "con_id": container.id,
@@ -328,6 +325,8 @@ class BomViewSet(viewsets.ModelViewSet):
                         value=0,
                         relay_id=relay
                     )
+        print(data['container'])
+        DB_NAME = "cica-gs" if data['container'] == "djangoConnectTest" else data['container']
         # MongoDB에 데이터 삽입
         try :
             mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
@@ -356,7 +355,6 @@ class BomViewSet(viewsets.ModelViewSet):
         time_set = False
         if req_time != now_time:
             time_set = True
-
         for sen_control in SenControl.objects.filter(delete_flag='N'):
             mode, value, part_code, relay = sen_control.mode, sen_control.value, sen_control.part_code, sen_control.relay
             value = ast.literal_eval(value) 
