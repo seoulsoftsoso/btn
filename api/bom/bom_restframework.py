@@ -355,7 +355,7 @@ class BomViewSet(viewsets.ModelViewSet):
         time_set = False
         if req_time != now_time:
             time_set = True
-        for sen_control in SenControl.objects.filter(delete_flag='N'):
+        for sen_control in SenControl.objects.filter(delete_flag='N', relay__container_id=plantation_id):
             mode, value, part_code, relay = sen_control.mode, sen_control.value, sen_control.part_code, sen_control.relay
             value = ast.literal_eval(value) 
             if mode == "SV":
