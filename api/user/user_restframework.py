@@ -180,6 +180,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user = UserMaster.objects.get(id=kwargs['pk'])
         user.delete_flag = 'Y'
         user.ent.delete_flag = 'Y'
+        user.user.delete()
         user.ent.save()
         user.save()
         return Response({'status': 'success'})
