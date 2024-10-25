@@ -96,13 +96,13 @@ if __name__ == '__main__':
             print(f"Running cycle: {self.isActive}, Time: {send_time}")
             
             # 주기를 반복하는 타이머 시작
-            self.cycle_timeout = threading.Timer(send_time * 60 * 24, lambda: self.run_cycle([start, end], execute_rest))
+            self.cycle_timeout = threading.Timer(send_time * 60, lambda: self.run_cycle([start, end], execute_rest))
             self.cycle_timeout.start()
 
         def set_active(self, active):
             self.isActive = active
 
     cycle_thread = CycleThread()
-    cycle_thread.run_cycle([0, 1/6])
+    cycle_thread.run_cycle([0, 10])
 
     get_data()
