@@ -70,7 +70,13 @@ def get_data():
                 print("No data found")
         except Exception as e:
             print(f"Error: {e}")
-
+        try: 
+            collection = db.get_collection(SENSOR, codec_options=options)
+            query = {'c_date': {'$gte': time_10_minutes_ago}}
+            results = collection
+            collection.delete_many(query)
+        except Exception as e:
+            print(f"Error: {e}")
 if __name__ == '__main__':
     class CycleThread:
         def __init__(self, cycle_timeout=0):
@@ -97,6 +103,6 @@ if __name__ == '__main__':
             self.isActive = active
 
     cycle_thread = CycleThread()
-    cycle_thread.run_cycle([0, 24])
+    cycle_thread.run_cycle([0, 1/6])
 
     get_data()
