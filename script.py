@@ -57,7 +57,7 @@ def get_data():
                 for key in gather_data:
                     avg = gather_data[key]['sum'] / gather_data[key]['count']
                     pre_sensor_data.append({
-                    "c_date": datetime.now(pytz.timezone('Asia/Seoul')),
+                    "c_date": datetime.now(pytz.timezone('Asia/Seoul')) - timedelta(minutes=1),
                     "con_id": conatiner.id,
                     "senid": key,
                     "type": "gta",
