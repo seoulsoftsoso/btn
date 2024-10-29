@@ -59,8 +59,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             ret = ret.filter(date__lte=self.request.query_params.get('to_date'))
         if self.request.query_params.get('current_date'):
             ret = ret.filter(date=self.request.query_params.get('current_date'))
-        if self.request.query_params.get('bom_id'):
-            ret = ret.filter(plantation__bom_id=self.request.query_params.get('bom_id'))
+        if self.request.query_params.get('container_id'):
+            ret = ret.filter(plantation__bom_id=self.request.query_params.get('container_id'))
         return ret    
     
     def retrieve(self, request, *args, **kwargs):
