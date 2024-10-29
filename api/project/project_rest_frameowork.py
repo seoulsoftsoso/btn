@@ -44,6 +44,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['date', 'done_flag']
     read_only_fields = ['id']
     permission_classes = []
 
@@ -58,6 +59,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             ret = ret.filter(date__lte=self.request.query_params.get('to_date'))
         if self.request.query_params.get('current_date'):
             ret = ret.filter(date=self.request.query_params.get('current_date'))
+        if self.request.query_params.get('bom_id'):
+            ret = ret.filter(plantation__bom_id=self.request.query_params.get('bom_id'))
         return ret    
     
     def retrieve(self, request, *args, **kwargs):
