@@ -173,6 +173,7 @@ class Plantation(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(UserMaster, related_name='created_plantations', on_delete=models.CASCADE)
     updated_by = models.ForeignKey(UserMaster, related_name='updated_plantations', on_delete=models.CASCADE)
+    test_flag = models.CharField(max_length=1, default='N')
 
     class Meta:
         db_table = 'plantation'
@@ -220,13 +221,28 @@ class script (models.Model):
     class Meta:
         db_table = 'script'
 
-class EntScript(models.Model):
+class EntManual(models.Model):
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
     date = models.DateField()
     manual = models.ForeignKey('Manual', on_delete=models.CASCADE)
-    script = models.ForeignKey('script', on_delete=models.CASCADE)
     plantation = models.ForeignKey('Plantation', on_delete=models.CASCADE)
+    done_flag = models.CharField(max_length=1, default='N')
+    delete_flag = models.CharField(max_length=1, default='N')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(UserMaster, related_name='created_ent_manuals', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(UserMaster, related_name='updated_ent_manuals', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'entManual'
+
+class EntScript(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    date = models.DateField()
+    entManual = models.ForeignKey('EntManual', on_delete=models.CASCADE)
+    script = models.ForeignKey('script', on_delete=models.CASCADE)
     done_flag = models.CharField(max_length=1, default='N')
     delete_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
