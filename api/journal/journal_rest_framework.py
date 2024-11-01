@@ -63,8 +63,8 @@ class JounralViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.query_params.get('container_id'):
-            ret = ret.filter(Plantation__bom_id=self.request.query_params.get('container_id'))
-        return Journal.objects.filter(delete_flag='N')
+            ret = Journal.filter(Plantation__bom_id=self.request.query_params.get('container_id'))
+        return ret
     
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
