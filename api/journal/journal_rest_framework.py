@@ -62,6 +62,7 @@ class JounralViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
     def get_queryset(self):
+        ret = Journal.objects.filter(delete_flag='N')
         if self.request.query_params.get('container_id'):
             ret = Journal.objects.filter(plantation__bom_id=self.request.query_params.get('container_id'))
         return ret
@@ -125,4 +126,10 @@ class JounralViewSet(viewsets.ModelViewSet):
             instance.delete_flag = 'Y' 
             instance.save()
         return Response({'message': 'success'})
+    
+    @action(detail=False, methods=['get'])
+    def get_list(self, request):
+        queryset = Journal.objects.filter(delete_flag='N')
+        serializer = JournalSerializer(queryset, many=True)
+        return Response(serializer.data)
 
