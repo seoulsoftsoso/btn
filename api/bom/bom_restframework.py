@@ -79,13 +79,12 @@ class BomCreateSerializer(serializers.ModelSerializer):
 
     def create(self, instance):
         instance['created_by_id'] = self.get_by_username()
-
         instance['updated_by_id'] = self.get_by_username()
 
         return super().create(instance)
 
     def update(self, instance, validated_data):
-        validated_data['updated_by'] = self.get_by_username()
+        validated_data['updated_by_id'] = self.get_by_username()
 
         return super().update(instance, validated_data)
 
