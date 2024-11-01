@@ -57,7 +57,7 @@ class JounralViewSet(viewsets.ModelViewSet):
     serializer_class = JournalSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['date', 'done_flag', "plantation__owner_id"]
+    filterset_fields = ['done_flag', 'plantation__owner_id']
     read_only_fields = ['id']
     permission_classes = []
 

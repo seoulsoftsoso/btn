@@ -260,6 +260,7 @@ class Journal(models.Model):
     humi = models.IntegerField()
     # title =('입고', '배지관리', '솎아내기', '수확')
     delete_flag = models.CharField(max_length=1, default='N')
+    plantation = models.ForeignKey('Plantation', on_delete=models.CASCADE)
     done_flag = models.CharField(max_length=1, default='N')
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -267,6 +268,7 @@ class Journal(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(UserMaster, related_name='created_journals', on_delete=models.CASCADE)
     updated_by = models.ForeignKey(UserMaster, related_name='updated_journals', on_delete=models.CASCADE)
+    user = models.ForeignKey(UserMaster, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'journal'
