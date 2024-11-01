@@ -1,6 +1,6 @@
 from datetime import datetime
 from rest_framework import viewsets
-from api.models import Journal , UserMaster, imgJournal, JournalDone
+from api.models import Journal , UserMaster, imgJournal, JournalDone, Plantation
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
@@ -57,10 +57,13 @@ class JounralViewSet(viewsets.ModelViewSet):
     serializer_class = JournalSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['date', 'done_flag', "plantation__owner_id"]
     read_only_fields = ['id']
     permission_classes = []
 
     def get_queryset(self):
+        if self.request.query_params.get('container_id'):
+            ret = ret.filter(Plantation__bom_id=self.request.query_params.get('container_id'))
         return Journal.objects.filter(delete_flag='N')
     
     def retrieve(self, request, *args, **kwargs):
@@ -71,6 +74,7 @@ class JounralViewSet(viewsets.ModelViewSet):
         request.data['user'] = request.data['user_id']
         request.data['created_by'] = self.request.user.id
         request.data['updated_by'] = self.request.user.id
+        request.data['plantation'] = Plantation.objects.get(bom_id=request.data['container_id']).id
         res = super().create(request, *args, **kwargs)
         ImgFiles = request.FILES.getlist('imgFiles')  # getlist 사용으로 다중 파일 처리
         for imgFile in ImgFiles:
