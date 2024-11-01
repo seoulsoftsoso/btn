@@ -63,7 +63,7 @@ class JounralViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.query_params.get('container_id'):
-            ret = Journal.filter(Plantation__bom_id=self.request.query_params.get('container_id'))
+            ret = Journal.objects.filter(Plantation__bom_id=self.request.query_params.get('container_id'))
         return ret
     
     def retrieve(self, request, *args, **kwargs):
