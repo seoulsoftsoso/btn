@@ -22,20 +22,21 @@ class JournalSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def get_by_user_id(self):
+        print(self.context['request'].user)
         return UserMaster.objects.get(user=self.context['request'].user)
     
     def get_related_img(self, instance):
         return imgJournal.objects.filter(journal_id=instance.id).values_list('image', flat=True)
+ 
+    def create(self, validated_data):
+        validated_data['created_by'] = self.get_by_user_id()
+        validated_data['updated_by'] = self.get_by_user_id()
+        validated_data['delete_flag'] = 'N'
 
-    def create(self, instance):
-        instance['created_by'] = self.get_by_username()
-        instance['updated_by'] = self.get_by_username()
-        instance['delete_flag'] = 'N'
-
-        return super().create(instance)
+        return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        validated_data['updated_by'] = self.get_by_username()
+        validated_data['updated_by'] = self.get_by_user_id()
 
         return super().update(instance, validated_data)
 
@@ -57,37 +58,37 @@ class JounralViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
     read_only_fields = ['id']
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
 
     def get_queryset(self):
-        return Journal.objects.filter(delete_flag='N').prefetch_related('created_by', 'updated_by')
+        return Journal.objects.filter(delete_flag='N')
     
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
+    
+
+    def create(self, request, *args, **kwargs):
+        request.data['user'] = request.data['user_id']
+        request.data['created_by'] = self.request.user.id
+        request.data['updated_by'] = self.request.user.id
+        res = super().create(request, *args, **kwargs)
+        ImgFiles = request.FILES.getlist('imgFiles')  # getlist 사용으로 다중 파일 처리
+        for imgFile in ImgFiles:
+            imgJournal.objects.create(journal_id=res.id, img=imgFile)
+        return res
     
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         if(instance.done_flag == 'Y'):
             return Response({'message': '작성이 완료된 일지는 수정할 수 없습니다.'})
-        instance.__dict__.update(request.data)
-        instance.updated_by = request.user
-        instance.updated_at = datetime.now()
-        instance.save()
         return super().update(request, *args, **kwargs)
-
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        instance = self.queryset.get(pk=response.data['id'])  # 생성된 객체를 가져오기
-        ImgFiles = request.FILES.getlist('imgFiles')  # getlist 사용으로 다중 파일 처리
-        for imgFile in ImgFiles:
-            imgJournal.objects.create(journal_id=instance.id, img=imgFile)
-        return response
     
     @action(detail=True, methods=['post', 'patch', 'delete'])
     def done_journal(self, request, *args, **kwargs):
         data = request.data
         instance = self.get_object()
         user = UserMaster.objects.get(user=self.request.user)
+        print(user.id)
         if request.method == 'POST':
             instance.done_flag = 'Y'
             instance.save()
@@ -95,8 +96,8 @@ class JounralViewSet(viewsets.ModelViewSet):
             JournalDone.objects.create(
                 **{key: value for key, value in data.items()},
                 journal_id=instance.id,
-                created_by=user,
-                updated_by=user,
+                created_by_id = user.id,
+                updated_by_id = user.id,
                 created_at=datetime.now(),
                 updated_at=datetime.now()
             )
