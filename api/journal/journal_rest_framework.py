@@ -64,7 +64,9 @@ class JounralViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         ret = Journal.objects.filter(delete_flag='N')
         if self.request.query_params.get('container_id'):
-            ret = Journal.objects.filter(plantation__bom_id=self.request.query_params.get('container_id'))
+            ret = ret.filter(plantation__bom_id=self.request.query_params.get('container_id'))
+        if self.request.query_params.get('done_flag'):
+            ret = ret.filter(done_flag=self.request.query_params.get('done_flag'))
         return ret
     
     def retrieve(self, request, *args, **kwargs):
@@ -129,7 +131,6 @@ class JounralViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def get_list(self, request):
-        queryset = Journal.objects.filter(delete_flag='N')
-        serializer = JournalSerializer(queryset, many=True)
-        return Response(serializer.data)
+        queryset = self.get_queryset()
+        return Response(queryset.values())
 
