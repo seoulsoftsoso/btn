@@ -11,6 +11,10 @@ from pymongo import MongoClient, DESCENDING
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.views.decorators.csrf import csrf_exempt
+import os
+
+SERVER_URL = os.getenv("MONGO_URL")
+
 
 
 def csrf(request):
@@ -107,7 +111,7 @@ def container_sen_map(request):
         con_name = container_bom_masters.part_code
         con_id = container_bom_masters.id
 
-        uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+        uri = SERVER_URL
         client = MongoClient(uri)
         db = client[con_name]
         dbSensorGather = db['sen_gather']
@@ -190,7 +194,7 @@ def sen_list(request):
         unique_gtr_items = list(gtr_bom_masters.values_list('item__item_name', flat=True).distinct())
 
         # uri = "mongodb://localhost:27017/"
-        uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+        uri = SERVER_URL
         client = MongoClient(uri)
         db = client[container_bom_masters.part_code]
         dbSensorGather = db['sen_gather']
@@ -227,7 +231,7 @@ def fetch_graph_data(request):
         container_bom_masters = BomMaster.objects.get(id=con_id)
         con_name = container_bom_masters.part_code
 
-        client = MongoClient('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+        client = MongoClient(SERVER_URL)
         db = client[con_name]
         collection = db['sen_gather']
 

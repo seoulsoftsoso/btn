@@ -18,4 +18,6 @@ uwsgi.ini
 /my_settings.py
 /button/settings.py
 __init__.py
+/static/*
 restart.sh
+.env

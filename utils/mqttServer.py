@@ -8,10 +8,19 @@ import paho.mqtt.client as mqtt
 from pymongo import MongoClient
 from pytz import timezone
 import sys
+from django.core.cache import cache
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'button.settings')
 django.setup()
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+
+mongo_url = os.getenv("MONGO_URL")
 
 # Signal
 
@@ -19,8 +28,8 @@ from api.models import Plantation, PlanPart
 
 DB_NAME = 'djangoConnectTest'
 COLLECTION = 'sen_gather'
-SERVER_URL = ('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName'
-              '=Cluster0')
+STATUS = 'sen_status'
+SERVER_URL = (mongo_url)
 MQTT_TOPIC = [('btn/init', 1)]
 
 def on_connect(client, userdata, flags, rc):
@@ -120,6 +129,23 @@ def on_message(client, userdata, msg):
         else:
             client.publish(topic, '{"result": "err", "msg": "gathering is failed"}', qos=2)
             return
+    if req_type == 'ctl':
+        try:
+            con_id = Plantation.objects.get(c_code=topic.split('/')[-1]).bom_id
+        except Plantation.DoesNotExist:
+            client.publish(topic, '{"result": "err", "msg": "this container not exist"}', qos=1)
+            return
+        relay = data['relay']
+        cache.set(f"{con_id}_sensor", relay)
+        res = collection.insert_one({
+            "c_date": datetime.now(timezone('Asia/Seoul')),
+            "con_id": con_id,
+            "senid": raw_bom.id,
+            "type": "sta",
+            "status": data['status']
+        })
+        client.publish(topic, '{"result": "ok", "msg": "control is proceed"}', qos=1)
+        return
 
 
 def on_publish(client, userdata, mid):

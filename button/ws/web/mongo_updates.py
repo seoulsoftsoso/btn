@@ -3,10 +3,18 @@ import threading
 import asyncio
 from channels.layers import get_channel_layer
 from django.apps import apps
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+
+mongo_url = os.getenv("MONGO_URL")
+
 
 def listen_to_changes(request):
-    uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    client = MongoClient(uri)
+    client = MongoClient(mongo_url)
 
     pipeline = [{'$match': {'operationType': 'insert'}}]
 
@@ -70,7 +78,6 @@ def listen_to_changes(request):
     # MongoDB 변경 사항을 감지하는 스트림
     with db.watch(pipeline) as stream:
         for change in stream:
-            print('hi')
             cont = {}
             for container in container_bom_masters:
                 con_inf = {}
