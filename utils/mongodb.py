@@ -17,7 +17,7 @@ DB_NAME = 'djangoConnectTest'
 COLLECTION = 'sen_gather'
 SERVER_URL = (mongo_url)
 
-mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+mongo = MongoClient(SERVER_URL)
 db = mongo[DB_NAME]
 collection = db[COLLECTION]
 

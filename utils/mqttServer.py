@@ -107,7 +107,7 @@ def on_message(client, userdata, msg):
         if planPart.reg_flag == 'N':
             client.publish(topic, '{"result": "fail", "msg": "Sensor {name} is not registered"}', qos=1)
             return
-        mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+        mongo = MongoClient(SERVER_URL)
         db = mongo[DB_NAME]
         collection = db[COLLECTION]
         raw_bom = planPart.part

@@ -332,10 +332,11 @@ class BomViewSet(viewsets.ModelViewSet):
                         relay_id=relay
                     )
         print(data['container'])
+        print(SERVER_URL)
         DB_NAME = "cica-gs" if data['container'] == "djangoConnectTest" else data['container']
         # MongoDB에 데이터 삽입
         try :
-            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+            mongo = MongoClient(SERVER_URL)
             if mongo[DB_NAME].list_collection_names() == []:
                 mongo[DB_NAME].create_collection(GATHER)
                 mongo[DB_NAME].create_collection(SENSOR)
@@ -343,7 +344,7 @@ class BomViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Database error', 'error': str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
-            mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
+            mongo = MongoClient(SERVER_URL)
             db = mongo[DB_NAME]
             if len(pre_sensor_data) > 0:
                 sen_collection = db[GATHER]
