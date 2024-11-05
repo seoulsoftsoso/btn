@@ -21,9 +21,9 @@ import os
 mongo_url = os.getenv("MONGO_URL")
 def user_table_data(request):
     client = MongoClient(mongo_url)
+    print(mongo_url)
     # dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     # dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-    print(mongo_url)
     order_products = OrderProduct.objects.filter(order__client_id=request.user.id)
     print(order_products)
     print(request.user.id)
@@ -38,7 +38,6 @@ def user_table_data(request):
 
     unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
     unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
-    print(container_bom_masters)
     cont = {}
     for container in container_bom_masters:
         db = client[container.part_code]
