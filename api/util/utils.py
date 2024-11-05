@@ -10,15 +10,23 @@ from django.db.models import Subquery
 import json
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 
+load_dotenv()
+
+import os
+ 
+
+mongo_url = os.getenv("MONGO_URL")
 def user_table_data(request):
-    uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    client = MongoClient(uri)
+    client = MongoClient(mongo_url)
     # dbSensorGather.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
     # dbSensorStatus.create_index([('con_id', 1), ('senid', 1), ('c_date', -1)])
-
+    print(mongo_url)
     order_products = OrderProduct.objects.filter(order__client_id=request.user.id)
+    print(order_products)
+    print(request.user.id)
     bom_masters = BomMaster.objects.filter(id__in=order_products.values_list('bom', flat=True), delete_flag='N')
 
     container_bom_masters = bom_masters.filter(level=0)
@@ -30,7 +38,7 @@ def user_table_data(request):
 
     unique_gtr_items = list(set(gtr_bom_masters.values_list('item__item_name', flat=True)))
     unique_sta_items = list(set(sta_bom_masters.values_list('part_code', flat=True)))
-
+    print(container_bom_masters)
     cont = {}
     for container in container_bom_masters:
         db = client[container.part_code]
@@ -114,7 +122,7 @@ def fetch_data(request):
         print(con_id)
         print(sen_Ids)
 
-        client = MongoClient('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+        client = MongoClient(mongo_url)
         db = client['djangoConnectTest']
         collection = db['sen_gather']
 

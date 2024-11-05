@@ -9,11 +9,18 @@ from api.models import Plantation
 
 from pymongo import MongoClient
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+
 import pytz 
 from bson.codec_options import CodecOptions
 GATHER = 'sen_gather'
 SENSOR = "sen_status"
-SERVER_URL = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+SERVER_URL = os.getenv("MONGO_URL")
+
 
 
 def get_data():

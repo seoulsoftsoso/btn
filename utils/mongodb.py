@@ -4,12 +4,18 @@ from pymongo import MongoClient
 from datetime import datetime
 from pytz import timezone
 import certifi
+import os
+from dotenv import load_dotenv
 
+
+load_dotenv()
+
+
+mongo_url = os.getenv("MONGO_URL")
 
 DB_NAME = 'djangoConnectTest'
 COLLECTION = 'sen_gather'
-SERVER_URL = ('mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName'
-              '=Cluster0')
+SERVER_URL = (mongo_url)
 
 mongo = MongoClient(SERVER_URL, tlsCAFile=certifi.where())
 db = mongo[DB_NAME]

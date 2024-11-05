@@ -3,6 +3,14 @@ import threading
 import asyncio
 from channels.layers import get_channel_layer
 from django.apps import apps
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+mongo_url = os.getenv("MONGO_URL")
+
 
 def listen_to_changes_flutter(conId, consumer):
 
@@ -18,8 +26,7 @@ def listen_to_changes_flutter(conId, consumer):
     unique_gtr_items = list(gtr_bom_masters.values_list('item__item_name', flat=True).distinct())
     unique_sta_items = list(sta_bom_masters.values_list('part_code', flat=True).distinct())
 
-    uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    client = MongoClient(uri)
+    client = MongoClient(mongo_url)
     db = client[container_bom_masters.part_code]
     dbSensorGather = db['sen_gather']
     dbSensorStatus = db['sen_status']

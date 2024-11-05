@@ -1,11 +1,19 @@
 from django.shortcuts import render
 from django.core.serializers.json import DjangoJSONEncoder
-
+from pymongo import MongoClient
+from dotenv import load_dotenv
+import os
 # 유저 정보 
+from dotenv import load_dotenv
 
+
+load_dotenv()
+
+
+mongo_url = os.getenv("MONGO_URL")
 
 def dashboard2(request):
-    uri = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    uri = mongo_url
     client = MongoClient(uri)
     db = client['djangoConnectTest']
     dbSensorGather = db['sen_gather']

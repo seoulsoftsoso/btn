@@ -23,8 +23,15 @@ from pymongo import MongoClient
 DB_NAME = 'djangoConnectTest'
 GATHER = 'sen_gather'
 SENSOR = "sen_status"
-SERVER_URL = "mongodb+srv://sj:1234@cluster0.ozlwsy4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+from dotenv import load_dotenv
 
+
+load_dotenv()
+
+import os
+ 
+
+SERVER_URL = os.getenv("MONGO_URL")
 
 
 ENV_STATUS = {
