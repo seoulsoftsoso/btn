@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from api.models import TodoList, Plantation
 from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import serializers
 from django.db import transaction
 from rest_framework.response import Response
@@ -29,7 +29,7 @@ class TodoListViewSet(viewsets.ModelViewSet):
     queryset = TodoList.objects.all()
     serializer_class = TodoListSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['done_flag', 'date']
     ordering_fields = ['date', '-date']
     read_only_fields = ['id']
