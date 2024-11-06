@@ -36,7 +36,7 @@ def get_data():
 
             # 현재 서울 시간 가져오기
             seoul_tz = pytz.timezone('Asia/Seoul')
-            seoul_time = datetime.now(seoul_tz).replace(second=0, microsecond=0)
+            seoul_time = datetime.now(seoul_tz).replace(second=20, microsecond=0)
 
             # 10분 전 시간 계산
             time_10_minutes_ago = seoul_time - timedelta(minutes=10)

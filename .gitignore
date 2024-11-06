@@ -21,3 +21,4 @@ __init__.py
 /static/*
 restart.sh
 .env
+nohup.out
