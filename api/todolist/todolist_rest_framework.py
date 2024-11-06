@@ -31,7 +31,7 @@ class TodoListViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['done_flag', 'date']
-    ordering_fields = ['date']
+    ordering_fields = ['date', '-date']
     read_only_fields = ['id']
     permission_classes = [AllowAny]
 
