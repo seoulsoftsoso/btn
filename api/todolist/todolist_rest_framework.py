@@ -38,7 +38,7 @@ class TodoListViewSet(viewsets.ModelViewSet):
         ret = TodoList.objects.all()
         
         if self.request.query_params.get('container_id'):
-            ret = ret.filter(conatiner__bom_id=self.request.query_params.get('container_id'))
+            ret = ret.filter(container__bom_id=self.request.query_params.get('container_id'))
         return ret
 
     def create(self, request, *args, **kwargs) -> Response:
