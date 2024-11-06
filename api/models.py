@@ -39,6 +39,16 @@ class EnterpriseMaster(models.Model):
     class Meta:
         db_table = 'enterpriseMaster'
 
+class TodoList(models.Model):
+    title = models.CharField(max_length=255)
+    container = models.ForeignKey('Plantation', on_delete=models.CASCADE)
+    done_flag = models.BooleanField(default=False)
+    date = models.DateField()
+    delete_flag = models.CharField(max_length=1, default='N')
+
+    class Meta:
+        db_table = 'todoList'
+
 
 class ItemMaster(models.Model):
     item_code = models.CharField(max_length=255, unique=True)

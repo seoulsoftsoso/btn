@@ -13,6 +13,7 @@ from .flutter.flutter import *
 from .control.senControl import senControlViewSet
 from .project.project_rest_frameowork import ProjectViewSet
 from .manual.manual import ManualViewSet
+from .todolist.todolist_rest_framework import TodoListViewSet
 router = DefaultRouter()
 
 router.register(r'bom', BomViewSet)
@@ -26,6 +27,7 @@ router.register(r'journal', JounralViewSet)
 router.register(r'project', ProjectViewSet)
 router.register(r'senControl', senControlViewSet)
 router.register(r'manual', ManualViewSet)
+router.register(r'todo', TodoListViewSet)
 urlpatterns = [
     path('', include(router.urls)),
 
