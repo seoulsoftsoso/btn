@@ -119,8 +119,6 @@ class OrderMaster(models.Model):
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(UserMaster, related_name='order_created_by', on_delete=models.SET_NULL, null=True)
-    updated_by = models.ForeignKey(UserMaster, related_name='order_updated_by', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         db_table = 'orderMaster'
@@ -140,8 +138,6 @@ class OrderProduct(models.Model):
     delete_flag = models.CharField(max_length=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(UserMaster, related_name='order_product_created_by', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(UserMaster, related_name='order_product_updated_by', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'orderProduct'
@@ -158,8 +154,6 @@ class PlanPart(models.Model):
     reg_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(UserMaster, related_name='created_planpart', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(UserMaster, related_name='updated_planpart', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'planPart'
@@ -181,8 +175,6 @@ class Plantation(models.Model):
     reg_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(UserMaster, related_name='created_plantations', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(UserMaster, related_name='updated_plantations', on_delete=models.CASCADE)
     test_flag = models.CharField(max_length=1, default='N')
 
     class Meta:
@@ -241,8 +233,6 @@ class EntManual(models.Model):
     delete_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(UserMaster, related_name='created_ent_manuals', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(UserMaster, related_name='updated_ent_manuals', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'entManual'
@@ -257,8 +247,6 @@ class EntScript(models.Model):
     delete_flag = models.CharField(max_length=1, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(UserMaster, related_name='created_ent_scripts', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(UserMaster, related_name='updated_ent_scripts', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'entScript'
@@ -276,8 +264,6 @@ class Journal(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(UserMaster, related_name='created_journals', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(UserMaster, related_name='updated_journals', on_delete=models.CASCADE)
     user = models.ForeignKey(UserMaster, on_delete=models.CASCADE)
 
     class Meta:
@@ -298,8 +284,6 @@ class JournalDone(models.Model):
     journal = models.ForeignKey('Journal', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(UserMaster, related_name='created_journal_done', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(UserMaster, related_name='updated_journal_done', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'journalDone'

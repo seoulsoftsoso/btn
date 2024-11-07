@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from rest_framework import viewsets
 from api.models import script, EntManual, UserMaster, BomMaster, Plantation, Manual, EntScript
-from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from django.db import transaction
@@ -22,16 +21,10 @@ class ManualSerializer(serializers.ModelSerializer):
         return UserMaster.objects.get(user=self.context['request'].user)
     
     def create(self, instance):
-        instance['created_by'] = self.get_by_user_id()
-        instance['updated_by'] = self.get_by_user_id()
         instance['delete_flag'] = 'N'
 
         return super().create(instance)
 
-    def update(self, instance, validated_data):
-        validated_data['updated_by'] = self.get_by_user_id()
-
-        return super().update(instance, validated_data)
 
     def delete (self, instance):
         instance['delete_flag'] = 'Y'
@@ -49,10 +42,7 @@ class ManualViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
     def get_queryset(self):
-        ret = EntManual.objects.filter(delete_flag='N').prefetch_related('created_by', 'updated_by')
-        user_id = self.request.query_params.get('user_id')
-        if user_id:
-            ret = ret.filter(created_by__user_id=user_id)
+        ret = EntManual.objects.filter(delete_flag='N')
         if self.request.query_params.get('container_id'):
             ret = ret.filter(Plantation__bom_id=self.request.query_params.get('container_id'))
         return ret    
@@ -91,8 +81,6 @@ class ManualViewSet(viewsets.ModelViewSet):
             date=request.data['date'],
             done_flag="N",
             plantation=plant,
-            created_by=user_instance,
-            updated_by=user_instance,
             created_at=datetime.now(),
             updated_at=datetime.now(),
             delete_flag='N'
@@ -117,8 +105,6 @@ class ManualViewSet(viewsets.ModelViewSet):
                     title = obj.title,
                     entManual_id= entManualData.id,
                     description = obj.description,
-                    created_by=user_instance,
-                    updated_by=user_instance,
                     created_at=current_date,
                     updated_at=current_date,
                     delete_flag='N',

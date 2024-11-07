@@ -2,12 +2,11 @@ from django.db.models import F, Count
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 
-from api.models import OrderMaster, ItemMaster, UserMaster, PlanPart, Plantation
+from api.models import  PlanPart, PlanType
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from rest_framework.response import Response
-import uuid, json
 
 
 
@@ -17,21 +16,9 @@ class PlantationSerializer(serializers.ModelSerializer):
         model = PlanPart
         fields = '__all__'
         extra_kwargs = {
-            'created_by': {'required': False},
-            'updated_by': {'required': False},
+
         }
         read_only_fields = ['id']
-
-    def create(self, validated_data):
-        User = UserMaster.objects.get(user_id=self.context['request'].user.id)
-        validated_data['created_by'] = User
-        validated_data['updated_by'] = User
-        validated_data['delete_flag'] = 'N'
-        return super().create(validated_data)
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        return ret
 
     def delete(self, instance):
         instance['delete_flag'] = 'Y'
@@ -49,4 +36,7 @@ class PlanPartViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return PlanPart.objects.filter(delete_flag='N')
 
-
+    @action(detail=False, methods=['GET'])
+    def get_plant_type(self, request, pk=None):
+        ret = PlanType.objects.all().values('id', 'name')
+        return Response(ret)
