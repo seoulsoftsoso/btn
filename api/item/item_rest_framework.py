@@ -17,12 +17,12 @@ class ItemSerializer(serializers.ModelSerializer):
         }
         read_only_fields = ['id']
 
-    def create(self, instance):
-        instance['created_by'] = UserMaster.objects.get(user=self.context['request'].user)
-        instance['updated_by'] = UserMaster.objects.get(user=self.context['request'].user)
-        instance['delete_flag'] = 'N'
+    def create(self, validated_data):
+        validated_data['created_by'] = UserMaster.objects.get(user=self.context['request'].user)
+        validated_data['updated_by'] = UserMaster.objects.get(user=self.context['request'].user)
+        validated_data['delete_flag'] = 'N'
 
-        return super().create(instance)
+        return super().create(validated_data)
 
     def update(self, instance, validated_data):
         validated_data['updated_by'] = UserMaster.objects.get(user=self.context['request'].user)
@@ -47,6 +47,9 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         with transaction.atomic():

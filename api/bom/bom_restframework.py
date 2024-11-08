@@ -48,8 +48,6 @@ class BomMasterSerializer(serializers.ModelSerializer):
     product_info = serializers.CharField(source='item.item_name', read_only=True)
     image = serializers.CharField(source='item.brand', read_only=True)
     product_name = serializers.CharField(source='item.item_name', read_only=True)
-    created_by = serializers.CharField(required=False, read_only=True)  # 최종작성일
-    updated_by = serializers.CharField(required=False, read_only=True)  # 최종작성자
     delete_flag = serializers.CharField(required=False, read_only=True)  # 삭제여부
 
     class Meta:
@@ -57,15 +55,10 @@ class BomMasterSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, instance):
-        instance['created_by'] = self.get_by_username()
-        instance['updated_by'] = self.get_by_username()
         instance['delete_flag'] = 'N'
 
         return super().create(instance)
 
-    def update(self, instance, validated_data):
-        validated_data['updated_by'] = self.get_by_username()
-        return super().update(instance, validated_data)
 
     def delete(self, instance):
         instance['delete_flag'] = 'Y'
@@ -79,21 +72,6 @@ class BomCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BomMaster
         fields = '__all__'
-
-    def get_by_username(self):
-        User = UserMaster.objects.get(user_id=self.context['request'].user.id)
-        return User.id
-
-    def create(self, instance):
-        instance['created_by_id'] = self.get_by_username()
-        instance['updated_by_id'] = self.get_by_username()
-
-        return super().create(instance)
-
-    def update(self, instance, validated_data):
-        validated_data['updated_by_id'] = self.get_by_username()
-
-        return super().update(instance, validated_data)
 
 
 class BomViewSet(viewsets.ModelViewSet):
@@ -277,7 +255,7 @@ class BomViewSet(viewsets.ModelViewSet):
         return Response(sen_control_data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
-    def sen_control(self, request, *args, **kwargs):
+    def sen_control(self, request, *args, **kwargs) -> Response:
         data = request.data
         now_date = datetime.now(timezone('Asia/Seoul'))
         now_time = now_date.strftime("%H%M")
@@ -332,7 +310,6 @@ class BomViewSet(viewsets.ModelViewSet):
                         relay_id=relay
                     )
         print(data['container'])
-        print(SERVER_URL)
         DB_NAME = "cica-gs" if data['container'] == "djangoConnectTest" else data['container']
         # MongoDB에 데이터 삽입
         try :

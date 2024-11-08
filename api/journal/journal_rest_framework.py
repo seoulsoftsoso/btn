@@ -1,7 +1,6 @@
 from datetime import datetime
 from rest_framework import viewsets
 from api.models import Journal , UserMaster, imgJournal, JournalDone, Plantation
-from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from django.db import transaction
@@ -21,24 +20,9 @@ class JournalSerializer(serializers.ModelSerializer):
         }
         read_only_fields = ['id']
 
-    def get_by_user_id(self):
-        print(self.context['request'].user)
-        return UserMaster.objects.get(user=self.context['request'].user)
     
     def get_related_img(self, instance):
         return imgJournal.objects.filter(journal_id=instance.id).values_list('image', flat=True)
- 
-    def create(self, validated_data):
-        validated_data['created_by'] = self.get_by_user_id()
-        validated_data['updated_by'] = self.get_by_user_id()
-        validated_data['delete_flag'] = 'N'
-
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        validated_data['updated_by'] = self.get_by_user_id()
-
-        return super().update(instance, validated_data)
 
     def delete (self, instance):
         instance['delete_flag'] = 'Y'
@@ -57,7 +41,7 @@ class JounralViewSet(viewsets.ModelViewSet):
     serializer_class = JournalSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['done_flag', 'plantation__owner_id']
+    filterset_fields = ['done_flag', 'plantation__owner_id', "date"]
     read_only_fields = ['id']
     permission_classes = []
 
@@ -65,18 +49,13 @@ class JounralViewSet(viewsets.ModelViewSet):
         ret = Journal.objects.filter(delete_flag='N')
         if self.request.query_params.get('container_id'):
             ret = ret.filter(plantation__bom_id=self.request.query_params.get('container_id'))
-        if self.request.query_params.get('done_flag'):
-            ret = ret.filter(done_flag=self.request.query_params.get('done_flag'))
         return ret
     
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
     
-
     def create(self, request, *args, **kwargs):
         request.data['user'] = request.data['user_id']
-        request.data['created_by'] = self.request.user.id
-        request.data['updated_by'] = self.request.user.id
         request.data['plantation'] = Plantation.objects.get(bom_id=request.data['container_id']).id
         res = super().create(request, *args, **kwargs)
         ImgFiles = request.FILES.getlist('imgFiles')  # getlist 사용으로 다중 파일 처리
@@ -94,8 +73,6 @@ class JounralViewSet(viewsets.ModelViewSet):
     def done_journal(self, request, *args, **kwargs):
         data = request.data
         instance = self.get_object()
-        user = UserMaster.objects.get(user=self.request.user)
-        print(user.id)
         if request.method == 'POST':
             instance.done_flag = 'Y'
             instance.save()
@@ -103,16 +80,13 @@ class JounralViewSet(viewsets.ModelViewSet):
             JournalDone.objects.create(
                 **{key: value for key, value in data.items()},
                 journal_id=instance.id,
-                created_by_id = user.id,
-                updated_by_id = user.id,
                 created_at=datetime.now(),
-                updated_at=datetime.now()
+                updated_at=datetime.now(),
             )
         # 수정
         elif request.method == 'PATCH': 
             instance.done_journal.update(
                 **data,
-                updated_by=user,
                 updated_at=datetime.now()
             )
         else:

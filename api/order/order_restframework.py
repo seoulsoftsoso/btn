@@ -19,16 +19,11 @@ class OrderMasterSerializer(serializers.ModelSerializer):
         model = OrderMaster
         fields = '__all__'
         extra_kwargs = {
-            'created_by': {'required': False},
-            'updated_by': {'required': False},
             'comment': {'required': False},
         }
         read_only_fields = ['id']
 
     def create(self, validated_data):
-        User = UserMaster.objects.get(user_id=self.context['request'].user.id)
-        validated_data['created_by'] = User
-        validated_data['updated_by'] = User
         validated_data['delete_flag'] = 'N'
         return super().create(validated_data)
 
@@ -58,15 +53,13 @@ class OrderViewSet(viewsets.ModelViewSet):
         request.data._mutable = True
         so_no = str(uuid.uuid4())
         request.data['so_no'] = so_no
-        request.data['created_by'] = User.id
-        request.data['updated_by'] = User.id
         request.data['delete_flag'] = 'N'
         request.data._mutable = False
         order = super().create(request, request, *args, **kwargs)
         container = ItemMaster.objects.get(
             created_by=User,
             level=0)
-        for i in range(0, int(request.data['order_cnt'])):
+        for _ in range(0, int(request.data['order_cnt'])):
             op = OrderProduct.objects.create(
                 unique_no=str(uuid.uuid4()),
                 product_name=container.item_name,
@@ -74,8 +67,6 @@ class OrderViewSet(viewsets.ModelViewSet):
                 delete_flag='N',
                 op_cnt=1,
                 status=1,
-                created_by=User,
-                updated_by=User,
             )
             bom = BomMaster.objects.create(
                 level=0,
@@ -86,7 +77,6 @@ class OrderViewSet(viewsets.ModelViewSet):
                 tax=container.standard_price * 0.1,
                 op=op,
                 delete_flag='N',
-                created_by=User,
                 updated_by=User,
                 order_id=order.data['id'],
             )
@@ -108,8 +98,6 @@ class OrderViewSet(viewsets.ModelViewSet):
                 owner=order.client,
                 bom=container,
                 reg_flag='Y',
-                created_by=user,
-                updated_by=user,
             )
         for sensor in sensor_by_order:
             controller = sensor.parent
@@ -124,8 +112,6 @@ class OrderViewSet(viewsets.ModelViewSet):
                 message = "init",
                 status = "WAIT_CON",
                 type=sensor.item.item_type,
-                created_by = user,
-                updated_by = user
             )
         order.comment = "주문완료"
         order.save()

@@ -2,12 +2,11 @@ from django.db.models import F, Count
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from api.models import OrderMaster, ItemMaster, UserMaster, Plantation
+from api.models import Plantation
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from rest_framework.response import Response
-import uuid, json
 
 
 
@@ -17,22 +16,11 @@ class PlantationSerializer(serializers.ModelSerializer):
         model = Plantation
         fields = '__all__'
         extra_kwargs = {
-            'created_by': {'required': False},
-            'updated_by': {'required': False},
         }
         read_only_fields = ['id']
         ref_name= 'PlanPartPlantationSerializer'
 
-    def create(self, validated_data):
-        User = UserMaster.objects.get(user_id=self.context['request'].user.id)
-        validated_data['created_by'] = User
-        validated_data['updated_by'] = User
-        validated_data['delete_flag'] = 'N'
-        return super().create(validated_data)
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        return ret
 
     def delete(self, instance):
         instance['delete_flag'] = 'Y'
@@ -51,15 +39,24 @@ class PlantationViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def get_container_by_owner(self, request, pk=None):
-        ret = Plantation.objects.values('owner_id', 'c_code')
+        ret = Plantation.objects.values('owner_id', 'c_code', 'plant_type', 'test_flag')
         group_ret_by_owner = []
         for i in ret:
+            print(i)
             if i['owner_id'] not in [x['owner_id'] for x in group_ret_by_owner]:
-                group_ret_by_owner.append({'owner_id': i['owner_id'], 'containers': [i['c_code']]})
+                group_ret_by_owner.append({'owner_id': i['owner_id'], 'containers': [{
+                            "c_code": i['c_code'],
+                            "plant_type": i['plant_type'],
+                            "test_flag": i['test_flag'],
+                        }]})
             else:
                 for j in group_ret_by_owner:
                     if j['owner_id'] == i['owner_id']:
-                        j['containers'].append(i['c_code'])
+                        j['containers'].append({
+                            "c_code": i['c_code'],
+                            "plant_type": i['plant_type'],
+                            "test_flag": i['test_flag'],
+                        })
 
         return Response(group_ret_by_owner)
 
