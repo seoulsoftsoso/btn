@@ -41,7 +41,7 @@ class JounralViewSet(viewsets.ModelViewSet):
     serializer_class = JournalSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['done_flag', 'plantation__owner_id']
+    filterset_fields = ['done_flag', 'plantation__owner_id', "date"]
     read_only_fields = ['id']
     permission_classes = []
 
@@ -49,8 +49,6 @@ class JounralViewSet(viewsets.ModelViewSet):
         ret = Journal.objects.filter(delete_flag='N')
         if self.request.query_params.get('container_id'):
             ret = ret.filter(plantation__bom_id=self.request.query_params.get('container_id'))
-        if self.request.query_params.get('done_flag'):
-            ret = ret.filter(done_flag=self.request.query_params.get('done_flag'))
         return ret
     
     def retrieve(self, request, *args, **kwargs):
