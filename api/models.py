@@ -252,8 +252,6 @@ class EntScript(models.Model):
         db_table = 'entScript'
 
 class Journal(models.Model):
-    amount = models.IntegerField()
-    unit = models.CharField(max_length=255, null=True)
     temp = models.IntegerField()
     humi = models.IntegerField()
     date = models.DateField(default="2024-11-08")
@@ -269,6 +267,14 @@ class Journal(models.Model):
 
     class Meta:
         db_table = 'journal'
+class TaskSet(models.Model):
+    task = models.CharField(max_length=255)
+    amount = models.IntegerField()
+    unit = models.CharField(max_length=255)
+    journal = models.ForeignKey('Journal', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'taskSet'
 
 class imgJournal(models.Model):
     image = models.ImageField(upload_to='journal_images/', null=True)
