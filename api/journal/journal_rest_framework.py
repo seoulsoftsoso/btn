@@ -1,6 +1,6 @@
 from datetime import datetime
 from rest_framework import viewsets
-from api.models import Journal , UserMaster, imgJournal, JournalDone, Plantation
+from api.models import Journal , UserMaster, imgJournal, JournalDone, Plantation,  TaskSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from django.db import transaction
@@ -12,6 +12,7 @@ from rest_framework.decorators import action
 class JournalSerializer(serializers.ModelSerializer):
     related_img = serializers.SerializerMethodField()
     done_journal = serializers.SerializerMethodField()
+    related_task = serializers.SerializerMethodField()
     class Meta:
         model = Journal
         fields = '__all__'
@@ -23,6 +24,9 @@ class JournalSerializer(serializers.ModelSerializer):
     
     def get_related_img(self, instance):
         return imgJournal.objects.filter(journal_id=instance.id).values_list('image', flat=True)
+    
+    def get_related_task(self, instance):
+        return TaskSet.objects.filter(journal_id=instance.id).values("id", "task", "unit", "amount")
 
     def delete (self, instance):
         instance['delete_flag'] = 'Y'
@@ -58,6 +62,9 @@ class JounralViewSet(viewsets.ModelViewSet):
         request.data['user'] = request.data['user_id']
         request.data['plantation'] = Plantation.objects.get(bom_id=request.data['container_id']).id
         res = super().create(request, *args, **kwargs)
+        Tasks = request.data.get('tasks')
+        for task in Tasks:
+            TaskSet.objects.create(journal_id=res.data["id"], **task)
         ImgFiles = request.FILES.getlist('imgFiles')  # getlist 사용으로 다중 파일 처리
         for imgFile in ImgFiles:
             imgJournal.objects.create(journal_id=res.id, img=imgFile)
