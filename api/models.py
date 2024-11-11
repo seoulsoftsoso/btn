@@ -252,8 +252,8 @@ class EntScript(models.Model):
         db_table = 'entScript'
 
 class Journal(models.Model):
-    temp = models.IntegerField()
-    humi = models.IntegerField()
+    temp = models.FloatField()
+    humi = models.FloatField()
     date = models.DateField(default="2024-11-08")
     # title =('입고', '배지관리', '솎아내기', '수확')
     delete_flag = models.CharField(max_length=1, default='N')
