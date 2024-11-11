@@ -263,7 +263,6 @@ class Journal(models.Model):
     description = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(UserMaster, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'journal'
