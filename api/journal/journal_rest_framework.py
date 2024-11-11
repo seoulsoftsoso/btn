@@ -59,7 +59,6 @@ class JounralViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
     
     def create(self, request, *args, **kwargs):
-        request.data['user'] = request.data['user_id']
         request.data['plantation'] = Plantation.objects.get(bom_id=request.data['container_id']).id
         res = super().create(request, *args, **kwargs)
         Tasks = request.data.get('tasks')
