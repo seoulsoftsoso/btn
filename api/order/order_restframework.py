@@ -79,6 +79,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 delete_flag='N',
                 updated_by=User,
                 order_id=order.data['id'],
+                created_by=User,
             )
             op.bom = bom
             op.save()
