@@ -11,6 +11,7 @@ cryptography==42.0.7
 daphne==4.1.2
 dateutils==0.6.12
 Django==4.2.11
+django-cron==0.6.0
 django-filter==24.3
 django-sslserver==0.22
 djangorestframework==3.15.1
@@ -36,6 +37,7 @@ pymongo==4.7.1
 PyMySQL==1.1.1
 pyOpenSSL==24.1.0
 python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 python-snappy==0.7.1
 pytz==2024.1
 PyYAML==6.0.2
@@ -44,7 +46,7 @@ signals==0.0.2
 six==1.16.0
 sqlparse==0.5.0
 Twisted==24.3.0
-# twisted-iocpsupport==1.0.4
+twisted-iocpsupport==1.0.4
 txaio==23.1.1
 typing_extensions==4.11.0
 tzdata==2024.1
