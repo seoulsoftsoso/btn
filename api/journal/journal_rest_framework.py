@@ -13,6 +13,7 @@ class JournalSerializer(serializers.ModelSerializer):
     related_img = serializers.SerializerMethodField()
     done_journal = serializers.SerializerMethodField()
     related_task = serializers.SerializerMethodField()
+    container_name = serializers.CharField(source='plantation.c_code')
     class Meta:
         model = Journal
         fields = '__all__'
@@ -21,12 +22,14 @@ class JournalSerializer(serializers.ModelSerializer):
         }
         read_only_fields = ['id']
 
-    
     def get_related_img(self, instance):
         return imgJournal.objects.filter(journal_id=instance.id).values_list('image', flat=True)
     
     def get_related_task(self, instance):
         return TaskSet.objects.filter(journal_id=instance.id).values("id", "task", "unit", "amount")
+    
+    def get_container_name(self, instance):
+        return instance.plantation.c_code
 
     def delete (self, instance):
         instance['delete_flag'] = 'Y'
