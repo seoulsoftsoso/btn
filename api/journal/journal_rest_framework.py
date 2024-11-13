@@ -13,7 +13,7 @@ class JournalSerializer(serializers.ModelSerializer):
     related_img = serializers.SerializerMethodField()
     done_journal = serializers.SerializerMethodField()
     related_task = serializers.SerializerMethodField()
-    container_name = serializers.CharField(source='plantation.c_code')
+    container_name = serializers.SerializerMethodField()
     class Meta:
         model = Journal
         fields = '__all__'
