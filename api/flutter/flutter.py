@@ -2,7 +2,7 @@ import pytz
 from dateutil.parser import isoparse
 from django.contrib.auth import authenticate
 from django.middleware.csrf import get_token
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.http import JsonResponse
 
@@ -219,13 +219,23 @@ def fetch_graph_data(request):
 
     if request.method == 'POST':
         data = json.loads(request.body)
-        start_date = isoparse(data['startDate'])
-        end_date = isoparse(data['endDate'])
+
+
+        # Parse startDate and endDate as KST
+        start_date_kst = isoparse(data['startDate']).replace(tzinfo=seoul_timezone)
+        end_date_kst = isoparse(data['endDate']).replace(tzinfo=seoul_timezone)
+
+        # Convert KST to UTC
+        start_date_utc = start_date_kst.astimezone(utc_timezone) - timedelta(seconds=1)
+        end_date_utc = end_date_kst.astimezone(utc_timezone)
+        #
+        # start_date = isoparse(data['startDate'])
+        # end_date = isoparse(data['endDate'])
         con_id = int(data['conId'])
         day_index = int(data['dayIndex'])
         sen_Ids = [int(sen_id) for sen_id in data['senIds']]
-        print(start_date)
-        print(end_date)
+        print(f"Start Date (UTC): {start_date_utc}")
+        print(f"End Date (UTC): {end_date_utc}")
         print(con_id)
         print(sen_Ids)
         container_bom_masters = BomMaster.objects.get(id=con_id)
@@ -246,7 +256,7 @@ def fetch_graph_data(request):
         pipeline = [
             {
                 '$match': {
-                    'c_date': {'$gte': start_date, '$lt': end_date},
+                    'c_date': {'$gte': start_date_utc, '$lt': end_date_utc},
                     'con_id': con_id,
                     'senid': {'$in': sen_Ids}
                 }
