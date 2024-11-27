@@ -161,25 +161,150 @@
         <!--/ 재배동 실시간 현황 -->
         <div class="col-lg-4 order-md-2" style="width:25%">
             <div class="mb-4">
-                <div class="card"
-                     style="border-radius: 16px;
-                            background: #FFF;
-                            box-shadow: 0 0px red;
-                            display: flex;
-                            min-width: 488px;
-                            height: 245px;
-                            justify-content: center;
-                            align-items: center;
-                            flex-shrink: 0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
-                            <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
-                                <!--여기에 날씨api추가-->
-                            </div>
+        <div class="card"
+             style="border-radius: 16px;
+                    background: #FFF;
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                    display: flex;
+                    min-width: 488px;
+                    height: 245px;
+                    justify-content: center;
+                    align-items: center;
+                    flex-shrink: 0;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
+                    <div class="d-flex flex-sm-row flex-column align-items-center justify-content-between" style="display: flex; width: 100%; align-items: center; gap: 16px;">
+                        <!-- 날씨 API 데이터를 여기에 추가 -->
+                        <div style="flex: 0 0 auto;">
+                            <i id="current-weather-icon" class="wi wi-na" style="font-size: 90px; margin-right: 16px;"></i>
                         </div>
+
+                        <div style="flex: 1; text-align: left; width: 100%;">
+                            <h2 style="font-size: 13px; margin-bottom: 8px;">충주시</h2>
+                            <p id="current-temperature" style="font-size: 32px; margin: 0;">--°</p>
+                            <p id="min-max" style="margin: 2px 0;">최고: --° / 최저: --°</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="margin: 8px 0;">강수량: <span id="precipitation">--mm</span></p>
+                        <p style="margin: 8px 0;">습도: <span id="humidity">--%</span></p>
+                    </div>
+                </div>
+                <div class="weather-hourly" style="margin-top: 16px; display: flex; overflow-x: auto; gap: 8px;">
+                    <div id="hourly-weather" style="display: flex; gap: 8px;">
+                        <!-- 시간별 날씨 데이터가 여기에 동적으로 추가됩니다 -->
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'lyDUmhGXOkFhF223Zwo0nFv5yf1DX0ZyravVX7RfcyO0AcCqNmaFrXS24UBUwUy0Q2lCS6OeeRJfibpiLbMimw%3D%3D';
+        const BASE_URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0';
+        const NX = '69'; // 충주시 x 좌표
+        const NY = '106'; // 충주시 y 좌표
+
+        function getBaseDate() {
+            const now = new Date();
+            return now.toISOString().slice(0, 10).replace(/-/g, '');
+        }
+
+        function getWeatherIcon(sky, pty) {
+            if (pty === '1') return 'wi-rain'; // 비
+            if (pty === '2' || pty === '3') return 'wi-snow'; // 비/눈, 눈
+            switch (sky) {
+                case '1': return 'wi-day-sunny'; // 맑음
+                case '3': return 'wi-cloudy'; // 구름 많음
+                case '4': return 'wi-cloudy-windy'; // 흐림
+                default: return 'wi-na'; // 알 수 없음
+            }
+        }
+
+        async function fetchWeather() {
+            const ultraSrtUrl = `${BASE_URL}/getUltraSrtFcst?serviceKey=${API_KEY}&numOfRows=100&pageNo=1&dataType=JSON&base_date=${getBaseDate()}&base_time=0600&nx=${NX}&ny=${NY}`;
+            const vilageFcstUrl = `${BASE_URL}/getVilageFcst?serviceKey=${API_KEY}&numOfRows=1000&pageNo=1&dataType=JSON&base_date=${getBaseDate()}&base_time=0500&nx=${NX}&ny=${NY}`;
+
+            try {
+                const [ultraSrtResponse, vilageFcstResponse] = await Promise.all([
+                    fetch(ultraSrtUrl),
+                    fetch(vilageFcstUrl),
+                ]);
+
+                const ultraSrtData = await ultraSrtResponse.json();
+                const vilageFcstData = await vilageFcstResponse.json();
+
+                return {
+                    ultraSrtItems: ultraSrtData.response.body.items.item,
+                    vilageFcstItems: vilageFcstData.response.body.items.item,
+                };
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                return { ultraSrtItems: [], vilageFcstItems: [] };
+            }
+        }
+
+        function updateWeatherUI({ ultraSrtItems, vilageFcstItems }) {
+            // 현재 날씨 정보
+            const currentTemp = ultraSrtItems.find(item => item.category === 'T1H');
+            const precipitation = ultraSrtItems.find(item => item.category === 'PTY');
+            const humidity = ultraSrtItems.find(item => item.category === 'REH');
+            const sky = ultraSrtItems.find(item => item.category === 'SKY');
+            const pty = precipitation?.fcstValue || '0';
+
+            document.getElementById('current-temperature').innerText = `${currentTemp?.fcstValue ?? '--'}°`;
+            document.getElementById('precipitation').innerText = `${precipitation?.fcstValue ?? '--'}mm`;
+            document.getElementById('humidity').innerText = `${humidity?.fcstValue ?? '--'}%`;
+
+            const iconClass = getWeatherIcon(sky?.fcstValue, pty);
+            document.getElementById('current-weather-icon').className = `wi ${iconClass}`;
+
+            // 최고/최저 온도
+            const maxTemp = vilageFcstItems.find(item => item.category === 'TMX');
+            const minTemp = vilageFcstItems.find(item => item.category === 'TMN');
+
+            document.getElementById('min-max').innerText = `최고: ${maxTemp?.fcstValue ?? '--'}° / 최저: ${minTemp?.fcstValue ?? '--'}°`;
+
+            // 시간별 날씨 정보
+            const hourlyContainer = document.getElementById('hourly-weather');
+            hourlyContainer.innerHTML = '';
+
+            ultraSrtItems
+                .filter(item => item.category === 'T1H')
+                .forEach(item => {
+                    const time = item.fcstTime.slice(0, 2); // 시간 추출
+                    const temp = item.fcstValue;
+                    const sky = ultraSrtItems.find(w => w.fcstTime === item.fcstTime && w.category === 'SKY')?.fcstValue || '1';
+                    const pty = ultraSrtItems.find(w => w.fcstTime === item.fcstTime && w.category === 'PTY')?.fcstValue || '0';
+
+                    const hourlyDiv = document.createElement('div');
+                    hourlyDiv.style.textAlign = 'center';
+                    hourlyDiv.style.padding = '6px';
+                    hourlyDiv.style.border = '1px solid #ddd';
+                    hourlyDiv.style.borderRadius = '10px';
+
+                    const iconClass = getWeatherIcon(sky, pty);
+
+                    hourlyDiv.innerHTML = `
+                        <i class="wi ${iconClass}" style="font-size: 24px; margin-bottom: 4px;"></i>
+                        <p style="margin: 0; font-size: 12px;">${time}:00</p>
+                        <p style="margin: 4px 0; font-size: 14px;">${temp}°</p>
+                    `;
+
+                    hourlyContainer.appendChild(hourlyDiv);
+                });
+        }
+
+        async function init() {
+            const weatherData = await fetchWeather();
+            updateWeatherUI(weatherData);
+        }
+
+        init();
+    </script>
+
+
+
             <div class="col-12 mb-4">
                 <div class="card"
                      style="background: #FFF;
