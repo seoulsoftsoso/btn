@@ -19,7 +19,10 @@ pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSRF_TRUSTED_ORIGINS = ['https://118.44.218.236:7000','https://btn.seoul-soft.com:7000',"https://btn.seoul-soft.com"]
+CSRF_TRUSTED_ORIGINS = ['https://118.44.218.236:7000','https://btn.seoul-soft.com:7000',"https://btn.seoul-soft.com",
+                        "http://localhost:64065",  # 개발 환경 로컬 호스트
+                        "http://127.0.0.1:64065",  # 개발 환경 로컬 호스트
+                        ]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -50,6 +53,7 @@ INSTALLED_APPS = [
     'channels',
     'django_filters',
     'rest_framework',
+    'corsheaders'
 ]
 
 
@@ -78,7 +82,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'button.middleware.EnsureUserMiddleware'
+    'button.middleware.EnsureUserMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'button.urls'
